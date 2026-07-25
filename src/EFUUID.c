@@ -25,6 +25,10 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#if defined(__APPLE__)
+#include <sys/random.h>
+#endif
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -59,13 +63,18 @@ typedef struct __EFUUID {
     EFUUIDBytes bytes;
 } *__EFUUID;
 
+static EFStringRef __EFStringCopyDescription(EFObjectRef objectRef)
+{
+    return EFUUIDCreateString(EFGetAllocator(objectRef), (EFUUIDRef)objectRef);
+}
+
 EFClass EFUUIDClass = {
     .name = "EFUUID",
     .typeID = kEFNotATypeID,
     .init = NULL,
     .deinit = NULL,
     .equal = NULL,
-    .copyDescription = NULL,
+    .copyDescription = __EFStringCopyDescription,
     .hash = NULL,
 };
 
@@ -83,14 +92,12 @@ EFTypeID EFUUIDGetTypeID(void)
 
 EFUUIDRef EFUUIDCreate(EFAllocatorRef allocatorRef)
 {
-    __EFUUID uuid = (__EFUUID)EFObjectCreate(allocatorRef, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
-    if(uuid == NULL)
+    EFAUTOREL __EFUUID uuid = (__EFUUID)EFObjectCreate(allocatorRef, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
+    if(uuid == NULL || getentropy(&(uuid->bytes), sizeof(uuid->bytes)) != 0)
     {
         return NULL;
     }
-
-    arc4random_buf(&(uuid->bytes), sizeof(uuid->bytes));
-    return (EFUUIDRef)uuid;
+    return (EFUUIDRef)EFAUTOTRANSFER(uuid);
 }
 
 EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocatorRef,
