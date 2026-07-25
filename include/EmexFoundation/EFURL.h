@@ -46,7 +46,6 @@ EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByReplacingLastPathComponent(E
 
 EF_EXTERN EFURLType EFURLGetType(EFURLRef urlRef);
 EF_EXTERN EF_RETURNS_NOT_RETAINED EFArrayRef EFURLGetPathComponents(EFURLRef urlRef);
-EF_EXTERN Boolean EFURLIsRelative(EFURLRef urlRef);
 
 EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPath(EFAllocatorRef allocatorRef, EFURLRef urlRef) EFDEPRECATED("use EFURLGetPath() instead, which is better since a URL object can't mutate anyways, which is the realization I had.");
 EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPathWithoutPrefix(EFAllocatorRef allocatorRef, EFURLRef urlRef);
