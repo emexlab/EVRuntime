@@ -61,22 +61,22 @@ static inline UInt64 bswap_n(UInt64 v,
     }
 }
 
-static inline __uint128_t load_window_le(const UInt8 *p,
-                                         size_t n)
+static inline EFUInt128 load_window_le(const UInt8 *p,
+                                       EFSize n)
 {
-    __uint128_t v = 0;
-    for(size_t i = 0; i < n; i++)
+    EFUInt128 v = 0;
+    for(EFSize i = 0; i < n; i++)
     {
-        v |= (__uint128_t)p[i] << (8 * i);
+        v |= (EFUInt128)p[i] << (8 * i);
     }
     return v;
 }
 
 static inline void store_window_le(UInt8 *p,
-                                   __uint128_t v,
-                                   size_t n)
+                                   EFUInt128 v,
+                                   EFSize n)
 {
-    for(size_t i = 0; i < n; i++)
+    for(EFSize i = 0; i < n; i++)
     {
         p[i] = (UInt8)(v >> (8 * i));
     }

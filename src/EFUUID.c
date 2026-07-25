@@ -39,9 +39,9 @@
 
 static void _intToHexChars(UInt32 in,
                            char *out,
-                           int digits)
+                           SInt32 digits)
 {
-    int shift;
+    SInt32 shift;
     UInt32 d;
     while(--digits >= 0)
     {

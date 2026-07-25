@@ -350,7 +350,7 @@ Boolean __EFArrayResizeIfNeededForOneMoreIndex(__EFArray array)
     }
 
     /* actual reallocation */
-    void *new_ptr = EFAllocatorReallocate(EFGetAllocator(array), array->items, (size_t)(new_cap * sizeof(void*)), 0);
+    void *new_ptr = EFAllocatorReallocate(EFGetAllocator(array), array->items, (EFSize)(new_cap * sizeof(void*)), 0);
     if(new_ptr == NULL)
     {
         return false;
@@ -398,7 +398,7 @@ Boolean EFArrayInsertValueAtIndex(EFMutableArrayRef mutableArrayRef,
     }
 
     /* insert */
-    memmove(&mutableArray->items[index + 1], &mutableArray->items[index], (size_t)((mutableArray->itemsCount - index) * sizeof(void*)));
+    memmove(&mutableArray->items[index + 1], &mutableArray->items[index], (EFSize)((mutableArray->itemsCount - index) * sizeof(void*)));
     mutableArray->items[index] = ptr;
     mutableArray->itemsCount++;
 
@@ -419,7 +419,7 @@ void EFArrayRemoveValueAtIndex(EFMutableArrayRef mutableArrayRef,
         mutableArray->callbacks->remove(mutableArray->items[index]);
     }
 
-    memmove(&mutableArray->items[index], &mutableArray->items[index + 1], (size_t)((mutableArray->itemsCount - index - 1) * sizeof(void*)));
+    memmove(&mutableArray->items[index], &mutableArray->items[index + 1], (EFSize)((mutableArray->itemsCount - index - 1) * sizeof(void*)));
     mutableArray->itemsCount--;
 }
 

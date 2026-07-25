@@ -44,10 +44,10 @@
 
 typedef struct __EFFileHandle {
     EFObject header;
-    int flg;
+    SInt32 flg;
     Boolean readable;
     Boolean writable;
-    int fileDescriptor;
+    SInt32 fileDescriptor;
 } *__EFFileHandle;
 
 static void __EVFileHandleDeinit(EFObjectRef fileHandleRef)
@@ -100,7 +100,7 @@ EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef)
 }
 
 EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef,
-                                                     int fd)
+                                                     SInt32 fd)
 {
     fd = dup(fd);
     if(fd < 0)
@@ -131,7 +131,7 @@ EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef
 
 EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef,
                                                      EFStringRef pathStringRef,
-                                                     int flg,
+                                                     SInt32 flg,
                                                      ...)
 {
     EFAUTOREL EFURLRef urlRef = EFURLCreateWithString(allocatorRef, pathStringRef);
@@ -146,7 +146,7 @@ EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef
     {
         va_list ap;
         va_start(ap, flg);
-        mode = va_arg(ap, int);
+        mode = va_arg(ap, SInt32);
         va_end(ap);
     }
 
@@ -171,7 +171,7 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
     }
 
     FILE *sslPipe = NULL;
-    int sockfd = -1;
+    SInt32 sockfd = -1;
     EFURLType urlType = EFURLGetType(urlRef);
     switch(urlType)
     {
@@ -233,7 +233,7 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
     }
 
     char c;
-    int state = 0;
+    SInt32 state = 0;
     while(read(sockfd, &c, 1) == 1)
     {
         if(c == '\r' && state == 0)
@@ -274,7 +274,7 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
 
     /* need a run-loop later! */
     UInt8 downloadBuffer[4096];
-    ssize_t networkBytesRead;
+    EFIndex networkBytesRead;
     while((networkBytesRead = read(sockfd, downloadBuffer, sizeof(downloadBuffer))) > 0)
     {
         EFFileHandleWrite(virtualHandle, downloadBuffer, (EFIndex)networkBytesRead);
@@ -295,7 +295,7 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
 
 EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef,
                                                     EFURLRef urlRef,
-                                                    int flg,
+                                                    SInt32 flg,
                                                     ...)
 {
     if(urlRef == NULL)
@@ -320,12 +320,12 @@ EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef,
     {
         va_list ap;
         va_start(ap, flg);
-        mode = va_arg(ap, int);
+        mode = va_arg(ap, SInt32);
         va_end(ap);
     }
 
     /* really opening the file */
-    int fd = open(str, flg, mode);
+    SInt32 fd = open(str, flg, mode);
     if(fd < 0)
     {
         return NULL;
@@ -385,7 +385,7 @@ EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandleRef,
         return NULL;
     }
 
-    if((EFIndex)read(fileHandle->fileDescriptor, buffer, (size_t)length) < length)
+    if((EFIndex)read(fileHandle->fileDescriptor, buffer, (EFSize)length) < length)
     {
         return NULL;
     }
@@ -421,7 +421,7 @@ EFIndex EFFileHandleRead(EFFileHandleRef fileHandleRef,
         return -1;
     }
 
-    return (EFIndex)read(fileHandle->fileDescriptor, buffer, (size_t)length);
+    return (EFIndex)read(fileHandle->fileDescriptor, buffer, (EFSize)length);
 }
 
 EFIndex EFFileHandleWrite(EFFileHandleRef fileHandleRef,
@@ -434,7 +434,7 @@ EFIndex EFFileHandleWrite(EFFileHandleRef fileHandleRef,
         return -1;
     }
 
-    return (EFIndex)write(fileHandle->fileDescriptor, buffer, (size_t)length);
+    return (EFIndex)write(fileHandle->fileDescriptor, buffer, (EFSize)length);
 }
 
 EFIndex EFFileHandleTruncate(EFFileHandleRef fileHandleRef,
@@ -459,7 +459,7 @@ EFIndex EFFileHandleSeek(EFFileHandleRef fileHandleRef,
         return -1;
     }
 
-    int a = 0;
+    SInt32 a = 0;
     switch(seekType)
     {
         case kEFFileHandleSeekTypeSet:
@@ -574,7 +574,9 @@ out_failed_restore_position:
     return NULL;
 }
 
-char *EFFileHandleGets(EFFileHandleRef fileHandleRef, char *s, int n)
+char *EFFileHandleGets(EFFileHandleRef fileHandleRef,
+                       char *s,
+                       SInt32 n)
 {
     if(s == NULL || n <= 0)
     {
@@ -587,11 +589,11 @@ char *EFFileHandleGets(EFFileHandleRef fileHandleRef, char *s, int n)
         return s;
     }
 
-    int i = 0;
+    SInt32 i = 0;
     while(i < n - 1)
     {
         char c;
-        ssize_t r = EFFileHandleRead(fileHandleRef, (UInt8*)&c, (EFIndex)1);
+        EFIndex r = EFFileHandleRead(fileHandleRef, (UInt8*)&c, (EFIndex)1);
 
         if(r < 0)
         {
@@ -674,7 +676,7 @@ EFMappingRef EFFileHandleCopyMapping(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    int protFlags = 0;
+    SInt32 protFlags = 0;
     protFlags |= fileHandle->readable ? PROT_READ : 0;
     protFlags |= fileHandle->writable ? PROT_WRITE : 0;
 

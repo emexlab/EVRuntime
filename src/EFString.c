@@ -40,12 +40,12 @@
 
 static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                                           const char *buffer,
-                                          size_t length)
+                                          EFSize length)
 {
     switch(encoding)
     {
         case kEFStringEncodingASCII:
-            for(size_t i = 0; i < length; i++)
+            for(EFSize i = 0; i < length; i++)
             {
                 if((unsigned char)buffer[i] > 0x7F)
                 {
@@ -57,7 +57,7 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
         {
             static const signed char b64[256] = {};
 
-            size_t i = 0;
+            EFSize i = 0;
             while(i < length)
             {
                 unsigned char c = (unsigned char)buffer[i];
@@ -79,8 +79,8 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                     continue;
                 }
 
-                size_t bits = 0;
-                unsigned int acc = 0;
+                EFSize bits = 0;
+                UInt32 acc = 0;
                 while(i < length)
                 {
                     unsigned char d = (unsigned char)buffer[i];
@@ -100,7 +100,7 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
 
                 if(bits % 16 != 0)
                 {
-                    unsigned int leftover = acc & ((1u << (bits % 16)) - 1);
+                    UInt32 leftover = acc & ((1u << (bits % 16)) - 1);
                     if((bits % 16) >= 6 || leftover != 0)
                     {
                         return false;
@@ -115,12 +115,12 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
         }
         case kEFStringEncodingUTF8: /* thanks to: https://www.rfc-editor.org/rfc/rfc3629.html */
         {
-            size_t i = 0;
+            EFSize i = 0;
             while(i < length)
             {
                 unsigned char c = (unsigned char)buffer[i];
-                int seqlen;
-                unsigned int cp;
+                SInt32 seqlen;
+                UInt32 cp;
                 if(c < 0x80)
                 {
                     seqlen = 1;
@@ -146,11 +146,11 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                     return false;
                 }
 
-                if(i + (size_t)seqlen > length)
+                if(i + (EFSize)seqlen > length)
                 {
                     return false;
                 }
-                for(int k = 1; k < seqlen; ++k)
+                for(SInt32 k = 1; k < seqlen; ++k)
                 {
                     unsigned char cc = (unsigned char)buffer[i+k];
                     if((cc & 0xC0) != 0x80)
@@ -159,7 +159,7 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                     }
                     cp = (cp << 6) | (cc & 0x3F);
                 }
-                static const unsigned int min_cp[5] = { 0, 0, 0x80, 0x800, 0x10000 };
+                static const UInt32 min_cp[5] = { 0, 0, 0x80, 0x800, 0x10000 };
                 if(cp < min_cp[seqlen])
                 {
                     return false;
@@ -172,7 +172,7 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                 {
                     return false;
                 }
-                i += (size_t)seqlen;
+                i += (EFSize)seqlen;
             }
             return true;
         }
@@ -235,7 +235,7 @@ static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    length = (EFIndex)strnlen((const char*)buffer, (size_t)length);
+    length = (EFIndex)strnlen((const char*)buffer, (EFSize)length);
     if(!__EFStringValidateEncoding(encoding, (const char*)buffer, length))
     {
         return NULL;
@@ -261,7 +261,7 @@ static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
     {
         string->buffer = (char*)((const char*)string + sizeof(struct __EFString));
     needs_copy:
-        memcpy(string->buffer, buffer, (size_t)length);
+        memcpy(string->buffer, buffer, (EFSize)length);
         string->buffer[length] = '\0';
     }
     else
@@ -307,7 +307,7 @@ static inline EFStringRef __EFStringCreateWithCString(EFAllocatorRef allocatorRe
         return NULL;
     }
 
-    size_t length = strlen(str);
+    EFSize length = strlen(str);
     return __EFStringCreate(allocatorRef, (const UInt8*)str, length, encoding, isInlined, false);
 }
 
@@ -350,7 +350,7 @@ typedef struct {
 } __EFFmtBuf;
 
 static inline void __evfb_ensure(__EFFmtBuf *b,
-                                 size_t extra)
+                                 EFSize extra)
 {
     if(b->failed)
     {
@@ -358,7 +358,7 @@ static inline void __evfb_ensure(__EFFmtBuf *b,
     }
     if(b->size + extra + 1 > b->cap)
     {
-        size_t nc = b->cap ? b->cap : 64;
+        EFSize nc = b->cap ? b->cap : 64;
         while(nc < b->size + extra + 1)
         {
             nc *= 2;
@@ -374,7 +374,7 @@ static inline void __evfb_ensure(__EFFmtBuf *b,
 }
 static inline void __evfb_bytes(__EFFmtBuf *b,
                                 const char *s,
-                                size_t n)
+                                EFSize n)
 {
     __evfb_ensure(b, n); if (b->failed) return;
     memcpy(b->data + b->size, s, n); b->size += n;
@@ -400,21 +400,21 @@ enum {
 
 #define __EF_EMIT(TYPE) do { \
     TYPE _v = va_arg(*ap, TYPE); \
-    int _n = snprintf(NULL, 0, spec, _v); \
+    SInt32 _n = snprintf(NULL, 0, spec, _v); \
     if(_n < 0) \
     { \
         b->failed = true; \
         return; \
     } \
-    __evfb_ensure(b, (size_t)_n); if (b->failed) return; \
-    snprintf(b->data + b->size, (size_t)_n + 1, spec, _v); \
-    b->size += (size_t)_n; \
+    __evfb_ensure(b, (EFSize)_n); if (b->failed) return; \
+    snprintf(b->data + b->size, (EFSize)_n + 1, spec, _v); \
+    b->size += (EFSize)_n; \
 } while (0)
 
 static inline void __EFEmitValue(__EFFmtBuf *b,
                                  const char *spec,
                                  char conv,
-                                 int lenmod,
+                                 SInt32 lenmod,
                                  va_list *ap)
 {
     switch(conv)
@@ -426,9 +426,9 @@ static inline void __EFEmitValue(__EFFmtBuf *b,
                 case LEN_l: __EF_EMIT(long); break;
                 case LEN_ll: __EF_EMIT(long long); break;
                 case LEN_j: __EF_EMIT(intmax_t); break;
-                case LEN_z: __EF_EMIT(size_t); break;
+                case LEN_z: __EF_EMIT(EFSize); break;
                 case LEN_t: __EF_EMIT(ptrdiff_t); break;
-                default: __EF_EMIT(int); break;
+                default: __EF_EMIT(SInt32); break;
         } break;
     case 'o':
     case 'u':
@@ -439,9 +439,9 @@ static inline void __EFEmitValue(__EFFmtBuf *b,
             case LEN_l: __EF_EMIT(unsigned long); break;
             case LEN_ll: __EF_EMIT(unsigned long long); break;
             case LEN_j: __EF_EMIT(uintmax_t); break;
-            case LEN_z: __EF_EMIT(size_t); break;
+            case LEN_z: __EF_EMIT(EFSize); break;
             case LEN_t: __EF_EMIT(ptrdiff_t); break;
-            default: __EF_EMIT(unsigned int); break;
+            default: __EF_EMIT(UInt32); break;
         } break;
     case 'e':
     case 'E':
@@ -460,7 +460,7 @@ static inline void __EFEmitValue(__EFFmtBuf *b,
             __EF_EMIT(double);
         }
         break;
-    case 'c': __EF_EMIT(int); break;
+    case 'c': __EF_EMIT(SInt32); break;
     case 's': __EF_EMIT(const char *); break;
     case 'p': __EF_EMIT(void *); break;
     default: __evfb_bytes(b, spec, strlen(spec)); break;
@@ -503,7 +503,9 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
             continue;
         }
 
-        char spec[64]; int si = 0; spec[si++] = '%';
+        char spec[64];
+        SInt32 si = 0;
+        spec[si++] = '%';
         while(*p && strchr("-+ 0#'", *p))
         {
             if(si < 58)
@@ -514,7 +516,7 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
 
         if(*p == '*')
         {
-            int w = va_arg(ap, int);
+            SInt32 w = va_arg(ap, SInt32);
             si += snprintf(spec+si, sizeof spec - si, "%d", w);
             p++;
         }
@@ -539,7 +541,7 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
             p++;
             if(*p == '*')
             {
-                int pr = va_arg(ap, int);
+                SInt32 pr = va_arg(ap, SInt32);
                 si += snprintf(spec+si, sizeof spec - si, "%d", pr);
                 p++;
             }
@@ -556,7 +558,7 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
             }
         }
 
-        int lenmod = LEN_NONE;
+        SInt32 lenmod = LEN_NONE;
         if(*p == 'h')
         {
             if(p[1]=='h')
@@ -617,7 +619,7 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
         char conv = *p;
         if(conv == '\0')
         {
-            __evfb_bytes(&b, start, (size_t)(p - start));
+            __evfb_bytes(&b, start, (EFSize)(p - start));
             break;
         }
         if(conv == 'n')
@@ -868,7 +870,7 @@ Boolean EFStringHasPrefix(EFStringRef stringRef,
         }
     }
 
-    return strncmp(prefix->buffer, string->buffer, (size_t)prefix->length) == 0;
+    return strncmp(prefix->buffer, string->buffer, (EFSize)prefix->length) == 0;
 }
 
 Boolean EFStringHasSuffix(EFStringRef stringRef,
@@ -904,7 +906,7 @@ Boolean EFStringHasSuffix(EFStringRef stringRef,
         }
     }
 
-    return strncmp(suffix->buffer, (string->buffer + string->length) - suffix->length, (size_t)suffix->length) == 0;
+    return strncmp(suffix->buffer, (string->buffer + string->length) - suffix->length, (EFSize)suffix->length) == 0;
 }
 
 Boolean EFStringEqual(EFStringRef stringRef1,
@@ -924,7 +926,7 @@ Boolean EFStringEqual(EFStringRef stringRef1,
     }
 
     /* they share the same length */
-    size_t length = string1->length;
+    EFSize length = string1->length;
 
     /* strings must comply to their encodings */
     if(string1->encoding != string2->encoding)
@@ -1003,7 +1005,7 @@ EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef stringRef,
     EFIndex componentCount = 0;
     for(EFIndex i = 0; i < string->length; i++)
     {
-        if(strncmp(&string->buffer[i], separatorString->buffer, (size_t)separatorString->length) == 0)
+        if(strncmp(&string->buffer[i], separatorString->buffer, (EFSize)separatorString->length) == 0)
         {
             componentCount++;
         }
@@ -1106,7 +1108,7 @@ Boolean EFStringTrimWhitespace(EFMutableStringRef mutableStringRef)
 
     if(start != 0)
     {
-        memmove(mutableString->buffer, mutableString->buffer + start, (size_t)new_len);
+        memmove(mutableString->buffer, mutableString->buffer + start, (EFSize)new_len);
     }
     mutableString->buffer[new_len] = '\0';
     mutableString->length = new_len;
@@ -1305,7 +1307,7 @@ static Boolean __EFStringExtractNumberCharacter(const char *line,
     }
 
     /* finding closed quote */
-    size_t len = strlen(line);
+    EFSize len = strlen(line);
     if(len < 3 || line[len - 1] != '\'')
     {
         return false;

@@ -213,9 +213,9 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     char const *commandCString = NULL;
 
 #ifdef __APPLE__
-    int procMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, processIdentifier };
+    SInt32 procMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, processIdentifier };
     struct kinfo_proc proc;
-    size_t oldlen = sizeof(struct kinfo_proc);
+    EFSize oldlen = sizeof(struct kinfo_proc);
     if(sysctl(procMib, 4, &proc, &oldlen, NULL, 0) != 0)
     {
         return NULL;
@@ -226,9 +226,9 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     gid = proc.kp_eproc.e_ucred.cr_gid;
     commandCString = proc.kp_proc.p_comm;
 #elifdef __FreeBSD__
-    int procMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, processIdentifier };
+    SInt32 procMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, processIdentifier };
     struct kinfo_proc proc;
-    size_t oldlen = sizeof(struct kinfo_proc);
+    EFSize oldlen = sizeof(struct kinfo_proc);
     if(sysctl(procMib, 4, &proc, &oldlen, NULL, 0) != 0)
     {
         return NULL;
@@ -274,7 +274,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     char exePath[64];
     snprintf(exePath, sizeof(exePath), "/proc/%ld/exe", (long)processIdentifier);
     char linkTarget[PATH_MAX];
-    ssize_t linkLen = readlink(exePath, linkTarget, sizeof(linkTarget) - 1);
+    EFIndex linkLen = readlink(exePath, linkTarget, sizeof(linkTarget) - 1);
     if(linkLen != -1)
     {
         linkTarget[linkLen] = '\0';
@@ -286,15 +286,15 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     FILE *cmdFile = fopen(cmdlinePath, "rb");
     if(cmdFile != NULL)
     {
-        size_t capacity = 4096;
+        EFSize capacity = 4096;
         char *cmdBuffer = EFAllocatorAllocate(allocatorRef, capacity, 0);
-        size_t readBytes = 0;
+        EFSize readBytes = 0;
 
         if(cmdBuffer != NULL)
         {
             while(1)
             {
-                size_t readNow = fread(cmdBuffer + readBytes, 1, capacity - readBytes - 1, cmdFile);
+                EFSize readNow = fread(cmdBuffer + readBytes, 1, capacity - readBytes - 1, cmdFile);
                 if(readNow == 0)
                 {
                     break;
@@ -315,8 +315,8 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
 
             if(readBytes > 0)
             {
-                int linuxArgc = 0;
-                for(size_t i = 0; i < readBytes; i++)
+                SInt32 linuxArgc = 0;
+                for(EFSize i = 0; i < readBytes; i++)
                 {
                     if(cmdBuffer[i] == '\0')
                     {
@@ -336,7 +336,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
                     if(mutableArguments != NULL)
                     {
                         char *cp = cmdBuffer;
-                        int argIndex = 0;
+                        SInt32 argIndex = 0;
                         while(argIndex < linuxArgc && cp < (cmdBuffer + readBytes))
                         {
                             if(argIndex > 0)
@@ -375,11 +375,11 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
 #endif /* __APPLE__ || __FreeBSD__ || __linux__ */
 
 #ifdef __APPLE__
-    int argMaxMib[2] = { CTL_KERN, KERN_ARGMAX };
-    int argsMib[3] = { CTL_KERN, KERN_PROCARGS2, processIdentifier };
+    SInt32 argMaxMib[2] = { CTL_KERN, KERN_ARGMAX };
+    SInt32 argsMib[3] = { CTL_KERN, KERN_PROCARGS2, processIdentifier };
 
-    int argMax = 0;
-    size_t size = sizeof(argMax);
+    SInt32 argMax = 0;
+    EFSize size = sizeof(argMax);
     if(sysctl(argMaxMib, 2, &argMax, &size, NULL, 0) != 0)
     {
         return NULL;
@@ -391,7 +391,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    size = (size_t)argMax;
+    size = (EFSize)argMax;
     if(sysctl(argsMib, 3, procArgs, &size, NULL, 0) == -1)
     {
         EFAllocatorDeallocate(allocatorRef, procArgs);
@@ -399,7 +399,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     }
 
     /* now extracting the information like arguments */
-    int argc = 0;
+    SInt32 argc = 0;
     memcpy(&argc, procArgs, sizeof(argc));
     char *cp = procArgs + sizeof(argc);
 
@@ -434,7 +434,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    int arg_count = 0;
+    SInt32 arg_count = 0;
     while(arg_count < argc && cp < &procArgs[size])
     {
         if(arg_count > 0)
@@ -451,16 +451,16 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     }
     EFAllocatorDeallocate(allocatorRef, procArgs);
 #elifdef __FreeBSD__
-    int pathMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, processIdentifier };
+    SInt32 pathMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, processIdentifier };
     char pathBuf[1024];
-    size_t pathLen = sizeof(pathBuf);
+    EFSize pathLen = sizeof(pathBuf);
     if(sysctl(pathMib, 4, pathBuf, &pathLen, NULL, 0) == 0 && pathLen > 0)
     {
         executablePath = EFStringCreateWithCString(allocatorRef, pathBuf, kEFStringEncodingUTF8);
     }
 
-    int argsMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ARGS, processIdentifier };
-    size_t argsSize = 0;
+    SInt32 argsMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ARGS, processIdentifier };
+    EFSize argsSize = 0;
 
     if(sysctl(argsMib, 4, NULL, &argsSize, NULL, 0) == 0 && argsSize > 0)
     {
@@ -730,8 +730,8 @@ extern EFProcessRef EFProcessGetCurrentProcess(void)
 }
 
 SInt32 EFProcessWaitPID(EFProcessRef processRef,
-                        int *status,
-                        int options)
+                        SInt32 *status,
+                        SInt32 options)
 {
     __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)

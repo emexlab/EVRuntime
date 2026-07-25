@@ -106,13 +106,13 @@ static inline EFDataRef __EFDataCreate(EFAllocatorRef allocatorRef,
         {
             goto needs_copy;
         }
-        bzero(data->buffer, (size_t)length);
+        bzero(data->buffer, (EFSize)length);
     }
     else if(isInlined)
     {
         data->buffer = (UInt8*)((const char*)data + sizeof(struct __EFData));
 needs_copy:
-        memcpy(data->buffer, buffer, (size_t)length);
+        memcpy(data->buffer, buffer, (EFSize)length);
     }
     else
     {
@@ -230,7 +230,7 @@ Boolean EFDataCopyRangeToBuffer(EFDataRef dataRef,
         return false;
     }
 
-    memcpy(buffer, data->buffer + (size_t)range.location, (size_t)range.length);
+    memcpy(buffer, data->buffer + (EFSize)range.location, (EFSize)range.length);
     return true;
 }
 
@@ -257,7 +257,7 @@ Boolean EFDataSetLength(EFMutableDataRef mutableDataRef,
     mutableData->buffer = newp;
     if(mutableData->length < length)
     {
-        bzero(mutableData->buffer + (size_t)mutableData->length, length - mutableData->length);
+        bzero(mutableData->buffer + (EFSize)mutableData->length, length - mutableData->length);
     }
     mutableData->length = length;
     return true;
@@ -297,8 +297,8 @@ Boolean EFDataAppendBuffer(EFMutableDataRef mutableDataRef,
         return false;
     }
 
-    UInt8 *ptr = mutableData->buffer + (size_t)(mutableData->length - length);
-    memcpy(ptr, buffer, (size_t)length);
+    UInt8 *ptr = mutableData->buffer + (EFSize)(mutableData->length - length);
+    memcpy(ptr, buffer, (EFSize)length);
 
     return true;
 }

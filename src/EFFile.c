@@ -57,7 +57,7 @@ EFFilePolicy EFFilePolicyInNoCreate = {
     .createOnOpen = false,
 };
 
-static inline int __EFFilePolicyToORW(EFFilePolicyPermission p)
+static inline SInt32 __EFFilePolicyToORW(EFFilePolicyPermission p)
 {
     if((p & (kEFFilePolicyPermissionRead | kEFFilePolicyPermissionWrite)) == (kEFFilePolicyPermissionRead | kEFFilePolicyPermissionWrite))
     {
@@ -69,17 +69,6 @@ static inline int __EFFilePolicyToORW(EFFilePolicyPermission p)
     }
     return O_RDONLY;
 }
-
-/*
-static inline int __EFFilePolicyToProt(EFFilePolicyPermission p)
-{
-    int prot = PROT_NONE;
-    prot |= ((p & kEFFilePolicyPermissionRead) ? PROT_READ : PROT_NONE);
-    prot |= ((p & kEFFilePolicyPermissionWrite) ? PROT_WRITE : PROT_NONE);
-    prot |= ((p & kEFFilePolicyPermissionExecute) ? PROT_EXEC : PROT_NONE);
-    return prot;
-}
-*/
 
 typedef struct __EFFile {
     EFObject header;

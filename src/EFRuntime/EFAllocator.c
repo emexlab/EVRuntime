@@ -38,7 +38,7 @@ static void *__EFAllocatorDefaultAllocate(EFAllocatorRef allocatorRef,
                                           EFIndex size,
                                           EFOptionFlags hint)
 {
-    return calloc(1, (size_t)size);
+    return calloc(1, (EFSize)size);
 }
 
 static void *__EFAllocatorDefaultReallocate(EFAllocatorRef allocatorRef,
@@ -46,7 +46,7 @@ static void *__EFAllocatorDefaultReallocate(EFAllocatorRef allocatorRef,
                                             EFIndex newSize,
                                             EFOptionFlags hint)
 {
-    return realloc(ptr, (size_t)newSize);
+    return realloc(ptr, (EFSize)newSize);
 }
 
 static void __EFAllocatorDefaultDeallocate(EFAllocatorRef allocatorRef,
@@ -83,7 +83,7 @@ EFObjectRef EFObjectCreate(EFAllocatorRef allocatorRef,
     EFClass *class = EFClassGetByID(typeID);
 
     /* validating class and passed size */
-    assert(class != NULL && (size_t)size >= sizeof(EFObject));
+    assert(class != NULL && (EFSize)size >= sizeof(EFObject));
 
     EFObject *object = EFAllocatorAllocate(allocatorRef, size, 0);
     if(object == NULL)

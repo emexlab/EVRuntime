@@ -145,7 +145,7 @@ Boolean EFBitWalkerWrite(EFBitWalkerRef walkerRef,
     }
 
     /* advance cursor */
-    size_t tmp = walker->bitIndex + numBits;
+    EFSize tmp = walker->bitIndex + numBits;
     walker->bytePos += tmp >> 3;
     walker->bitIndex = tmp & 7;
 

@@ -61,6 +61,6 @@ EF_EXTERN EF_RETURNS_NOT_RETAINED EFStringRef EFProcessGetCommand(EFProcessRef p
 EF_EXTERN EF_RETURNS_NOT_RETAINED EFStringRef EFProcessGetExecutablePath(EFProcessRef processRef);
 EF_EXTERN EF_RETURNS_NOT_RETAINED EFArrayRef EFProcessGetArguments(EFProcessRef processRef);
 
-EF_EXTERN SInt32 EFProcessWaitPID(EFProcessRef processRef, int *status, int options);
+EF_EXTERN SInt32 EFProcessWaitPID(EFProcessRef processRef, SInt32 *status, SInt32 options);
 
 #endif /* EFPROCESS_H */

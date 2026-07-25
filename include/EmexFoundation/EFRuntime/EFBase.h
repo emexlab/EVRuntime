@@ -113,9 +113,11 @@ typedef double EFTimeInterval;
 typedef EFTimeInterval EFAbsoluteTime;
 /* no OSStatus??? this is modern, aint macintosh carbon era shit, my water aint carbonised */
 
-typedef UInt64 EFAddr;
-typedef EFAddr EFSize;
+typedef uintptr_t EFAddr;
+typedef size_t EFSize;
 typedef EFIndex EFOffset;
+
+typedef __uint128_t EFUInt128;
 
 typedef enum: UInt8 {
     kEFComparisonResultLessThan,

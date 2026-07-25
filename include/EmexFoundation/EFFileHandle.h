@@ -49,9 +49,9 @@ typedef struct __EFFileHandle *EFFileHandleRef;
 EF_EXTERN EFTypeID EFFileHandleGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef, int fd);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef, EFStringRef pathStringRef, int flg, ...);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef, EFURLRef urlRef, int flg, ...);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef, SInt32 fd);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef, EFStringRef pathStringRef, SInt32 flg, ...);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef, EFURLRef urlRef, SInt32 flg, ...);
 EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateCopy(EFAllocatorRef allocatorRef, EFFileHandleRef fileHandleRef);
 
 EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandleRef, EFIndex length);
@@ -70,7 +70,7 @@ EF_EXTERN Boolean EFFileHandleIsWritable(EFFileHandleRef fileHandleRef);
 
 EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileHandleCopyDataForRange(EFAllocatorRef allocatorRef, EFFileHandleRef fileHandleRef, EFRange range);
 
-EF_EXTERN char *EFFileHandleGets(EFFileHandleRef fileHandleRef, char *s, int n);
+EF_EXTERN char *EFFileHandleGets(EFFileHandleRef fileHandleRef, char *s, SInt32 n);
 EF_EXTERN void EFFileHandlePutc(EFFileHandleRef fileHandleRef, char c);
 EF_EXTERN void EFFileHandlePuts(EFFileHandleRef fileHandleRef, const char *s);
 EF_EXTERN void EFFileHandlePrintf(EFFileHandleRef fileHandleRef, const char *format, ...);

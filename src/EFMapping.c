@@ -78,10 +78,10 @@ EFTypeID EFMappingGetTypeID(void)
 EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef,
                              void *addr,
                              EFSize size,
-                             int prot,
-                             int flags,
-                             int fd,
-                             off_t offset)
+                             SInt32 prot,
+                             SInt32 flags,
+                             SInt32 fd,
+                             EFOffset offset)
 {
     EFAUTOREL __EFMapping mapping = (__EFMapping)EFObjectCreate(allocatorRef, EFMappingGetTypeID(), (EFIndex)sizeof(struct __EFMapping));
     if(mapping == NULL)
@@ -89,7 +89,7 @@ EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    mapping->addr = mmap(addr, (int)size, prot, flags, fd, offset);
+    mapping->addr = mmap(addr, size, prot, flags, fd, offset);
     if(mapping->addr == MAP_FAILED)
     {
         return NULL;
