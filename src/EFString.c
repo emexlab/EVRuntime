@@ -38,8 +38,6 @@
 #include <EmexFoundation/EFURL.h>
 #include <EmexFoundation/EFFileHandle.h>
 
-typedef __EFString EFString;
-
 static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                                           const char *buffer,
                                           size_t length)
@@ -185,7 +183,7 @@ static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
 
 static void __EFStringDeinit(EFObjectRef stringRef)
 {
-    EFString string = (EFString)stringRef;
+    __EFString string = (__EFString)stringRef;
     if(string->isMutable)
     {
         EFAllocatorDeallocate(EFGetAllocator(stringRef), string->buffer);
@@ -243,7 +241,7 @@ static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    EFString string = EFObjectCreate(allocatorRef, EFStringGetTypeID(), (EFIndex)(sizeof(struct __EFString) + (isInlined ? (length + 1) : 0)));
+    __EFString string = (__EFString)EFObjectCreate(allocatorRef, EFStringGetTypeID(), (EFIndex)(sizeof(struct __EFString) + (isInlined ? (length + 1) : 0)));
     if(string == NULL)
     {
         return NULL;
@@ -284,7 +282,7 @@ static inline EFStringRef __EFStringCreateCopy(EFAllocatorRef allocatorRef,
                                                EFStringRef stringRef,
                                                Boolean isMutable)
 {
-    EFString string = (EFString)stringRef;
+    __EFString string = (__EFString)stringRef;
     if(string == NULL)
     {
         return NULL;
@@ -346,8 +344,8 @@ EFStringRef EFStringCreateWithCStringNoCopy(EFAllocatorRef allocatorRef,
 typedef struct {
     EFAllocatorRef allocatorRef;
     char *data;
-    size_t length;
-    size_t cap;
+    EFSize size;
+    EFSize cap;
     Boolean failed;
 } __EFFmtBuf;
 
@@ -358,10 +356,10 @@ static inline void __evfb_ensure(__EFFmtBuf *b,
     {
         return;
     }
-    if(b->length + extra + 1 > b->cap)
+    if(b->size + extra + 1 > b->cap)
     {
         size_t nc = b->cap ? b->cap : 64;
-        while(nc < b->length + extra + 1)
+        while(nc < b->size + extra + 1)
         {
             nc *= 2;
         }
@@ -379,13 +377,13 @@ static inline void __evfb_bytes(__EFFmtBuf *b,
                                 size_t n)
 {
     __evfb_ensure(b, n); if (b->failed) return;
-    memcpy(b->data + b->length, s, n); b->length += n;
+    memcpy(b->data + b->size, s, n); b->size += n;
 }
 
 static inline void __evfb_char(__EFFmtBuf *b,
                                char c)
 {
-    __evfb_ensure(b, 1); if (b->failed) return; b->data[b->length++] = c;
+    __evfb_ensure(b, 1); if (b->failed) return; b->data[b->size++] = c;
 }
 
 enum {
@@ -409,8 +407,8 @@ enum {
         return; \
     } \
     __evfb_ensure(b, (size_t)_n); if (b->failed) return; \
-    snprintf(b->data + b->length, (size_t)_n + 1, spec, _v); \
-    b->length += (size_t)_n; \
+    snprintf(b->data + b->size, (size_t)_n + 1, spec, _v); \
+    b->size += (size_t)_n; \
 } while (0)
 
 static inline void __EFEmitValue(__EFFmtBuf *b,
@@ -651,7 +649,7 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    EFStringRef resultRef = EFStringCreateWithBuffer(allocatorRef, (const UInt8 *)(b.data ? b.data : ""), b.length, kEFStringEncodingUTF8);
+    EFStringRef resultRef = EFStringCreateWithBuffer(allocatorRef, (const UInt8 *)(b.data ? b.data : ""), b.size, kEFStringEncodingUTF8);
     EFAllocatorDeallocate(b.allocatorRef, b.data);
     return resultRef;
 }
@@ -677,7 +675,7 @@ EFStringRef EFStringCreateCopyWithRange(EFAllocatorRef allocatorRef,
                                         EFStringRef stringRef,
                                         EFRange range)
 {
-    EFString string = (EFString)stringRef;
+    __EFString string = (__EFString)stringRef;
     if(string == NULL || range.location > string->length || (range.location + range.length) > string->length)
     {
         return NULL;
@@ -702,7 +700,7 @@ EFMutableStringRef EFStringCreateMutableCopyWithRange(EFAllocatorRef allocatorRe
                                                       EFStringRef stringRef,
                                                       EFRange range)
 {
-    EFString string = (EFString)stringRef;
+    __EFString string = (__EFString)stringRef;
     if(string == NULL || range.location > string->length || (range.location + range.length) > string->length)
     {
         return NULL;
@@ -752,7 +750,7 @@ const char *EFStringGetCStringPtr(EFStringRef stringRef,
         return NULL;
     }
 
-    EFString string = (EFString)stringRef;
+    __EFString string = (__EFString)stringRef;
     if(!__EFStringValidateEncoding(encoding, string->buffer, string->length))
     {
         return NULL;
@@ -805,12 +803,12 @@ EFStringRef EFStringCreateFromExternalRepresentation(EFAllocatorRef allocatorRef
 
 EFIndex EFStringGetLength(EFStringRef stringRef)
 {
-    if(stringRef == NULL)
+    __EFString string = (__EFString)stringRef;
+    if(string == NULL)
     {
         return 0;
     }
 
-    EFString string = (EFString)stringRef;
     return string->length;
 }
 
@@ -840,8 +838,8 @@ Boolean EFStringGetCString(EFStringRef stringRef,
 Boolean EFStringHasPrefix(EFStringRef stringRef,
                           EFStringRef prefixRef)
 {
-    EFString string = (EFString)stringRef;
-    EFString prefix = (EFString)prefixRef;
+    __EFString string = (__EFString)stringRef;
+    __EFString prefix = (__EFString)prefixRef;
     if(string == NULL || prefix == NULL)
     {
         return false;
@@ -876,8 +874,8 @@ Boolean EFStringHasPrefix(EFStringRef stringRef,
 Boolean EFStringHasSuffix(EFStringRef stringRef,
                           EFStringRef suffixRef)
 {
-    EFString string = (EFString)stringRef;
-    EFString suffix = (EFString)suffixRef;
+    __EFString string = (__EFString)stringRef;
+    __EFString suffix = (__EFString)suffixRef;
     if(string == NULL || suffix == NULL)
     {
         return false;
@@ -912,8 +910,8 @@ Boolean EFStringHasSuffix(EFStringRef stringRef,
 Boolean EFStringEqual(EFStringRef stringRef1,
                       EFStringRef stringRef2)
 {
-    EFString string1 = (EFString)stringRef1;
-    EFString string2 = (EFString)stringRef2;
+    __EFString string1 = (__EFString)stringRef1;
+    __EFString string2 = (__EFString)stringRef2;
     if(string1 == NULL || string2 == NULL)
     {
         return false;
@@ -946,8 +944,8 @@ Boolean EFStringEqualRange(EFStringRef stringRef1,
                            EFStringRef stringRef2,
                            EFRange range)
 {
-    EFString string = (EFString)stringRef1;
-    EFString rangeString = (EFString)stringRef2;
+    __EFString string = (__EFString)stringRef1;
+    __EFString rangeString = (__EFString)stringRef2;
     if(string == NULL || rangeString == NULL)
     {
         return false;
@@ -982,9 +980,8 @@ Boolean EFStringEqualRange(EFStringRef stringRef1,
 EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef stringRef,
                                               EFStringRef separatorStringRef)
 {
-    EFString string = (EFString)stringRef;
-    EFString separatorString = (EFString)separatorStringRef;
-
+    __EFString string = (__EFString)stringRef;
+    __EFString separatorString = (__EFString)separatorStringRef;
     if(string == NULL || separatorString == NULL)
     {
         return NULL;
@@ -1080,7 +1077,7 @@ static Boolean __EFIsWhitespace(char c)
 
 Boolean EFStringTrimWhitespace(EFMutableStringRef mutableStringRef)
 {
-    EFString mutableString = (EFString)mutableStringRef;
+    __EFString mutableString = (__EFString)mutableStringRef;
     if(mutableString == NULL || !mutableString->isMutable)
     {
         return false;
@@ -1120,8 +1117,8 @@ Boolean EFStringTrimWhitespace(EFMutableStringRef mutableStringRef)
 Boolean EFStringAppendString(EFMutableStringRef mutableStringRef,
                              EFStringRef stringRef)
 {
-    EFString mutableString = (EFString)mutableStringRef;
-    EFString appendString = (EFString)stringRef;
+    __EFString mutableString = (__EFString)mutableStringRef;
+    __EFString appendString = (__EFString)stringRef;
     if(mutableString == NULL || !mutableString->isMutable || appendString == NULL) /* string must be mutable to be compatible with operations like appending */
     {
         return false;
@@ -1152,7 +1149,7 @@ Boolean EFStringAppendFormat(EFMutableStringRef mutableStringRef,
                              EFStringRef formatStringRef,
                              ...)
 {
-    EFString mutableString = (EFString)mutableStringRef;
+    __EFString mutableString = (__EFString)mutableStringRef;
     if(mutableString == NULL || !mutableString->isMutable)
     {
         return false;
@@ -1179,7 +1176,7 @@ Boolean EFStringAppendFormat(EFMutableStringRef mutableStringRef,
 Boolean EFStringDelete(EFMutableStringRef mutableStringRef,
                        EFRange range)
 {
-    EFString mutableString = (EFString)mutableStringRef;
+    __EFString mutableString = (__EFString)mutableStringRef;
     if(mutableString == NULL || range.location < 0 || range.length < 0)
     {
         return false;
