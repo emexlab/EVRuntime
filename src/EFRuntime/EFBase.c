@@ -38,7 +38,7 @@ EFRange EFRangeZero = {
 };
 
 static _Atomic(EFClass *) ev_class_table[EF_MAX_CLASSES];
-static _Atomic(uint64_t) ev_class_next = 1;
+static _Atomic(EFTypeID) ev_class_next = 1;
 
 EFTypeID EFGetTypeID(EFObjectRef ref)
 {
@@ -176,7 +176,7 @@ EFIndex EFGetRetainCount(EFObjectRef ref)
 EFTypeID EFClassRegister(EFClass *cls)
 {
     assert(cls != NULL);
-    uint64_t id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
+    EFTypeID id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
     if(id >= EF_MAX_CLASSES)
     {
         return kEFNotATypeID;
