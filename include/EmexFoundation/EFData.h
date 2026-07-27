@@ -32,9 +32,6 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 
-typedef struct __EFData *EFDataRef;
-typedef struct __EFData *EFMutableDataRef;
-
 EF_EXTERN EFTypeID EFDataGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFDataCreateWithBuffer(EFAllocatorRef allocatorRef, const UInt8 *buffer, EFIndex length);

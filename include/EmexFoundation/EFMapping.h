@@ -33,8 +33,6 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 
-typedef struct __EFMapping *EFMappingRef;
-
 EF_EXTERN EFTypeID EFMappingGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef, void *addr, EFSize size, SInt32 prot, SInt32 flags, SInt32 fd, EFOffset offset);

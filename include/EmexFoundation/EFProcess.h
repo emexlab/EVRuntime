@@ -26,10 +26,6 @@
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
-#include <EmexFoundation/EFArray.h>
-#include <EmexFoundation/EFString.h>
-
-typedef struct __EFProcess *EFProcessRef;
 
 EF_EXTERN EFTypeID EFProcessGetTypeID(void);
 

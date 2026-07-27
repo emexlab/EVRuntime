@@ -31,10 +31,6 @@
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
-#include <EmexFoundation/EFArray.h>
-#include <EmexFoundation/EFData.h>
-#include <EmexFoundation/EFNumber.h>
-#include <EmexFoundation/EFURL.h>
 
 typedef enum: UInt8 {
     kEFStringEncodingUTF7,
@@ -51,9 +47,6 @@ typedef enum: UInt8 {
     kEFStringCompareNumerically         = 1 << 5,
     kEFStringCompareWidthInsensitive    = 1 << 6,
 } EFStringCompareFlags;
-
-typedef struct __EFString *EFStringRef;
-typedef struct __EFString *EFMutableStringRef;
 
 typedef struct __EFString {
     EFObject header;

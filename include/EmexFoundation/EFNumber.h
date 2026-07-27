@@ -41,8 +41,6 @@ typedef enum: UInt8 {
     kEFNumberTypeUInt64,
 } EFNumberType;
 
-typedef struct __EFNumber *EFNumberRef;
-
 EF_EXTERN EFTypeID EFNumberGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFNumberRef EFNumberCreate(EFAllocatorRef allocatorRef, EFNumberType type, const void *value);

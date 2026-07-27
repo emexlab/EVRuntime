@@ -26,11 +26,6 @@
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
-#include <EmexFoundation/EFURL.h>
-#include <EmexFoundation/EFFileHandle.h>
-#include <EmexFoundation/EFBitWalker.h>
-
-typedef struct __EFFile *EFFileRef;
 
 typedef enum: UInt8 {
     kEFFileTypeUnknown,

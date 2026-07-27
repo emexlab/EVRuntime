@@ -26,14 +26,11 @@
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
-#include <EmexFoundation/EFFileHandle.h>
 
 typedef struct {
     EFIndex bytePos;
     UInt8 bitIndex;
 } EFBitWalkerPosition;
-
-typedef struct __EFBitWalker *EFBitWalkerRef;
 
 EF_EXTERN EFTypeID EFBitWalkerGetTypeID(void);
 

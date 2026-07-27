@@ -32,10 +32,6 @@
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
-#include <EmexFoundation/EFString.h>
-#include <EmexFoundation/EFData.h>
-#include <EmexFoundation/EFURL.h>
-#include <EmexFoundation/EFMapping.h>
 
 typedef enum: UInt8 {
     kEFFileHandleSeekTypeSet,
@@ -43,8 +39,6 @@ typedef enum: UInt8 {
     kEFFileHandleSeekTypeEnd,
     /* fuck darwin no SEEK_HOLE (only Torvalds should seek the hole of his mom right back into the birth canal he came out of) */
 } EFFileHandleSeekType;
-
-typedef struct __EFFileHandle *EFFileHandleRef;
 
 EF_EXTERN EFTypeID EFFileHandleGetTypeID(void);
 

@@ -48,6 +48,8 @@
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFProcess.h>
 #include <EmexFoundation/EFFileHandle.h>
+#include <EmexFoundation/EFString.h>
+#include <EmexFoundation/EFArray.h>
 
 typedef struct __EFProcess {
     EFObject header;

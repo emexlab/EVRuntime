@@ -33,10 +33,6 @@ typedef enum: UInt8 {
     kEFURLTypeHTTP,
 } EFURLType;
 
-typedef struct __EFURL *EFURLRef;
-typedef struct __EFString *EFStringRef;
-typedef struct __EFArray *EFArrayRef;
-
 EF_EXTERN EFTypeID EFURLGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef, EFStringRef string);

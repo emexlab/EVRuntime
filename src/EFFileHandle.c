@@ -41,6 +41,11 @@
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFFileHandle.h>
 #include <EmexFoundation/EFUUID.h>
+#include <EmexFoundation/EFURL.h>
+#include <EmexFoundation/EFArray.h>
+#include <EmexFoundation/EFString.h>
+#include <EmexFoundation/EFData.h>
+#include <EmexFoundation/EFMapping.h>
 
 typedef struct __EFFileHandle {
     EFObject header;

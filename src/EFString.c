@@ -37,6 +37,9 @@
 #include <EmexFoundation/EFString.h>
 #include <EmexFoundation/EFURL.h>
 #include <EmexFoundation/EFFileHandle.h>
+#include <EmexFoundation/EFNumber.h>
+#include <EmexFoundation/EFData.h>
+#include <EmexFoundation/EFArray.h>
 
 static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                                           const char *buffer,

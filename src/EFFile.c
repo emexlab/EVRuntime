@@ -35,6 +35,10 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFFile.h>
 #include <EmexFoundation/EFBitWalker.h>
+#include <EmexFoundation/EFURL.h>
+#include <EmexFoundation/EFString.h>
+#include <EmexFoundation/EFFileHandle.h>
+#include <EmexFoundation/EFData.h>
 
 EFFilePolicy EFFilePolicyInData = {
     .neededPermission = kEFFilePolicyPermissionRead,

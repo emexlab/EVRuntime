@@ -27,8 +27,6 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 
-typedef struct __EFUUID *EFUUIDRef;
-
 typedef struct {
     UInt8 byte0;
     UInt8 byte1;

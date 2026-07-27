@@ -137,7 +137,21 @@ typedef unsigned long EFTypeID;
 typedef void *EFObjectRef;      /* so the compiler shuts up */
 typedef void *EFAllocatorRef;
 
+typedef struct __EFNumber *EFNumberRef;
 typedef struct __EFString *EFStringRef;
+typedef struct __EFString *EFMutableStringRef;
+typedef struct __EFArray *EFArrayRef;
+typedef struct __EFArray *EFMutableArrayRef;
+typedef struct __EFBitWalker *EFBitWalkerRef;
+typedef struct __EFData *EFDataRef;
+typedef struct __EFData *EFMutableDataRef;
+typedef struct __EFFile *EFFileRef;
+typedef struct __EFFileHandle *EFFileHandleRef;
+typedef struct __EFMapping *EFMappingRef;
+typedef struct __EFProcess *EFProcessRef;
+typedef struct __EFURL *EFURLRef;
+typedef struct __EFUUID *EFUUIDRef;
+
 
 typedef void (*EFObjectInitCallback)(EFObjectRef ref);
 typedef void (*EFObjectDeinitCallback)(EFObjectRef ref);

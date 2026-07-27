@@ -27,9 +27,6 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 
-typedef struct __EFArray *EFArrayRef;
-typedef struct __EFArray *EFMutableArrayRef;
-
 typedef Boolean (*evarray_append_callback)(void *ptr);
 typedef void (*evarray_remove_callback)(void *ptr);
 typedef Boolean (*evarray_equal_callback)(void *ptr1, void *ptr2);
