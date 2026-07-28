@@ -32,7 +32,7 @@
 #include <EmexFoundation/EFFileHandle.h>
 
 typedef struct __EFBitWalker {
-    EFObject header;
+    EFObject super;
     EFFileHandleRef fileHandle;
     EFIndex bytePos;
     UInt8 bitIndex;

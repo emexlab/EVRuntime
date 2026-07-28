@@ -34,7 +34,7 @@
 #include <EmexFoundation/EFString.h>
 
 typedef struct __EFArray {
-    EFObject header;
+    EFObject super;
 
     Boolean isMutable;
     EFArrayCallbacks callbacks;

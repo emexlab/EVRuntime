@@ -49,7 +49,7 @@ typedef enum: UInt8 {
 } EFStringCompareFlags;
 
 typedef struct __EFString {
-    EFObject header;
+    EFObject super;
     EFStringEncoding encoding;
     Boolean isMutable;
     Boolean isInlined;          /* meaning the buffer pointer points to after the string object */
@@ -66,9 +66,9 @@ typedef struct __EFString {
         .isInlined = false, \
         .buffer = (char *)("" cStr ""), \
         .length = (EFIndex)(sizeof("" cStr "") - 1), \
-        .header._rt = kEFRootTypeStaticObject \
+        .super._rt = kEFRootTypeStaticObject \
     }; \
-    _evk.header.typeID = EFStringGetTypeID(), \
+    _evk.super.typeID = EFStringGetTypeID(), \
     (EFStringRef)&_evk; \
 }))
 

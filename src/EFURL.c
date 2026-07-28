@@ -36,7 +36,7 @@
 #include <EmexFoundation/EFArray.h>
 
 typedef struct __EFURL {
-    EFObject header;
+    EFObject super;
     EFURLType type;
     EFArrayRef pathComponents;
     EFStringRef pathString;

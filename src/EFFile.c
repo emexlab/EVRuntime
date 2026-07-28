@@ -75,7 +75,7 @@ static inline SInt32 __EFFilePolicyToORW(EFFilePolicyPermission p)
 }
 
 typedef struct __EFFile {
-    EFObject header;
+    EFObject super;
     EFURLRef url;
     EFFileType type;
     EFFilePolicy policy;

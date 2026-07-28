@@ -32,7 +32,7 @@
 #include <EmexFoundation/EFString.h>
 
 typedef struct __EFMapping {
-    EFObject header;
+    EFObject super;
     Boolean unmap;
     void *addr;
     EFSize size;

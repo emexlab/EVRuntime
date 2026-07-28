@@ -31,7 +31,7 @@
 #include <EmexFoundation/EFMallocBlock.h>
 
 typedef struct __EFMallocBlock {
-    EFObject header;
+    EFObject super;
     EFSize size;
     EFObjectDeinitCallback deinitCallback;
 } *__EFMallocBlock;

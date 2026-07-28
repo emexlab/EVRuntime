@@ -59,7 +59,7 @@ static void _intToHexChars(UInt32 in,
 }
 
 typedef struct __EFUUID {
-    EFObject header;
+    EFObject super;
     EFUUIDBytes bytes;
 } *__EFUUID;
 

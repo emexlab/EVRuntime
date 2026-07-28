@@ -48,7 +48,7 @@
 #include <EmexFoundation/EFMapping.h>
 
 typedef struct __EFFileHandle {
-    EFObject header;
+    EFObject super;
     SInt32 flg;
     Boolean readable;
     Boolean writable;

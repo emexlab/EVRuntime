@@ -52,7 +52,7 @@
 #include <EmexFoundation/EFArray.h>
 
 typedef struct __EFProcess {
-    EFObject header;
+    EFObject super;
     Boolean weSpawnedThis;
 
     /* basic information */

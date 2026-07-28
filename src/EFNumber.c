@@ -36,7 +36,7 @@
 typedef __int128_t SInt128;
 
 typedef struct __EFNumber {
-    EFObject header;
+    EFObject super;
     EFNumberType type;
     SInt128 s128;
 } *__EFNumber;
