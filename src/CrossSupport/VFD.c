@@ -19,15 +19,21 @@
  * along with EmexFoundation. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#if defined(__linux__)
+#define _GNU_SOURCE
+#endif /* __FreeBSD__ || __linux__ */
+
 /* ----------------------------------------------------------------------
  *  System Headers
  * -------------------------------------------------------------------- */
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
+#if defined(__FreeBSD__) || defined(__linux__)
+#include <sys/mman.h>
+#endif /* __FreeBSD__ || __linux__ */
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -41,9 +47,20 @@ SInt32 VFDCreate(UInt32 flags)
     /* creates file descriptor that "lives in memory" */
     EFAUTOREL EFUUIDRef uuid = EFUUIDCreate(kEFAllocatorDefault);
     EFAUTOREL EFStringRef string = EFUUIDCreateString(kEFAllocatorDefault, uuid);
+    SInt32 fileDescriptor;
+
+#if (defined(__FreeBSD__) || defined(__linux__)) && defined(MFD_CLOEXEC)
+    fileDescriptor = memfd_create(EFStringGetCStringPtr(string, kEFStringEncodingUTF8), MFD_CLOEXEC);
+    if(fileDescriptor >= 0)
+    {
+        return fileDescriptor;
+    }
+    /* fallback shall work regardless */
+#endif /* (__FreeBSD__ || __linux__) && MFD_CLOEXEC */
+
     EFAUTOREL EFStringRef pathStr = EFStringCreateWithFormat(kEFAllocatorDefault, EFSTR("%s/%@"), getenv("TMPDIR")?: "/tmp", string);
     const char *pathStrC = EFStringGetCStringPtr(pathStr, kEFStringEncodingUTF8);
-    SInt32 fileDescriptor = open(pathStrC, flags | O_CREAT | O_TRUNC, 0777);
+    fileDescriptor = open(pathStrC, flags | O_CREAT | O_TRUNC, 0777);
     unlink(pathStrC);   /* unlinking immediately keeps it in memory */
     return fileDescriptor;
 }
