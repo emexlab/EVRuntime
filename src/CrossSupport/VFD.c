@@ -32,7 +32,7 @@
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
-#include <EmexFoundation/CrossSupport/vfd.h>
+#include <EmexFoundation/CrossSupport/VFD.h>
 #include <EmexFoundation/EFString.h>
 #include <EmexFoundation/EFUUID.h>
 
