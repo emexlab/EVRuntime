@@ -36,7 +36,7 @@
 #include <EmexFoundation/EFString.h>
 #include <EmexFoundation/EFUUID.h>
 
-SInt32 vfd_create(UInt32 flags)
+SInt32 VFDCreate(UInt32 flags)
 {
     /* creates file descriptor that "lives in memory" */
     EFAUTOREL EFUUIDRef uuid = EFUUIDCreate(kEFAllocatorDefault);

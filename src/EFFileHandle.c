@@ -91,7 +91,7 @@ EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef)
         return NULL;
     }
 
-    fileHandle->fileDescriptor = vfd_create(O_RDWR | O_CREAT | O_TRUNC);
+    fileHandle->fileDescriptor = VFDCreate(O_RDWR | O_CREAT | O_TRUNC);
     if(fileHandle->fileDescriptor < 0)
     {
         return NULL;
