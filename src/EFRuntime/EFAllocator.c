@@ -109,7 +109,7 @@ extern void *EFAllocatorAllocate(EFAllocatorRef allocatorRef,
                                  EFIndex size,
                                  EFOptionFlags hint)
 {
-    EFAllocator *allocator = (EFAllocator*)(allocatorRef?: kEFAllocatorDefault);
+    EFAllocator *allocator = (EFAllocator*)(allocatorRef ? allocatorRef : kEFAllocatorDefault);
     assert(allocator->allocate != NULL);
     return allocator->allocate(allocatorRef, size, hint);
 }
@@ -119,7 +119,7 @@ extern void *EFAllocatorReallocate(EFAllocatorRef allocatorRef,
                                    EFIndex newSize,
                                    EFOptionFlags hint)
 {
-    EFAllocator *allocator = (EFAllocator*)(allocatorRef?: kEFAllocatorDefault);
+    EFAllocator *allocator = (EFAllocator*)(allocatorRef ? allocatorRef : kEFAllocatorDefault);
     assert(allocator->reallocate != NULL);
     return allocator->reallocate(allocatorRef, ptr, newSize, hint);
 }
@@ -127,7 +127,7 @@ extern void *EFAllocatorReallocate(EFAllocatorRef allocatorRef,
 extern void EFAllocatorDeallocate(EFAllocatorRef allocatorRef,
                                   void *ptr)
 {
-    EFAllocator *allocator = (EFAllocator*)(allocatorRef?: kEFAllocatorDefault);
+    EFAllocator *allocator = (EFAllocator*)(allocatorRef ? allocatorRef : kEFAllocatorDefault);
     assert(allocator->deallocate != NULL);
     allocator->deallocate(allocatorRef, ptr);
 }

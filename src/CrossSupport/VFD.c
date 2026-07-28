@@ -58,7 +58,8 @@ SInt32 VFDCreate(UInt32 flags)
     /* fallback shall work regardless */
 #endif /* (__FreeBSD__ || __linux__) && MFD_CLOEXEC */
 
-    EFAUTOREL EFStringRef pathStr = EFStringCreateWithFormat(kEFAllocatorDefault, EFSTR("%s/%@"), getenv("TMPDIR")?: "/tmp", string);
+    const char *tmpDirEnv = getenv("TMPDIR");
+    EFAUTOREL EFStringRef pathStr = EFStringCreateWithFormat(kEFAllocatorDefault, EFSTR("%s/%@"), tmpDirEnv ? tmpDirEnv : "/tmp", string);
     const char *pathStrC = EFStringGetCStringPtr(pathStr, kEFStringEncodingUTF8);
     fileDescriptor = open(pathStrC, flags | O_CREAT | O_TRUNC, 0777);
     unlink(pathStrC);   /* unlinking immediately keeps it in memory */
