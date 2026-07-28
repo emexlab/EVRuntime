@@ -19,25 +19,19 @@
  * along with EmexFoundation. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef EMEXFOUNDATION_H
-#define EMEXFOUNDATION_H
+#ifndef EFMALLOCBLOCK_H
+#define EFMALLOCBLOCK_H
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
-#include <EmexFoundation/CrossSupport/vfd.h>
-#include <EmexFoundation/EFNumber.h>
-#include <EmexFoundation/EFString.h>
-#include <EmexFoundation/EFArray.h>
-#include <EmexFoundation/EFData.h>
-#include <EmexFoundation/EFFileHandle.h>
-#include <EmexFoundation/EFProcess.h>
-#include <EmexFoundation/EFURL.h>
-#include <EmexFoundation/EFFile.h>
-#include <EmexFoundation/EFBitWalker.h>
-#include <EmexFoundation/EFUUID.h>
-#include <EmexFoundation/EFMapping.h>
-#include <EmexFoundation/EFMallocBlock.h>
 
-#endif /* EMEXFOUNDATION_H */
+EFTypeID EFMallocBlockGetTypeID(void);
+
+EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocatorRef, EFSize size);
+EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocatorRef, EFSize size, EFObjectDeinitCallback deinitCallback);
+
+EFSize EFMallocBlockGetSize(EFMallocBlockRef blockRef);
+
+#endif /* EFMALLOCBLOCK_H */

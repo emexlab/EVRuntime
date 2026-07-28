@@ -32,6 +32,7 @@ add_library(EmexFoundation ${LIB_TYPE}
     src/EFBitWalker.c
     src/EFUUID.c
     src/EFMapping.c
+    src/EFMallocBlock.c
 )
 
 target_include_directories(EmexFoundation

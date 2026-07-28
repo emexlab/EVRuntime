@@ -51,4 +51,12 @@ typedef struct {
     _Atomic EFIndex refcount;
 } EFObject;
 
+typedef struct {
+    struct {
+        EFObject pad_a;
+        EFSize pad_b;
+        EFObjectDeinitCallback pad_c;
+    } padding;
+} EFMallocBlockPadding;
+
 #endif /* EFOBJECT_H */

@@ -151,7 +151,7 @@ typedef struct __EFMapping *EFMappingRef;
 typedef struct __EFProcess *EFProcessRef;
 typedef struct __EFURL *EFURLRef;
 typedef struct __EFUUID *EFUUIDRef;
-
+typedef struct __EFMallocBlock *EFMallocBlockRef;
 
 typedef void (*EFObjectInitCallback)(EFObjectRef ref);
 typedef void (*EFObjectDeinitCallback)(EFObjectRef ref);
