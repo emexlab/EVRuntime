@@ -21,7 +21,7 @@
 
 #if defined(__linux__)
 #define _GNU_SOURCE
-#endif /* __FreeBSD__ || __linux__ */
+#endif /* __linux__ */
 
 /* ----------------------------------------------------------------------
  *  System Headers
@@ -31,9 +31,9 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
-#if defined(__FreeBSD__) || defined(__linux__)
+#if defined(__linux__)
 #include <sys/mman.h>
-#endif /* __FreeBSD__ || __linux__ */
+#endif /* __linux__ */
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -49,7 +49,7 @@ SInt32 VFDCreate(UInt32 flags)
     EFAUTOREL EFStringRef string = EFUUIDCreateString(kEFAllocatorDefault, uuid);
     SInt32 fileDescriptor;
 
-#if (defined(__FreeBSD__) || defined(__linux__)) && defined(MFD_CLOEXEC)
+#if defined(__linux__) && defined(MFD_CLOEXEC)
     fileDescriptor = memfd_create(EFStringGetCStringPtr(string, kEFStringEncodingUTF8), MFD_CLOEXEC);
     if(fileDescriptor >= 0)
     {
