@@ -32,7 +32,9 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
+#if defined(__linux__)
 #include <sys/mman.h>
+#endif /* __linux__ */
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -56,20 +58,6 @@ SInt32 VFDCreate(void)
     }
     /* fallback shall work regardless */
 #endif /* __linux__ && MFD_CLOEXEC */
-
-#if defined(__APPLE__) || defined(__FreeBSD__)
-    EFUUIDBytes uuidBytes = EFUUIDGetBytes(uuid);
-
-    char shmName[26];
-    snprintf(shmName, sizeof(shmName), "/vfd-%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", uuidBytes.byte0, uuidBytes.byte1, uuidBytes.byte2, uuidBytes.byte3, uuidBytes.byte4, uuidBytes.byte5, uuidBytes.byte6, uuidBytes.byte7, uuidBytes.byte8, uuidBytes.byte9);
-    shmName[sizeof(shmName) - 1] = '\0';
-    fileDescriptor = shm_open(shmName, O_RDWR | O_CREAT | O_EXCL, 0600);
-    if(fileDescriptor >= 0)
-    {
-        shm_unlink(shmName);
-        return fileDescriptor;
-    }
-#endif /* __APPLE__ || __FreeBSD__ */
 
     /* ik it is a hack, but it works cross platform */
     const char *tmpDirEnv = getenv("TMPDIR");
