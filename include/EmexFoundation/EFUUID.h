@@ -53,5 +53,6 @@ EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef all
 EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreateWithUUIDBytes(EFAllocatorRef allocatorRef, EFUUIDBytes uuidBytes);
 
 EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFUUIDCreateString(EFAllocatorRef allocatorRef, EFUUIDRef uuidRef);
+EF_EXTERN EFUUIDBytes EFUUIDGetBytes(EFUUIDRef uuidRef);
 
 #endif /* EFUUID_H */

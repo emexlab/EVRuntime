@@ -185,3 +185,13 @@ EFStringRef EFUUIDCreateString(EFAllocatorRef allocatorRef,
 
     return EFStringCreateWithCString(allocatorRef, buf, kEFStringEncodingUTF8);
 }
+
+EFUUIDBytes EFUUIDGetBytes(EFUUIDRef uuidRef)
+{
+    __EFUUID uuid = (__EFUUID)uuidRef;
+    if(uuid == NULL)
+    {
+        return (EFUUIDBytes){};
+    }
+    return uuid->bytes;
+}

@@ -26,14 +26,13 @@
 /* ----------------------------------------------------------------------
  *  System Headers
  * -------------------------------------------------------------------- */
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
-#if defined(__linux__)
 #include <sys/mman.h>
-#endif /* __linux__ */
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -42,15 +41,15 @@
 #include <EmexFoundation/EFString.h>
 #include <EmexFoundation/EFUUID.h>
 
-SInt32 VFDCreate(UInt32 flags)
+SInt32 VFDCreate(void)
 {
-    /* creates file descriptor that "lives in memory" */
+    /* we need some unique string */
     EFAUTOREL EFUUIDRef uuid = EFUUIDCreate(kEFAllocatorDefault);
     EFAUTOREL EFStringRef string = EFUUIDCreateString(kEFAllocatorDefault, uuid);
     SInt32 fileDescriptor;
 
 #if defined(__linux__) && defined(MFD_CLOEXEC)
-    fileDescriptor = memfd_create(EFStringGetCStringPtr(string, kEFStringEncodingUTF8), MFD_CLOEXEC);
+    fileDescriptor = memfd_create(EFStringGetCStringPtr(string, kEFStringEncodingUTF8), MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if(fileDescriptor >= 0)
     {
         return fileDescriptor;
@@ -58,10 +57,25 @@ SInt32 VFDCreate(UInt32 flags)
     /* fallback shall work regardless */
 #endif /* __linux__ && MFD_CLOEXEC */
 
+#if defined(__APPLE__) || defined(__FreeBSD__)
+    EFUUIDBytes uuidBytes = EFUUIDGetBytes(uuid);
+
+    char shmName[26];
+    snprintf(shmName, sizeof(shmName), "/vfd-%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", uuidBytes.byte0, uuidBytes.byte1, uuidBytes.byte2, uuidBytes.byte3, uuidBytes.byte4, uuidBytes.byte5, uuidBytes.byte6, uuidBytes.byte7, uuidBytes.byte8, uuidBytes.byte9);
+    shmName[sizeof(shmName) - 1] = '\0';
+    fileDescriptor = shm_open(shmName, O_RDWR | O_CREAT | O_EXCL, 0600);
+    if(fileDescriptor >= 0)
+    {
+        shm_unlink(shmName);
+        return fileDescriptor;
+    }
+#endif /* __APPLE__ || __FreeBSD__ */
+
+    /* ik it is a hack, but it works cross platform */
     const char *tmpDirEnv = getenv("TMPDIR");
     EFAUTOREL EFStringRef pathStr = EFStringCreateWithFormat(kEFAllocatorDefault, EFSTR("%s/%@"), tmpDirEnv ? tmpDirEnv : "/tmp", string);
     const char *pathStrC = EFStringGetCStringPtr(pathStr, kEFStringEncodingUTF8);
-    fileDescriptor = open(pathStrC, flags | O_CREAT | O_TRUNC, 0777);
+    fileDescriptor = open(pathStrC, O_RDWR | O_CREAT | O_TRUNC, 0777);
     unlink(pathStrC);   /* unlinking immediately keeps it in memory */
     return fileDescriptor;
 }
