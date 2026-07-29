@@ -27,11 +27,11 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 
-EFTypeID EFMallocBlockGetTypeID(void);
+EF_EXTERN EFTypeID EFMallocBlockGetTypeID(void);
 
-EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocatorRef, EFSize size);
-EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocatorRef, EFSize size, EFObjectDeinitCallback deinitCallback);
+EF_EXTERN EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocatorRef, EFSize size);
+EF_EXTERN EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocatorRef, EFSize size, EFObjectDeinitCallback deinitCallback);
 
-EFSize EFMallocBlockGetSize(EFMallocBlockRef blockRef);
+EF_EXTERN EFSize EFMallocBlockGetSize(EFMallocBlockRef blockRef);
 
 #endif /* EFMALLOCBLOCK_H */

@@ -82,7 +82,7 @@
 #define SINT64_MAX  0x7FFFFFFFFFFFFFFFLL
 #endif /* SINT64_MAX */
 
-#define EF_EXTERN   extern
+#define EF_EXTERN __attribute__((visibility("default"))) extern
 
 /* later for arc in my own objc runtime */
 #define EF_RETURNS_RETAINED
