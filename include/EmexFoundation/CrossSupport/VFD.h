@@ -28,6 +28,5 @@
 #include <EmexFoundation/EFRuntime/EFBase.h>
 
 EF_EXTERN SInt32 VFDCreate(void);
-EF_EXTERN Boolean VFDMakeReadOnly(SInt32 fileDescriptor);
 
 #endif /* CROSSSUPORT_VFD_H */
