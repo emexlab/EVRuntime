@@ -99,3 +99,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
     FILES_MATCHING
         PATTERN "*.h"
 )
+
+set_target_properties(EmexFoundation PROPERTIES
+    INSTALL_NAME_DIR "/usr/local/lib"
+)
