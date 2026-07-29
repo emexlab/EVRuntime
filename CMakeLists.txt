@@ -69,13 +69,13 @@ else()
 
         if(APPLE)
             target_link_options(EmexFoundation PRIVATE
-                -dead_strip
+                "LINKER:-dead_strip"
             )
         else()
             target_link_options(EmexFoundation PRIVATE
-                --exclude-libs,ALL
-                --gc-sections
-                -Bsymbolic
+                "LINKER:--exclude-libs,ALL"
+                "LINKER:--gc-sections"
+                "LINKER:-Bsymbolic"
             )
         endif()
     endif()
