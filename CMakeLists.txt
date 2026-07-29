@@ -64,7 +64,19 @@ else()
         if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
             list(APPEND _EF_OPT_FLAGS -fgraphite-identity -floop-nest-optimize -fipa-pta)
         elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
-            list(APPEND _EF_OPT_FLAGS -fvectorize -fslp-vectorize)
+            list(APPEND _EF_OPT_FLAGS -fvectorize -fslp-vectorize -fvisibility=hidden -fvisibility-inlines-hidden)
+        endif()
+
+        if(APPLE)
+            target_link_options(EmexFoundation PRIVATE
+                -dead_strip
+            )
+        else()
+            target_link_options(EmexFoundation PRIVATE
+                --exclude-libs,ALL
+                --gc-sections
+                -Bsymbolic
+            )
         endif()
     endif()
 
