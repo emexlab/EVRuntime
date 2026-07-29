@@ -58,6 +58,6 @@ EF_EXTERN void EFArrayRemoveValueAtIndex(EFMutableArrayRef mutableArrayRef, EFIn
 
 EF_EXTERN Boolean EFArrayAppendValuesOfArray(EFMutableArrayRef mutableArrayRef, EFArrayRef otherArrayRef);
 EF_EXTERN Boolean EFArrayInsertValuesOfArrayAtIndex(EFMutableArrayRef mutableArrayRef, EFIndex index, EFArrayRef otherArrayRef);    /* unimplemented */
-EF_EXTERN Boolean EFArrayRemoveValuesInRange(EFMutableArrayRef mutableArrayRef, EFRange range);                                     /* unimplemented */
+EF_EXTERN void EFArrayRemoveValuesInRange(EFMutableArrayRef mutableArrayRef, EFRange range);
 
 #endif /* EFARRAY_H */

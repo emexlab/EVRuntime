@@ -469,8 +469,11 @@ Boolean EFArrayInsertValuesOfArrayAtIndex(EFMutableArrayRef mutableArrayRef,
     return false;
 }
 
-Boolean EFArrayRemoveValuesInRange(EFMutableArrayRef mutableArrayRef,
-                                   EFRange range)
+void EFArrayRemoveValuesInRange(EFMutableArrayRef mutableArrayRef,
+                                EFRange range)
 {
-    return false;
+    for(EFIndex index = range.location; index < range.location; index++)
+    {
+        EFArrayRemoveValueAtIndex(mutableArrayRef, range.location);
+    }
 }

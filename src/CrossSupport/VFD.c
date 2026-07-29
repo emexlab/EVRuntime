@@ -56,7 +56,7 @@ SInt32 VFDCreate(UInt32 flags)
         return fileDescriptor;
     }
     /* fallback shall work regardless */
-#endif /* (__FreeBSD__ || __linux__) && MFD_CLOEXEC */
+#endif /* __linux__ && MFD_CLOEXEC */
 
     const char *tmpDirEnv = getenv("TMPDIR");
     EFAUTOREL EFStringRef pathStr = EFStringCreateWithFormat(kEFAllocatorDefault, EFSTR("%s/%@"), tmpDirEnv ? tmpDirEnv : "/tmp", string);
