@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdatomic.h>
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -38,12 +39,35 @@ EFRange EFRangeZero = {
 };
 
 extern EFClassDefinition EFStringClass;
+extern EFClassDefinition EFNumberClass;
+extern EFClassDefinition EFURLClass;
+extern EFClassDefinition EFUUIDClass;
+extern EFClassDefinition EFDataClass;
+extern EFClassDefinition EFFileHandleClass;
+extern EFClassDefinition EFFileClass;
+extern EFClassDefinition EFBitWalkerClass;
+extern EFClassDefinition EFMappingClass;
+extern EFClassDefinition EFProcessClass;
+extern EFClassDefinition EFMallocBlockClass;
+extern EFClassDefinition EFArrayClass;
 
 static _Atomic(EFClass) ev_class_table[EF_MAX_CLASSES] = {
     NULL,
     &EFStringClass,
+    &EFNumberClass,
+    &EFURLClass,
+    &EFUUIDClass,
+    &EFDataClass,
+    &EFFileHandleClass,
+    &EFFileClass,
+    &EFBitWalkerClass,
+    &EFMappingClass,
+    &EFProcessClass,
+    &EFMallocBlockClass,
+    &EFArrayClass,
+    NULL,                   /* dictionary is unimplemented, because we first need hashing */
 };
-static _Atomic(EFTypeID) ev_class_next = 2;
+static _Atomic(EFTypeID) ev_class_next = kEFTypeIDDictionary;
 
 EFTypeID EFGetTypeID(EFObjectRef ref)
 {

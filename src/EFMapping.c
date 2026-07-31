@@ -52,9 +52,9 @@ static void __EFMappingDeinit(EFObjectRef objectRef)
     }
 }
 
-static EFClassDefinition EFMappingClass = {
+EFClassDefinition EFMappingClass = {
     .name = "EFMapping",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDMapping,
     .init = NULL,
     .deinit = __EFMappingDeinit,
     .equal = NULL,
@@ -62,16 +62,9 @@ static EFClassDefinition EFMappingClass = {
     .hash = NULL,
 };
 
-void EFMappingRegisterClass(void)
-{
-    EFClassRegister(&EFMappingClass);
-}
-
 EFTypeID EFMappingGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFMappingRegisterClass);
-    return EFMappingClass.typeID;
+    return kEFTypeIDMapping;
 }
 
 EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef,

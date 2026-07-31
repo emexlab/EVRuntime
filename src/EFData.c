@@ -55,9 +55,9 @@ static EFStringRef __EFDataCopyDescription(EFObjectRef dataRef)
     return EFStringCreateWithFormat(EFGetAllocator(dataRef), EFSTR("<%@ %p>{buffer = %p, length = %ld}"), data->isMutable ? EFSTR("EFMutableData") : EFSTR("EFData"), dataRef, data->buffer, data->length);
 }
 
-static EFClassDefinition EFDataClass = {
+EFClassDefinition EFDataClass = {
     .name = "EFData",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDData,
     .init = NULL,
     .deinit = __EFDataDeinit,
     .equal = NULL,
@@ -65,16 +65,9 @@ static EFClassDefinition EFDataClass = {
     .hash = NULL,
 };
 
-static void EFDataRegisterClass(void)
-{
-    EFClassRegister(&EFDataClass);
-}
-
 EFTypeID EFDataGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFDataRegisterClass);
-    return EFDataClass.typeID;
+    return kEFTypeIDData;
 }
 
 static inline EFDataRef __EFDataCreate(EFAllocatorRef allocatorRef,

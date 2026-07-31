@@ -61,9 +61,9 @@ static void __EVFileHandleDeinit(EFObjectRef fileHandleRef)
     close(fileHandle->fileDescriptor);
 }
 
-static EFClassDefinition EFFileHandleClass = {
+EFClassDefinition EFFileHandleClass = {
     .name = "EFFileHandle",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDFileHandle,
     .init = NULL,
     .deinit = __EVFileHandleDeinit,
     .equal = NULL,
@@ -71,16 +71,9 @@ static EFClassDefinition EFFileHandleClass = {
     .hash = NULL,
 };
 
-static void EFFileHandleRegisterClass(void)
-{
-    EFClassRegister(&EFFileHandleClass);
-}
-
 EFTypeID EFFileHandleGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFFileHandleRegisterClass);
-    return EFFileHandleClass.typeID;
+    return kEFTypeIDFileHandle;
 }
 
 EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef)

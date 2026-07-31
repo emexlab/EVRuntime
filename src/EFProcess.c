@@ -88,9 +88,9 @@ static EFStringRef __EFProcessCopyDescription(EFObjectRef processRef)
     return EFStringCreateWithFormat(allocator, EFSTR("<EFProcess %p>{processIdentifier = %ld, parentProcessIdentifier = %ld, userIdentifier = %ld, groupIdentifier = %ld, processGroupIdentifier = %ld, sessionIdentifier = %ld, command = %@, executablePath = %@, arguments = %@, alive = %d}"), processRef, process->processIdentifier, process->parentProcessIdentifier, process->userIdentifier, process->groupIdentifier, process->processGroupIdentifier, process->sessionIdentifier, process->command, process->executablePath, process->arguments, EFProcessIsAlive(processRef));
 }
 
-static EFClassDefinition EFProcessClass = {
+EFClassDefinition EFProcessClass = {
     .name = "EFProcess",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDProcess,
     .init = NULL,
     .deinit = __EFProcessDeinit,
     .equal = NULL,
@@ -98,16 +98,9 @@ static EFClassDefinition EFProcessClass = {
     .hash = NULL,
 };
 
-static void EFProcessRegisterClass(void)
-{
-    EFClassRegister(&EFProcessClass);
-}
-
 EFTypeID EFProcessGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFProcessRegisterClass);
-    return EFProcessClass.typeID;
+    return kEFTypeIDNumber;
 }
 
 extern char *const *environ;

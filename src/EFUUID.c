@@ -67,9 +67,9 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef objectRef)
     return EFUUIDCreateString(EFGetAllocator(objectRef), (EFUUIDRef)objectRef);
 }
 
-static EFClassDefinition EFUUIDClass = {
+EFClassDefinition EFUUIDClass = {
     .name = "EFUUID",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDUUID,
     .init = NULL,
     .deinit = NULL,
     .equal = NULL,
@@ -77,16 +77,9 @@ static EFClassDefinition EFUUIDClass = {
     .hash = NULL,
 };
 
-static void EFUUIDRegisterClass(void)
-{
-    EFClassRegister(&EFUUIDClass);
-}
-
 EFTypeID EFUUIDGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFUUIDRegisterClass);
-    return EFUUIDClass.typeID;
+    return kEFTypeIDUUID;
 }
 
 EFUUIDRef EFUUIDCreate(EFAllocatorRef allocatorRef)

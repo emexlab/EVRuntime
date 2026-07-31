@@ -89,9 +89,9 @@ static void __EFBitWalkerDeinit(EFObjectRef fileRef)
     EFReleaseTry(file->fileHandle);
 }
 
-static EFClassDefinition EFFileClass = {
+EFClassDefinition EFFileClass = {
     .name = "EFFile",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDFile,
     .init = NULL,
     .deinit = __EFBitWalkerDeinit,
     .equal = NULL,
@@ -99,16 +99,9 @@ static EFClassDefinition EFFileClass = {
     .copyDescription = NULL,
 };
 
-static void EFFileRegisterClass(void)
-{
-    EFClassRegister(&EFFileClass);
-}
-
 EFTypeID EFFileGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFFileRegisterClass);
-    return EFFileClass.typeID;
+    return kEFTypeIDFile;
 }
 
 EFFileRef __EFFileCreate(EFAllocatorRef allocatorRef,

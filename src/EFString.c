@@ -215,7 +215,7 @@ EFClassDefinition EFStringClass = {
 
 EFTypeID EFStringGetTypeID(void)
 {
-    return EFStringClass.typeID;
+    return kEFTypeIDString;
 }
 
 static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,

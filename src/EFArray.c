@@ -167,9 +167,9 @@ static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
     return EFAUTOTRANSFER(mutableStringRef);
 }
 
-static EFClassDefinition EFArrayClass = {
+EFClassDefinition EFArrayClass = {
     .name = "EFArray",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDArray,
     .init = NULL,
     .deinit = __EFArrayClassDeinit,
     .equal = __EFArrayClassEqual,
@@ -177,16 +177,9 @@ static EFClassDefinition EFArrayClass = {
     .hash = NULL,
 };
 
-static void EFArrayRegisterClass(void)
-{
-    EFClassRegister(&EFArrayClass);
-}
-
 EFTypeID EFArrayGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFArrayRegisterClass);
-    return EFArrayClass.typeID;
+    return kEFTypeIDArray;
 }
 
 EFArrayRef EFArrayCreate(EFAllocatorRef allocatorRef,

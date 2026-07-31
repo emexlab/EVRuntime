@@ -85,25 +85,18 @@ static EFStringRef __EFNumberCopyDescription(EFObjectRef numberRef)
     }
 }
 
-static EFClassDefinition EFNumberClass = {
+EFClassDefinition EFNumberClass = {
     .name = "EFNumber",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDNumber,
     .init = NULL,
     .deinit = NULL,
     .equal = __EFNumberEqual,
     .copyDescription = __EFNumberCopyDescription,
 };
 
-static void EFNumberRegisterClass(void)
-{
-    EFClassRegister(&EFNumberClass);
-}
-
 EFTypeID EFNumberGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFNumberRegisterClass);
-    return EFNumberClass.typeID;
+    return kEFTypeIDNumber;
 }
 
 EFNumberRef EFNumberCreate(EFAllocatorRef allocatorRef,

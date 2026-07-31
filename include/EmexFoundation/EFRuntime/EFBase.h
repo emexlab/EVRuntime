@@ -28,8 +28,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdatomic.h>
-#include <pthread.h>
 
 #ifndef UINT8_MIN
 #define UINT8_MIN   0
@@ -132,8 +130,20 @@ typedef enum: UInt8 {
 } EFRootType;
 
 typedef enum: unsigned long {
-    kEFTypeIDNone =     0,
-    kEFTypeIDString =   1,
+    kEFTypeIDNone =         0,
+    kEFTypeIDString =       1,
+    kEFTypeIDNumber =       2,
+    kEFTypeIDURL =          3,
+    kEFTypeIDUUID =         4,
+    kEFTypeIDData =         5,
+    kEFTypeIDFileHandle =   6,
+    kEFTypeIDFile =         7,
+    kEFTypeIDBitWalker =    8,
+    kEFTypeIDMapping =      9,
+    kEFTypeIDProcess =      10,
+    kEFTypeIDMallocBlock =  11,
+    kEFTypeIDArray =        12,
+    kEFTypeIDDictionary =   13, /* unimplemented */
 } EFTypeID;
 
 typedef void *EFObjectRef;      /* so the compiler shuts up */

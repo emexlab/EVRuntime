@@ -53,9 +53,9 @@ static EFStringRef __EFURLCopyDescription(EFObjectRef urlRef)
     return EFRetainTry(EFURLGetPath(urlRef));
 }
 
-static EFClassDefinition EFURLClass = {
+EFClassDefinition EFURLClass = {
     .name = "EFURL",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDURL,
     .init = NULL,
     .deinit = __EFURLDeinit,
     .equal = NULL,
@@ -63,16 +63,9 @@ static EFClassDefinition EFURLClass = {
     .hash = NULL,
 };
 
-void EFURLRegisterClass(void)
-{
-    EFClassRegister(&EFURLClass);
-}
-
 EFTypeID EFURLGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFURLRegisterClass);
-    return EFURLClass.typeID;
+    return kEFTypeIDURL;
 }
 
 EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef,

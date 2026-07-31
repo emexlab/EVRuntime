@@ -44,9 +44,9 @@ static void __EFMallocBlockDeinit(EFObjectRef blockRef)
     }
 }
 
-static EFClassDefinition EFMallocBlockClass = {
+EFClassDefinition EFMallocBlockClass = {
     .name = "EFMallocBlock",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDMallocBlock,
     .init = NULL,
     .deinit = __EFMallocBlockDeinit,
     .equal = NULL,
@@ -54,16 +54,9 @@ static EFClassDefinition EFMallocBlockClass = {
     .hash = NULL,
 };
 
-static void EFMallocBlockRegisterClass(void)
-{
-    EFClassRegister(&EFMallocBlockClass);
-}
-
 EFTypeID EFMallocBlockGetTypeID(void)
 {
-    static pthread_once_t once;
-    pthread_once(&once, EFMallocBlockRegisterClass);
-    return EFMallocBlockClass.typeID;
+    return kEFTypeIDMallocBlock;
 }
 
 EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocatorRef,

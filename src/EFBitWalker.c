@@ -40,9 +40,9 @@ static void __EFBitWalkerDeinit(EFObjectRef walkerRef)
     EFRelease(walker->fileHandle);
 }
 
-static EFClassDefinition EFBitWalkerClass = {
+EFClassDefinition EFBitWalkerClass = {
     .name = "EFBitWalker",
-    .typeID = kEFTypeIDNone,
+    .typeID = kEFTypeIDBitWalker,
     .init = NULL,
     .deinit = __EFBitWalkerDeinit,
     .equal = NULL,
@@ -50,16 +50,9 @@ static EFClassDefinition EFBitWalkerClass = {
     .copyDescription = NULL,
 };
 
-static void EFBitWalkerRegisterClass(void)
-{
-    EFClassRegister(&EFBitWalkerClass);
-}
-
 EFTypeID EFBitWalkerGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFBitWalkerRegisterClass);
-    return EFBitWalkerClass.typeID;
+    return kEFTypeIDBitWalker;
 }
 
 EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocatorRef,
