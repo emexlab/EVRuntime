@@ -89,7 +89,7 @@ static EFStringRef __EFProcessCopyDescription(EFObjectRef processRef)
     return EFStringCreateWithFormat(allocator, EFSTR("<EFProcess %p>{processIdentifier = %ld, parentProcessIdentifier = %ld, userIdentifier = %ld, groupIdentifier = %ld, processGroupIdentifier = %ld, sessionIdentifier = %ld, command = %@, executablePath = %@, arguments = %@, alive = %d}"), processRef, process->processIdentifier, process->parentProcessIdentifier, process->userIdentifier, process->groupIdentifier, process->processGroupIdentifier, process->sessionIdentifier, process->command, process->executablePath, process->arguments, EFProcessIsAlive(processRef));
 }
 
-static EFClass EFProcessClass = {
+static EFClassDefinition EFProcessClass = {
     .name = "EFProcess",
     .typeID = kEFNotATypeID,
     .init = NULL,

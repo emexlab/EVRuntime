@@ -45,7 +45,7 @@ static void __EFBitWalkerDeinit(EFObjectRef walkerRef)
     EFRelease(walker->fileHandle);
 }
 
-EFClass EFBitWalkerClass = {
+static EFClassDefinition EFBitWalkerClass = {
     .name = "EFBitWalker",
     .typeID = kEFNotATypeID,
     .init = NULL,

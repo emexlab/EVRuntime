@@ -168,7 +168,7 @@ static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
     return EFAUTOTRANSFER(mutableStringRef);
 }
 
-static EFClass EFArrayClass = {
+static EFClassDefinition EFArrayClass = {
     .name = "EFArray",
     .typeID = kEFNotATypeID,
     .init = NULL,

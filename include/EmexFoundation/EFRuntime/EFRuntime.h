@@ -65,8 +65,8 @@
 #define EFSUPPRESS_DEPRECATED_END
 #endif /* __GNUC__ || __clang__ */
 
-EF_EXTERN EFTypeID EFClassRegister(EFClass *cls);
-EF_EXTERN EFClass *EFClassGetByID(EFTypeID id);
+EF_EXTERN EFTypeID EFClassRegister(EFClassDefinition *classDefinition);
+EF_EXTERN EFClass EFClassGetByID(EFTypeID id);
 
 EF_EXTERN EFTypeID EFGetTypeID(EFObjectRef ref);
 EF_EXTERN EFRootType EFGetRootType(EFObjectRef ref);

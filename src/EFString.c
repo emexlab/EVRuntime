@@ -203,7 +203,7 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef stringRef)
     return EFRetain(stringRef); /* just return our selves */
 }
 
-static EFClass EFStringClass = {
+static EFClassDefinition EFStringClass = {
     .name = "EFString",
     .typeID = kEFNotATypeID,
     .init = NULL,

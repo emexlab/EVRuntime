@@ -61,7 +61,7 @@ static void __EVFileHandleDeinit(EFObjectRef fileHandleRef)
     close(fileHandle->fileDescriptor);
 }
 
-static EFClass EFFileHandleClass = {
+static EFClassDefinition EFFileHandleClass = {
     .name = "EFFileHandle",
     .typeID = kEFNotATypeID,
     .init = NULL,

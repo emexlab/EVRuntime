@@ -40,6 +40,8 @@ typedef struct {
     EFObjectEqualCallback equal;
     EFObjectCopyDescriptionCallback copyDescription;
     EFObjectHashCallback hash;
-} EFClass;
+} EFClassDefinition;
+
+typedef EFClassDefinition *EFClass;
 
 #endif /* EFCLASS_H */

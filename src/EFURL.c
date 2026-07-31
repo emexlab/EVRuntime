@@ -54,7 +54,7 @@ static EFStringRef __EFURLCopyDescription(EFObjectRef urlRef)
     return EFRetainTry(EFURLGetPath(urlRef));
 }
 
-EFClass EFURLClass = {
+static EFClassDefinition EFURLClass = {
     .name = "EFURL",
     .typeID = kEFNotATypeID,
     .init = NULL,

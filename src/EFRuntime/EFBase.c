@@ -37,7 +37,7 @@ EFRange EFRangeZero = {
     .length = 0,
 };
 
-static _Atomic(EFClass *) ev_class_table[EF_MAX_CLASSES];
+static _Atomic(EFClass) ev_class_table[EF_MAX_CLASSES];
 static _Atomic(EFTypeID) ev_class_next = 1;
 
 EFTypeID EFGetTypeID(EFObjectRef ref)
@@ -79,7 +79,7 @@ Boolean EFEqual(EFObjectRef ref1,
         return false;
     }
 
-    EFClass *class = EFClassGetByID(typeID);
+    EFClass class = EFClassGetByID(typeID);
     if(class->equal != NULL)
     {
         return class->equal(ref1, ref2);
@@ -116,14 +116,13 @@ void EFRelease(EFObjectRef ref)
     {
         atomic_thread_fence(memory_order_acquire);
         /* trigger handler */
-        EFClass *class = EFClassGetByID(object->typeID);
+        EFClass class = EFClassGetByID(object->typeID);
         assert(class != NULL);
         if(class->deinit != NULL)
         {
             class->deinit(ref);
         }
-        EFAllocator *allocator = object->allocatorRef;
-        allocator->deallocate((EFAllocatorRef)allocator, (void*)ref);
+        EFAllocatorDeallocate(object->allocatorRef, (void*)ref);
     }
     else if(old <= 0)
     {
@@ -173,21 +172,21 @@ EFIndex EFGetRetainCount(EFObjectRef ref)
     return atomic_load(&object->refcount);
 }
 
-EFTypeID EFClassRegister(EFClass *cls)
+EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
 {
-    assert(cls != NULL);
+    assert(classDefinition != NULL);
     EFTypeID id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
     if(id >= EF_MAX_CLASSES)
     {
         return kEFNotATypeID;
     }
 
-    cls->typeID = id;
-    atomic_store_explicit(&ev_class_table[id], cls, memory_order_release);
+    classDefinition->typeID = id;
+    atomic_store_explicit(&ev_class_table[id], classDefinition, memory_order_release);
     return id;
 }
 
-EFClass *EFClassGetByID(EFTypeID id)
+EFClass EFClassGetByID(EFTypeID id)
 {
     if(id == kEFNotATypeID || id >= EF_MAX_CLASSES)
     {
@@ -226,22 +225,22 @@ EFStringRef EFCopyDescription(EFObjectRef ref)
     }
     else if(object->_rt == kEFRootTypeObject || object->_rt == kEFRootTypeStaticObject)
     {
-        EFClass *cls = EFClassGetByID(object->typeID);
-        if(cls == NULL)
+        EFClass class = EFClassGetByID(object->typeID);
+        if(class == NULL)
         {
             return EFSTR("<nil>");
         }
 
-        if(cls->copyDescription)
+        if(class->copyDescription)
         {
-            EFStringRef descriptionRef = cls->copyDescription(ref);
+            EFStringRef descriptionRef = class->copyDescription(ref);
             if(descriptionRef != NULL)
             {
                 return descriptionRef;
             }
         }
 
-        EFStringRef descriptionFallbackRef = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%s %p>"), cls->name, ref);
+        EFStringRef descriptionFallbackRef = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%s %p>"), class->name, ref);
         if(descriptionFallbackRef == NULL)
         {
             return EFSTR("<nil>");

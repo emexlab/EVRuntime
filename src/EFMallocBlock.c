@@ -45,7 +45,7 @@ static void __EFMallocBlockDeinit(EFObjectRef blockRef)
     }
 }
 
-EFClass EFMallocBlockClass = {
+static EFClassDefinition EFMallocBlockClass = {
     .name = "EFMallocBlock",
     .typeID = kEFNotATypeID,
     .init = NULL,

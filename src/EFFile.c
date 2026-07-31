@@ -89,7 +89,7 @@ static void __EFBitWalkerDeinit(EFObjectRef fileRef)
     EFReleaseTry(file->fileHandle);
 }
 
-EFClass EFFileClass = {
+static EFClassDefinition EFFileClass = {
     .name = "EFFile",
     .typeID = kEFNotATypeID,
     .init = NULL,
