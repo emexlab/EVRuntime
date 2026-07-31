@@ -26,11 +26,13 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdatomic.h>
+#include <pthread.h>
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFClass.h>
+#include <EmexFoundation/EFRuntime/EFAllocator.h>
 
 extern EFClassDefinition EFStringClass;
 extern EFClassDefinition EFNumberClass;
@@ -45,43 +47,87 @@ extern EFClassDefinition EFProcessClass;
 extern EFClassDefinition EFMallocBlockClass;
 extern EFClassDefinition EFArrayClass;
 
-static _Atomic(EFClass) ev_class_table[EFCLASS_MAX] = {
-    NULL,
-    &EFStringClass,
-    &EFNumberClass,
-    &EFURLClass,
-    &EFUUIDClass,
-    &EFDataClass,
-    &EFFileHandleClass,
-    &EFFileClass,
-    &EFBitWalkerClass,
-    &EFMappingClass,
-    &EFProcessClass,
-    &EFMallocBlockClass,
-    &EFArrayClass,
-    NULL,                   /* dictionary is unimplemented, because we first need hashing */
-};
-static _Atomic(EFTypeID) ev_class_next = kEFTypeIDDictionary;
+static pthread_mutex_t efClassLock = PTHREAD_MUTEX_INITIALIZER;
+static EFClass *efClassTable = NULL;
+static EFTypeID efClassNext = kEFTypeIDDictionary;
+static EFSize efClassCapacity = 0;
+
+static Boolean __EFClassTableExtendIfNeeded(void)
+{
+    if(pthread_mutex_trylock(&efClassLock) == 0)
+    {
+        pthread_mutex_unlock(&efClassLock);
+        return false;
+    }
+
+    if(efClassTable == NULL)
+    {
+        efClassTable = EFAllocatorAllocate(kEFAllocatorDefault, sizeof(EFClass) * 1024, 0);
+        if(efClassTable == NULL)
+        {
+            return false;
+        }
+
+        efClassTable[0] = NULL;
+        efClassTable[1] = &EFStringClass;
+        efClassTable[2] = &EFNumberClass;
+        efClassTable[3] = &EFURLClass;
+        efClassTable[4] = &EFUUIDClass;
+        efClassTable[5] = &EFDataClass;
+        efClassTable[6] = &EFFileHandleClass;
+        efClassTable[7] = &EFFileClass;
+        efClassTable[8] = &EFBitWalkerClass;
+        efClassTable[9] = &EFMappingClass;
+        efClassTable[10] = &EFProcessClass;
+        efClassTable[11] = &EFMallocBlockClass;
+        efClassTable[12] = &EFArrayClass;
+        efClassTable[13] = NULL;
+        efClassCapacity = 1024;
+    }
+    else if(efClassCapacity < efClassNext)
+    {
+        void *newp = EFAllocatorReallocate(kEFAllocatorDefault, efClassTable, sizeof(EFClass) * (efClassCapacity + 1024), 0);
+        if(newp == NULL)
+        {
+            return false;
+        }
+        efClassTable = newp;
+        efClassCapacity += 1024;
+    }
+
+    return true;
+}
 
 EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id)
 {
-    if(id >= EFCLASS_MAX)
+    pthread_mutex_lock(&efClassLock);
+    if((efClassTable == NULL && !__EFClassTableExtendIfNeeded()) || id > efClassNext)
     {
+        pthread_mutex_unlock(&efClassLock);
         return NULL;
     }
-    return atomic_load_explicit(&ev_class_table[id], memory_order_acquire);
+    EFClass class = efClassTable[id];
+    pthread_mutex_unlock(&efClassLock);
+    return class;
 }
 
 EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
 {
     assert(classDefinition != NULL);
-    EFTypeID id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
-    if(id >= EFCLASS_MAX)
+
+    pthread_mutex_lock(&efClassLock);
+
+    EFTypeID id = efClassNext + 1;
+    if(id == 0 || !__EFClassTableExtendIfNeeded())
     {
+        pthread_mutex_unlock(&efClassLock);
         return kEFTypeIDNone;
     }
+    efClassNext++;
 
     classDefinition->header.typeID = id;
-    atomic_store_explicit(&ev_class_table[id], classDefinition, memory_order_release);
+    efClassTable[id] = classDefinition;
+
+    pthread_mutex_unlock(&efClassLock);
     return id;
 }

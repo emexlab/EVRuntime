@@ -27,7 +27,6 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFBase.h>
 
-#define EFCLASS_MAX 1024
 #define EFCLASS_NEWEST_VERSION 2
 
 /* can never be changed */
