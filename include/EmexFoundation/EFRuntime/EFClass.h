@@ -27,14 +27,11 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFBase.h>
 
-#define EF_MAX_CLASSES  1024
+#define EFCLASS_MAX 1024
 
 typedef struct {
-    /* properties  */
     const char *name;
     EFTypeID typeID;
-
-    /* handlers */
     EFObjectInitCallback init;
     EFObjectDeinitCallback deinit;
     EFObjectEqualCallback equal;

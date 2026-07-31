@@ -51,7 +51,7 @@ extern EFClassDefinition EFProcessClass;
 extern EFClassDefinition EFMallocBlockClass;
 extern EFClassDefinition EFArrayClass;
 
-static _Atomic(EFClass) ev_class_table[EF_MAX_CLASSES] = {
+static _Atomic(EFClass) ev_class_table[EFCLASS_MAX] = {
     NULL,
     &EFStringClass,
     &EFNumberClass,
@@ -205,7 +205,7 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
 {
     assert(classDefinition != NULL);
     EFTypeID id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
-    if(id >= EF_MAX_CLASSES)
+    if(id >= EFCLASS_MAX)
     {
         return kEFTypeIDNone;
     }
@@ -217,7 +217,7 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
 
 EFClass EFClassGetByID(EFTypeID id)
 {
-    if(id == kEFTypeIDNone || id >= EF_MAX_CLASSES)
+    if(id == kEFTypeIDNone || id >= EFCLASS_MAX)
     {
         return NULL;
     }
