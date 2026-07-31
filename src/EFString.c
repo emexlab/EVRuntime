@@ -204,8 +204,12 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef stringRef)
 }
 
 EFClassDefinition EFStringClass = {
+    .header = {
+        .version = 2,
+        .typeID = kEFTypeIDString,
+        .name = NULL,
+    },
     .name = "EFString",
-    .typeID = kEFTypeIDString,
     .init = NULL,
     .deinit = __EFStringDeinit,
     .equal = __EFStringEqual,

@@ -210,14 +210,14 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
         return kEFTypeIDNone;
     }
 
-    classDefinition->typeID = id;
+    classDefinition->header.typeID = id;
     atomic_store_explicit(&ev_class_table[id], classDefinition, memory_order_release);
     return id;
 }
 
 EFClass EFClassGetByID(EFTypeID id)
 {
-    if(id == kEFTypeIDNone || id >= EFCLASS_MAX)
+    if(id >= EFCLASS_MAX)
     {
         return NULL;
     }

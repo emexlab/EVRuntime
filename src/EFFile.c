@@ -90,8 +90,12 @@ static void __EFBitWalkerDeinit(EFObjectRef fileRef)
 }
 
 EFClassDefinition EFFileClass = {
+    .header = {
+        .version = 2,
+        .typeID = kEFTypeIDFile,
+        .name = NULL,
+    },
     .name = "EFFile",
-    .typeID = kEFTypeIDFile,
     .init = NULL,
     .deinit = __EFBitWalkerDeinit,
     .equal = NULL,

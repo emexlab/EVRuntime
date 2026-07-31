@@ -88,7 +88,7 @@ EFObjectRef EFObjectCreate(EFAllocatorRef allocatorRef,
 
     object->_rt = kEFRootTypeObject;
     object->refcount = 1;
-    object->typeID = class->typeID;
+    object->typeID = class->header.typeID;
     object->allocatorRef = allocatorRef;
 
     /* initializing when applicable */

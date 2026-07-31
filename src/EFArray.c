@@ -168,8 +168,12 @@ static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
 }
 
 EFClassDefinition EFArrayClass = {
+    .header = {
+        .version = 2,
+        .typeID = kEFTypeIDArray,
+        .name = NULL,
+    },
     .name = "EFArray",
-    .typeID = kEFTypeIDArray,
     .init = NULL,
     .deinit = __EFArrayClassDeinit,
     .equal = __EFArrayClassEqual,

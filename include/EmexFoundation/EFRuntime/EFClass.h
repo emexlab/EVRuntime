@@ -28,10 +28,22 @@
 #include <EmexFoundation/EFRuntime/EFBase.h>
 
 #define EFCLASS_MAX 1024
+#define EFCLASS_NEWEST_VERSION 2
+
+/* can never be changed */
+typedef struct {
+    UInt16 version;
+    EFTypeID typeID;
+    EFStringRef name;   /* unused for now */
+} EFClassStableHeader;
 
 typedef struct {
+    EFClassStableHeader header;
+
+    /* shall not be there anymore in V3 */
     const char *name;
-    EFTypeID typeID;
+
+    /* callbacks */
     EFObjectInitCallback init;
     EFObjectDeinitCallback deinit;
     EFObjectEqualCallback equal;
@@ -39,6 +51,9 @@ typedef struct {
     EFObjectHashCallback hash;
 } EFClassDefinition;
 
+typedef EFClassDefinition EFClassDefinitionNewest;  /* bleeding edge could be unstable if many users from many platforms compile it */
+/* V1 lacked the version field sadly */
+typedef EFClassDefinition EFClassDefinitionV2;
 typedef EFClassDefinition *EFClass;
 
 #endif /* EFCLASS_H */

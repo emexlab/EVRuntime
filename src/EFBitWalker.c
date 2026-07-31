@@ -41,8 +41,12 @@ static void __EFBitWalkerDeinit(EFObjectRef walkerRef)
 }
 
 EFClassDefinition EFBitWalkerClass = {
+    .header = {
+        .version = 2,
+        .typeID = kEFTypeIDBitWalker,
+        .name = NULL,
+    },
     .name = "EFBitWalker",
-    .typeID = kEFTypeIDBitWalker,
     .init = NULL,
     .deinit = __EFBitWalkerDeinit,
     .equal = NULL,

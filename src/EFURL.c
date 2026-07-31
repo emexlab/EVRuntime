@@ -54,8 +54,12 @@ static EFStringRef __EFURLCopyDescription(EFObjectRef urlRef)
 }
 
 EFClassDefinition EFURLClass = {
+    .header = {
+        .version = 2,
+        .typeID = kEFTypeIDURL,
+        .name = NULL,
+    },
     .name = "EFURL",
-    .typeID = kEFTypeIDURL,
     .init = NULL,
     .deinit = __EFURLDeinit,
     .equal = NULL,

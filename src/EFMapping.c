@@ -53,8 +53,12 @@ static void __EFMappingDeinit(EFObjectRef objectRef)
 }
 
 EFClassDefinition EFMappingClass = {
+    .header = {
+        .version = 2,
+        .typeID = kEFTypeIDMapping,
+        .name = NULL,
+    },
     .name = "EFMapping",
-    .typeID = kEFTypeIDMapping,
     .init = NULL,
     .deinit = __EFMappingDeinit,
     .equal = NULL,
