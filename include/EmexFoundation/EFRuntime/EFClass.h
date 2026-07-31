@@ -37,6 +37,7 @@ typedef struct {
     EFStringRef name;   /* unused for now */
 } EFClassStableHeader;
 
+/* changes after registration are meaningless */
 typedef struct {
     EFClassStableHeader header;
 
@@ -55,5 +56,7 @@ typedef EFClassDefinition EFClassDefinitionNewest;  /* bleeding edge could be un
 /* V1 lacked the version field sadly */
 typedef EFClassDefinition EFClassDefinitionV2;
 typedef EFClassDefinition *EFClass;
+
+EF_EXTERN EFTypeID EFClassRegister(EFClassDefinition *classDefinition);
 
 #endif /* EFCLASS_H */

@@ -65,24 +65,6 @@
 #define EFSUPPRESS_DEPRECATED_END
 #endif /* __GNUC__ || __clang__ */
 
-EF_EXTERN EFTypeID EFClassRegister(EFClassDefinition *classDefinition);
-
-EF_EXTERN EFTypeID EFGetTypeID(EFObjectRef ref);
-EF_EXTERN EFRootType EFGetRootType(EFObjectRef ref);
-
-EF_EXTERN Boolean EFEqual(EFObjectRef ref1, EFObjectRef ref2);
-
-EF_EXTERN EF_RETURNS_RETAINED EFObjectRef EFRetain(EFObjectRef ref);
-EF_EXTERN void EFRelease(EF_CONSUMED EFObjectRef ref);
-EF_EXTERN EF_RETURNS_RETAINED EFObjectRef EFRetainTry(EFObjectRef ref);
-EF_EXTERN Boolean EFReleaseTry(EF_CONSUMED EFObjectRef ref);
-EF_EXTERN Boolean EFReleaseTryHelper(void *ref);    /* technically consumes */
-EF_EXTERN EFIndex EFGetRetainCount(EFObjectRef ref);
-
-EF_EXTERN EFAllocatorRef EFGetAllocator(EFObjectRef ref);
-
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFCopyDescription(EFObjectRef ref);
-
 EF_EXTERN void EFLog(EFStringRef formatStringRef, ...);
 
 #endif /* EFRUNTIME_H */

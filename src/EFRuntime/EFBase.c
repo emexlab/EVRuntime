@@ -33,50 +33,12 @@
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFString.h>
 
+EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id);
+
 EFRange EFRangeZero = {
     .location = 0,
     .length = 0,
 };
-
-extern EFClassDefinition EFStringClass;
-extern EFClassDefinition EFNumberClass;
-extern EFClassDefinition EFURLClass;
-extern EFClassDefinition EFUUIDClass;
-extern EFClassDefinition EFDataClass;
-extern EFClassDefinition EFFileHandleClass;
-extern EFClassDefinition EFFileClass;
-extern EFClassDefinition EFBitWalkerClass;
-extern EFClassDefinition EFMappingClass;
-extern EFClassDefinition EFProcessClass;
-extern EFClassDefinition EFMallocBlockClass;
-extern EFClassDefinition EFArrayClass;
-
-static _Atomic(EFClass) ev_class_table[EFCLASS_MAX] = {
-    NULL,
-    &EFStringClass,
-    &EFNumberClass,
-    &EFURLClass,
-    &EFUUIDClass,
-    &EFDataClass,
-    &EFFileHandleClass,
-    &EFFileClass,
-    &EFBitWalkerClass,
-    &EFMappingClass,
-    &EFProcessClass,
-    &EFMallocBlockClass,
-    &EFArrayClass,
-    NULL,                   /* dictionary is unimplemented, because we first need hashing */
-};
-static _Atomic(EFTypeID) ev_class_next = kEFTypeIDDictionary;
-
-EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id)
-{
-    if(id >= EFCLASS_MAX)
-    {
-        return NULL;
-    }
-    return atomic_load_explicit(&ev_class_table[id], memory_order_acquire);
-}
 
 EFTypeID EFGetTypeID(EFObjectRef ref)
 {
@@ -209,20 +171,6 @@ EFIndex EFGetRetainCount(EFObjectRef ref)
         return 1;   /* static.. */
     }
     return atomic_load(&object->refcount);
-}
-
-EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
-{
-    assert(classDefinition != NULL);
-    EFTypeID id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
-    if(id >= EFCLASS_MAX)
-    {
-        return kEFTypeIDNone;
-    }
-
-    classDefinition->header.typeID = id;
-    atomic_store_explicit(&ev_class_table[id], classDefinition, memory_order_release);
-    return id;
 }
 
 EFAllocatorRef EFGetAllocator(EFObjectRef ref)
