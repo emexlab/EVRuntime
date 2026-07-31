@@ -31,8 +31,6 @@
 #include <stdatomic.h>
 #include <pthread.h>
 
-#define kEFNotATypeID   ((uint64_t)0)
-
 #ifndef UINT8_MIN
 #define UINT8_MIN   0
 #endif /* UINT8_MIN*/
@@ -133,7 +131,11 @@ typedef enum: UInt8 {
     kEFRootTypeStaticObject,
 } EFRootType;
 
-typedef unsigned long EFTypeID;
+typedef enum: unsigned long {
+    kEFTypeIDNone =     0,
+    kEFTypeIDString =   1,
+} EFTypeID;
+
 typedef void *EFObjectRef;      /* so the compiler shuts up */
 typedef void *EFAllocatorRef;
 

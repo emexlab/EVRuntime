@@ -59,17 +59,20 @@ typedef struct __EFString {
 
 #define EFSTR(cStr) EFSTR_ENC(cStr, kEFStringEncodingUTF8)
 
+/* FIXME: doesn't work on file scope (clang and apple screw your self, support C23 properly) */
 #define EFSTR_ENC(cStr, enc) (__extension__ ({ \
-    static struct __EFString _evk = { \
+    static struct __EFString _efk = { \
         .encoding = (enc), \
         .isMutable = false, \
         .isInlined = false, \
         .buffer = (char *)("" cStr ""), \
         .length = (EFIndex)(sizeof("" cStr "") - 1), \
-        .super._rt = kEFRootTypeStaticObject \
+        .super = { \
+            ._rt = kEFRootTypeStaticObject,  \
+            .typeID = kEFTypeIDString, \
+        } \
     }; \
-    _evk.super.typeID = EFStringGetTypeID(), \
-    (EFStringRef)&_evk; \
+    (EFStringRef)&_efk; \
 }))
 
 EF_EXTERN EFTypeID EFStringGetTypeID(void);

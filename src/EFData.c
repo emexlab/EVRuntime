@@ -57,7 +57,7 @@ static EFStringRef __EFDataCopyDescription(EFObjectRef dataRef)
 
 static EFClassDefinition EFDataClass = {
     .name = "EFData",
-    .typeID = kEFNotATypeID,
+    .typeID = kEFTypeIDNone,
     .init = NULL,
     .deinit = __EFDataDeinit,
     .equal = NULL,

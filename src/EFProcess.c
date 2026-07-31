@@ -90,7 +90,7 @@ static EFStringRef __EFProcessCopyDescription(EFObjectRef processRef)
 
 static EFClassDefinition EFProcessClass = {
     .name = "EFProcess",
-    .typeID = kEFNotATypeID,
+    .typeID = kEFTypeIDNone,
     .init = NULL,
     .deinit = __EFProcessDeinit,
     .equal = NULL,

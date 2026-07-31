@@ -87,7 +87,7 @@ static EFStringRef __EFNumberCopyDescription(EFObjectRef numberRef)
 
 static EFClassDefinition EFNumberClass = {
     .name = "EFNumber",
-    .typeID = kEFNotATypeID,
+    .typeID = kEFTypeIDNone,
     .init = NULL,
     .deinit = NULL,
     .equal = __EFNumberEqual,

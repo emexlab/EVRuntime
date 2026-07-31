@@ -203,9 +203,9 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef stringRef)
     return EFRetain(stringRef); /* just return our selves */
 }
 
-static EFClassDefinition EFStringClass = {
+EFClassDefinition EFStringClass = {
     .name = "EFString",
-    .typeID = kEFNotATypeID,
+    .typeID = kEFTypeIDString,
     .init = NULL,
     .deinit = __EFStringDeinit,
     .equal = __EFStringEqual,
@@ -213,15 +213,8 @@ static EFClassDefinition EFStringClass = {
     .hash = NULL,
 };
 
-static void EFStringRegisterClass(void)
-{
-    EFClassRegister(&EFStringClass);
-}
-
 EFTypeID EFStringGetTypeID(void)
 {
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once(&once, EFStringRegisterClass);
     return EFStringClass.typeID;
 }
 

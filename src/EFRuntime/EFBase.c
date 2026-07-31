@@ -37,15 +37,20 @@ EFRange EFRangeZero = {
     .length = 0,
 };
 
-static _Atomic(EFClass) ev_class_table[EF_MAX_CLASSES];
-static _Atomic(EFTypeID) ev_class_next = 1;
+extern EFClassDefinition EFStringClass;
+
+static _Atomic(EFClass) ev_class_table[EF_MAX_CLASSES] = {
+    NULL,
+    &EFStringClass,
+};
+static _Atomic(EFTypeID) ev_class_next = 2;
 
 EFTypeID EFGetTypeID(EFObjectRef ref)
 {
     EFObject *object = (EFObject*)ref;
     if(object == NULL)
     {
-        return kEFNotATypeID;
+        return kEFTypeIDNone;
     }
     return object->typeID;
 }
@@ -178,7 +183,7 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
     EFTypeID id = atomic_fetch_add_explicit(&ev_class_next, 1, memory_order_relaxed);
     if(id >= EF_MAX_CLASSES)
     {
-        return kEFNotATypeID;
+        return kEFTypeIDNone;
     }
 
     classDefinition->typeID = id;
@@ -188,7 +193,7 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
 
 EFClass EFClassGetByID(EFTypeID id)
 {
-    if(id == kEFNotATypeID || id >= EF_MAX_CLASSES)
+    if(id == kEFTypeIDNone || id >= EF_MAX_CLASSES)
     {
         return NULL;
     }
