@@ -78,7 +78,13 @@
 #define SINT64_MAX  0x7FFFFFFFFFFFFFFFLL
 #endif /* SINT64_MAX */
 
+#if defined(__GNUC__) || defined(__clang__)
 #define EF_EXTERN __attribute__((visibility("default"))) extern
+#define EF_HIDDEN __attribute__((visibility("hidden"))) extern
+#else
+#define EF_EXTERN
+#define EF_HIDDEN
+#endif /* __GNUC__ || __clang__ */
 
 /* later for arc in my own objc runtime */
 #define EF_RETURNS_RETAINED

@@ -67,6 +67,8 @@ EFAllocatorRef kEFAllocatorMalloc = (EFAllocatorRef)&(EFAllocator){
 
 EFAllocatorRef kEFAllocatorDefault = NULL;
 
+EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id);
+
 EFObjectRef EFObjectCreate(EFAllocatorRef allocatorRef,
                            EFTypeID typeID,
                            EFIndex size)
@@ -75,7 +77,7 @@ EFObjectRef EFObjectCreate(EFAllocatorRef allocatorRef,
      * gotta need the class for the typeid
      * and the init handler.
      */
-    EFClass class = EFClassGetByID(typeID);
+    EFClass class = __EFClassGetByID(typeID);
 
     /* validating class and passed size */
     assert(class != NULL && (EFSize)size >= sizeof(EFObject));

@@ -69,6 +69,15 @@ static _Atomic(EFClass) ev_class_table[EFCLASS_MAX] = {
 };
 static _Atomic(EFTypeID) ev_class_next = kEFTypeIDDictionary;
 
+EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id)
+{
+    if(id >= EFCLASS_MAX)
+    {
+        return NULL;
+    }
+    return atomic_load_explicit(&ev_class_table[id], memory_order_acquire);
+}
+
 EFTypeID EFGetTypeID(EFObjectRef ref)
 {
     EFObject *object = (EFObject*)ref;
@@ -92,13 +101,14 @@ extern EFRootType EFGetRootType(EFObjectRef ref)
 Boolean EFEqual(EFObjectRef ref1,
                 EFObjectRef ref2)
 {
-    if(ref1 == ref2)
-    {
-        return true;
-    }
     if(ref1 == NULL || ref2 == NULL)
     {
         return false;
+    }
+
+    if(ref1 == ref2)
+    {
+        return true;
     }
 
     /* types must match */
@@ -108,7 +118,7 @@ Boolean EFEqual(EFObjectRef ref1,
         return false;
     }
 
-    EFClass class = EFClassGetByID(typeID);
+    EFClass class = __EFClassGetByID(typeID);
     if(class->equal != NULL)
     {
         return class->equal(ref1, ref2);
@@ -145,7 +155,7 @@ void EFRelease(EFObjectRef ref)
     {
         atomic_thread_fence(memory_order_acquire);
         /* trigger handler */
-        EFClass class = EFClassGetByID(object->typeID);
+        EFClass class = __EFClassGetByID(object->typeID);
         assert(class != NULL);
         if(class->deinit != NULL)
         {
@@ -215,15 +225,6 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
     return id;
 }
 
-EFClass EFClassGetByID(EFTypeID id)
-{
-    if(id >= EFCLASS_MAX)
-    {
-        return NULL;
-    }
-    return atomic_load_explicit(&ev_class_table[id], memory_order_acquire);
-}
-
 EFAllocatorRef EFGetAllocator(EFObjectRef ref)
 {
     EFObject *object = (EFObject*)ref;
@@ -254,7 +255,7 @@ EFStringRef EFCopyDescription(EFObjectRef ref)
     }
     else if(object->_rt == kEFRootTypeObject || object->_rt == kEFRootTypeStaticObject)
     {
-        EFClass class = EFClassGetByID(object->typeID);
+        EFClass class = __EFClassGetByID(object->typeID);
         if(class == NULL)
         {
             return EFSTR("<nil>");
