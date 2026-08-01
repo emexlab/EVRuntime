@@ -70,7 +70,7 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef objectRef)
 EFClassDefinition EFUUIDClass = {
     .header = {
         .version = 2,
-        .typeID = kEFTypeIDURL,
+        .typeID = kEFTypeIDUUID,
         .name = NULL,
     },
     .name = "EFUUID",
