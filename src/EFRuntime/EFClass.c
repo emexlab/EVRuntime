@@ -111,24 +111,51 @@ EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id)
     return class;
 }
 
+static EFClassDefinitionNewest *EFClassCopySafely(void *classDefinition)
+{
+    EFClassStableHeader *header = (EFClassStableHeader*)classDefinition;
+    switch(header->version)
+    {
+        case 2:
+        {
+            EFClassDefinitionV2 *classDefinitionV2 = (EFClassDefinitionV2*)classDefinition;
+            EFClassDefinitionNewest *newestClassDefinition = EFAllocatorAllocate(kEFAllocatorDefault, (EFSize)sizeof(EFClassDefinitionNewest), 0);
+            if(newestClassDefinition == NULL)
+            {
+                return NULL;
+            }
+
+            newestClassDefinition->header.version = 2;
+            newestClassDefinition->init = classDefinitionV2->init;
+            newestClassDefinition->deinit = classDefinitionV2->deinit;
+            newestClassDefinition->equal = classDefinitionV2->equal;
+            newestClassDefinition->hash = classDefinitionV2->hash;
+            newestClassDefinition->name = classDefinitionV2->name;
+            newestClassDefinition->copyDescription = classDefinitionV2->copyDescription;
+
+            return newestClassDefinition;
+        }
+        default:
+            break;
+    }
+    return NULL;
+}
+
 EFTypeID EFClassRegister(void *classDefinition)
 {
-    EFClassDefinitionV2 *classDefinitionReal = (EFClassDefinitionV2*)classDefinition;
-    assert(classDefinitionReal != NULL);
+    assert(classDefinition != NULL);
+    EFClassDefinitionNewest *classDefinitionCopy = (EFClassDefinitionNewest*)EFClassCopySafely(classDefinition);
+    assert(classDefinitionCopy != NULL);
 
     pthread_mutex_lock(&efClassLock);
 
-    EFTypeID id = efClassNext + 1;
-    if(id == 0 || !__EFClassTableExtendIfNeeded())
-    {
-        pthread_mutex_unlock(&efClassLock);
-        return kEFTypeIDNone;
-    }
-    efClassNext++;
-
-    classDefinitionReal->header.typeID = id;
-    efClassTable[id] = classDefinitionReal;
+    EFTypeID id = ++efClassNext;
+    assert(id != 0 && __EFClassTableExtendIfNeeded());
+    ((EFClassStableHeader*)classDefinition)->typeID = id;
+    classDefinitionCopy->header.typeID = id;
+    efClassTable[id] = classDefinitionCopy;
 
     pthread_mutex_unlock(&efClassLock);
+
     return id;
 }
