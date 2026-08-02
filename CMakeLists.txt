@@ -19,8 +19,9 @@ add_library(EmexFoundation ${LIB_TYPE}
     src/CrossSupport/VFD.c
 
     src/EFRuntime/EFBase.c
-    src/EFRuntime/EFClass.c
     src/EFRuntime/EFAllocator.c
+    src/EFRuntime/EFClass.c
+    src/EFRuntime/EFObject.c
 
     src/EFNumber.c
     src/EFString.c
