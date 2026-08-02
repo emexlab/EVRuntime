@@ -85,7 +85,7 @@ static EFStringRef __EFNumberCopyDescription(EFObjectRef numberRef)
     }
 }
 
-EFClassDefinition EFNumberClass = {
+EFClassDefinitionV2 EFNumberClass = {
     .header = {
         .version = 2,
         .typeID = kEFTypeIDNumber,

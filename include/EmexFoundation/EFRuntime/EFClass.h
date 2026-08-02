@@ -49,13 +49,12 @@ typedef struct {
     EFObjectEqualCallback equal;
     EFObjectCopyDescriptionCallback copyDescription;
     EFObjectHashCallback hash;
-} EFClassDefinition;
+} EFClassDefinitionV2;
 
-typedef EFClassDefinition EFClassDefinitionNewest;  /* bleeding edge could be unstable if many users from many platforms compile it */
+typedef EFClassDefinitionV2 EFClassDefinitionNewest;  /* bleeding edge could be unstable if many users from many platforms compile it */
 /* V1 lacked the version field sadly */
-typedef EFClassDefinition EFClassDefinitionV2;
-typedef EFClassDefinition *EFClass;
+typedef EFClassDefinitionV2 *EFClass;
 
-EF_EXTERN EFTypeID EFClassRegister(EFClassDefinition *classDefinition);
+EF_EXTERN EFTypeID EFClassRegister(void *classDefinition);
 
 #endif /* EFCLASS_H */

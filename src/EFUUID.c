@@ -27,7 +27,7 @@
 #include <unistd.h>
 #if defined(__APPLE__)
 #include <sys/random.h>
-#endif
+#endif /* __APPLE__ */
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -67,7 +67,7 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef objectRef)
     return EFUUIDCreateString(EFGetAllocator(objectRef), (EFUUIDRef)objectRef);
 }
 
-EFClassDefinition EFUUIDClass = {
+EFClassDefinitionV2 EFUUIDClass = {
     .header = {
         .version = 2,
         .typeID = kEFTypeIDUUID,

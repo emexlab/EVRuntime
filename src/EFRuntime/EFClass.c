@@ -34,18 +34,18 @@
 #include <EmexFoundation/EFRuntime/EFClass.h>
 #include <EmexFoundation/EFRuntime/EFAllocator.h>
 
-extern EFClassDefinition EFStringClass;
-extern EFClassDefinition EFNumberClass;
-extern EFClassDefinition EFURLClass;
-extern EFClassDefinition EFUUIDClass;
-extern EFClassDefinition EFDataClass;
-extern EFClassDefinition EFFileHandleClass;
-extern EFClassDefinition EFFileClass;
-extern EFClassDefinition EFBitWalkerClass;
-extern EFClassDefinition EFMappingClass;
-extern EFClassDefinition EFProcessClass;
-extern EFClassDefinition EFMallocBlockClass;
-extern EFClassDefinition EFArrayClass;
+extern EFClassDefinitionV2 EFStringClass;
+extern EFClassDefinitionV2 EFNumberClass;
+extern EFClassDefinitionV2 EFURLClass;
+extern EFClassDefinitionV2 EFUUIDClass;
+extern EFClassDefinitionV2 EFDataClass;
+extern EFClassDefinitionV2 EFFileHandleClass;
+extern EFClassDefinitionV2 EFFileClass;
+extern EFClassDefinitionV2 EFBitWalkerClass;
+extern EFClassDefinitionV2 EFMappingClass;
+extern EFClassDefinitionV2 EFProcessClass;
+extern EFClassDefinitionV2 EFMallocBlockClass;
+extern EFClassDefinitionV2 EFArrayClass;
 
 static pthread_mutex_t efClassLock = PTHREAD_MUTEX_INITIALIZER;
 static EFClass *efClassTable = NULL;
@@ -111,9 +111,10 @@ EF_HIDDEN EFClass __EFClassGetByID(EFTypeID id)
     return class;
 }
 
-EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
+EFTypeID EFClassRegister(void *classDefinition)
 {
-    assert(classDefinition != NULL);
+    EFClassDefinitionV2 *classDefinitionReal = (EFClassDefinitionV2*)classDefinition;
+    assert(classDefinitionReal != NULL);
 
     pthread_mutex_lock(&efClassLock);
 
@@ -125,8 +126,8 @@ EFTypeID EFClassRegister(EFClassDefinition *classDefinition)
     }
     efClassNext++;
 
-    classDefinition->header.typeID = id;
-    efClassTable[id] = classDefinition;
+    classDefinitionReal->header.typeID = id;
+    efClassTable[id] = classDefinitionReal;
 
     pthread_mutex_unlock(&efClassLock);
     return id;

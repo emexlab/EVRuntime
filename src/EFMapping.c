@@ -52,7 +52,7 @@ static void __EFMappingDeinit(EFObjectRef objectRef)
     }
 }
 
-EFClassDefinition EFMappingClass = {
+EFClassDefinitionV2 EFMappingClass = {
     .header = {
         .version = 2,
         .typeID = kEFTypeIDMapping,

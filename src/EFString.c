@@ -203,7 +203,7 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef stringRef)
     return EFRetain(stringRef); /* just return our selves */
 }
 
-EFClassDefinition EFStringClass = {
+EFClassDefinitionV2 EFStringClass = {
     .header = {
         .version = 2,
         .typeID = kEFTypeIDString,

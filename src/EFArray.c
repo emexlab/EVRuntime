@@ -167,7 +167,7 @@ static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
     return EFAUTOTRANSFER(mutableStringRef);
 }
 
-EFClassDefinition EFArrayClass = {
+EFClassDefinitionV2 EFArrayClass = {
     .header = {
         .version = 2,
         .typeID = kEFTypeIDArray,
