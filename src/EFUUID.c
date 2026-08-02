@@ -67,13 +67,12 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef objectRef)
     return EFUUIDCreateString(EFGetAllocator(objectRef), (EFUUIDRef)objectRef);
 }
 
-EFClassDefinitionV2 EFUUIDClass = {
+EFClassDefinitionNewest EFUUIDClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDUUID,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFUUID"),
     },
-    .name = "EFUUID",
     .init = NULL,
     .deinit = NULL,
     .equal = NULL,

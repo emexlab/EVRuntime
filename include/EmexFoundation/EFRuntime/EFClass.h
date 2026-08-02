@@ -27,13 +27,13 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFBase.h>
 
-#define EFCLASS_NEWEST_VERSION 2
+#define EFCLASS_NEWEST_VERSION 3
 
 /* can never be changed */
 typedef struct {
     UInt16 version;
     EFTypeID typeID;
-    EFStringRef name;   /* unused for now */
+    EFStringRef name;
 } EFClassStableHeader;
 
 /* changes after registration are meaningless */
@@ -51,9 +51,21 @@ typedef struct {
     EFObjectHashCallback hash;
 } EFClassDefinitionV2;
 
-typedef EFClassDefinitionV2 EFClassDefinitionNewest;  /* bleeding edge could be unstable if many users from many platforms compile it */
+/* changes after registration are meaningless */
+typedef struct {
+    EFClassStableHeader header;
+
+    /* callbacks */
+    EFObjectInitCallback init;
+    EFObjectDeinitCallback deinit;
+    EFObjectEqualCallback equal;
+    EFObjectCopyDescriptionCallback copyDescription;
+    EFObjectHashCallback hash;
+} EFClassDefinitionV3;
+
+typedef EFClassDefinitionV3 EFClassDefinitionNewest;  /* bleeding edge could be unstable if many users from many platforms compile it */
 /* V1 lacked the version field sadly */
-typedef EFClassDefinitionV2 *EFClass;
+typedef EFClassDefinitionV3 *EFClass;
 
 EF_EXTERN EFTypeID EFClassRegister(void *classDefinition);
 

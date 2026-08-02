@@ -88,13 +88,12 @@ static EFStringRef __EFProcessCopyDescription(EFObjectRef processRef)
     return EFStringCreateWithFormat(allocator, EFSTR("<EFProcess %p>{processIdentifier = %ld, parentProcessIdentifier = %ld, userIdentifier = %ld, groupIdentifier = %ld, processGroupIdentifier = %ld, sessionIdentifier = %ld, command = %@, executablePath = %@, arguments = %@, alive = %d}"), processRef, process->processIdentifier, process->parentProcessIdentifier, process->userIdentifier, process->groupIdentifier, process->processGroupIdentifier, process->sessionIdentifier, process->command, process->executablePath, process->arguments, EFProcessIsAlive(processRef));
 }
 
-EFClassDefinitionV2 EFProcessClass = {
+EFClassDefinitionNewest EFProcessClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDProcess,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFProcess"),
     },
-    .name = "EFProcess",
     .init = NULL,
     .deinit = __EFProcessDeinit,
     .equal = NULL,

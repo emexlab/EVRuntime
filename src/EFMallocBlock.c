@@ -28,6 +28,7 @@
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFMallocBlock.h>
+#include <EmexFoundation/EFString.h>
 
 typedef struct __EFMallocBlock {
     EFObject super;
@@ -44,13 +45,12 @@ static void __EFMallocBlockDeinit(EFObjectRef blockRef)
     }
 }
 
-EFClassDefinitionV2 EFMallocBlockClass = {
+EFClassDefinitionNewest EFMallocBlockClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDMallocBlock,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFMallocBlock"),
     },
-    .name = "EFMallocBlock",
     .init = NULL,
     .deinit = __EFMallocBlockDeinit,
     .equal = NULL,

@@ -61,13 +61,12 @@ static void __EVFileHandleDeinit(EFObjectRef fileHandleRef)
     close(fileHandle->fileDescriptor);
 }
 
-EFClassDefinitionV2 EFFileHandleClass = {
+EFClassDefinitionNewest EFFileHandleClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDFileHandle,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFFileHandle"),
     },
-    .name = "EFFileHandle",
     .init = NULL,
     .deinit = __EVFileHandleDeinit,
     .equal = NULL,

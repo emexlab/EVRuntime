@@ -25,6 +25,7 @@
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFBitWalker.h>
 #include <EmexFoundation/EFFileHandle.h>
+#include <EmexFoundation/EFString.h>
 
 typedef struct __EFBitWalker {
     EFObject super;
@@ -40,13 +41,12 @@ static void __EFBitWalkerDeinit(EFObjectRef walkerRef)
     EFRelease(walker->fileHandle);
 }
 
-EFClassDefinitionV2 EFBitWalkerClass = {
+EFClassDefinitionNewest EFBitWalkerClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDBitWalker,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFBitWalker"),
     },
-    .name = "EFBitWalker",
     .init = NULL,
     .deinit = __EFBitWalkerDeinit,
     .equal = NULL,

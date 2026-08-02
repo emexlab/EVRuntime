@@ -53,13 +53,12 @@ static EFStringRef __EFURLCopyDescription(EFObjectRef urlRef)
     return EFRetainTry(EFURLGetPath(urlRef));
 }
 
-EFClassDefinitionV2 EFURLClass = {
+EFClassDefinitionNewest EFURLClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDURL,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFURL"),
     },
-    .name = "EFURL",
     .init = NULL,
     .deinit = __EFURLDeinit,
     .equal = NULL,

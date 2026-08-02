@@ -85,13 +85,12 @@ static EFStringRef __EFNumberCopyDescription(EFObjectRef numberRef)
     }
 }
 
-EFClassDefinitionV2 EFNumberClass = {
+EFClassDefinitionNewest EFNumberClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDNumber,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFNumber"),
     },
-    .name = "EFNumber",
     .init = NULL,
     .deinit = NULL,
     .equal = __EFNumberEqual,

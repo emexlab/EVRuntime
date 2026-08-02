@@ -218,7 +218,7 @@ EFStringRef EFCopyDescription(EFObjectRef ref)
             }
         }
 
-        EFStringRef descriptionFallbackRef = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%s %p>"), class->name, ref);
+        EFStringRef descriptionFallbackRef = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%@ %p>"), class->header.name, ref);
         if(descriptionFallbackRef == NULL)
         {
             return EFSTR("<nil>");

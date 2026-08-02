@@ -89,13 +89,12 @@ static void __EFBitWalkerDeinit(EFObjectRef fileRef)
     EFReleaseTry(file->fileHandle);
 }
 
-EFClassDefinitionV2 EFFileClass = {
+EFClassDefinitionNewest EFFileClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDFile,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFFile"),
     },
-    .name = "EFFile",
     .init = NULL,
     .deinit = __EFBitWalkerDeinit,
     .equal = NULL,

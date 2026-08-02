@@ -75,6 +75,22 @@ typedef struct __EFString {
     (EFStringRef)&_efk; \
 }))
 
+#define EFSTR_FILESCOPE(cStr) \
+    EFSTR_FILESCOPE_ENC(cStr, kEFStringEncodingUTF8)
+
+#define EFSTR_FILESCOPE_ENC(cStr, enc) \
+    ((EFStringRef)&(struct __EFString){ \
+        .encoding = (enc), \
+        .isMutable = false, \
+        .isInlined = false, \
+        .buffer = (char *)("" cStr ""), \
+        .length = (EFIndex)(sizeof("" cStr "") - 1), \
+        .super = { \
+            ._rt = kEFRootTypeStaticObject, \
+            .typeID = kEFTypeIDString, \
+        }, \
+    })
+
 EF_EXTERN EFTypeID EFStringGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithBuffer(EFAllocatorRef allocatorRef, const UInt8 *buffer, EFIndex length, EFStringEncoding encoding);

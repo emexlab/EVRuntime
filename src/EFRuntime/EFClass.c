@@ -33,19 +33,20 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFClass.h>
 #include <EmexFoundation/EFRuntime/EFAllocator.h>
+#include <EmexFoundation/EFString.h>
 
-extern EFClassDefinitionV2 EFStringClass;
-extern EFClassDefinitionV2 EFNumberClass;
-extern EFClassDefinitionV2 EFURLClass;
-extern EFClassDefinitionV2 EFUUIDClass;
-extern EFClassDefinitionV2 EFDataClass;
-extern EFClassDefinitionV2 EFFileHandleClass;
-extern EFClassDefinitionV2 EFFileClass;
-extern EFClassDefinitionV2 EFBitWalkerClass;
-extern EFClassDefinitionV2 EFMappingClass;
-extern EFClassDefinitionV2 EFProcessClass;
-extern EFClassDefinitionV2 EFMallocBlockClass;
-extern EFClassDefinitionV2 EFArrayClass;
+extern EFClassDefinitionNewest EFStringClass;
+extern EFClassDefinitionNewest EFNumberClass;
+extern EFClassDefinitionNewest EFURLClass;
+extern EFClassDefinitionNewest EFUUIDClass;
+extern EFClassDefinitionNewest EFDataClass;
+extern EFClassDefinitionNewest EFFileHandleClass;
+extern EFClassDefinitionNewest EFFileClass;
+extern EFClassDefinitionNewest EFBitWalkerClass;
+extern EFClassDefinitionNewest EFMappingClass;
+extern EFClassDefinitionNewest EFProcessClass;
+extern EFClassDefinitionNewest EFMallocBlockClass;
+extern EFClassDefinitionNewest EFArrayClass;
 
 static pthread_mutex_t efClassLock = PTHREAD_MUTEX_INITIALIZER;
 static EFClass *efClassTable = NULL;
@@ -125,13 +126,32 @@ static EFClassDefinitionNewest *EFClassCopySafely(void *classDefinition)
                 return NULL;
             }
 
-            newestClassDefinition->header.version = 2;
+            newestClassDefinition->header.name = EFStringCreateWithCString(kEFAllocatorDefault, classDefinitionV2->name, kEFStringEncodingUTF8);
+            newestClassDefinition->header.version = EFCLASS_NEWEST_VERSION;
             newestClassDefinition->init = classDefinitionV2->init;
             newestClassDefinition->deinit = classDefinitionV2->deinit;
             newestClassDefinition->equal = classDefinitionV2->equal;
             newestClassDefinition->hash = classDefinitionV2->hash;
-            newestClassDefinition->name = classDefinitionV2->name;
             newestClassDefinition->copyDescription = classDefinitionV2->copyDescription;
+
+            return newestClassDefinition;
+        }
+        case 3:
+        {
+            EFClassDefinitionV3 *classDefinitionV3 = (EFClassDefinitionV3*)classDefinition;
+            EFClassDefinitionNewest *newestClassDefinition = EFAllocatorAllocate(kEFAllocatorDefault, (EFSize)sizeof(EFClassDefinitionNewest), 0);
+            if(newestClassDefinition == NULL)
+            {
+                return NULL;
+            }
+
+            newestClassDefinition->header.name = EFStringCreateCopy(kEFAllocatorDefault, classDefinitionV3->header.name);
+            newestClassDefinition->header.version = EFCLASS_NEWEST_VERSION;
+            newestClassDefinition->init = classDefinitionV3->init;
+            newestClassDefinition->deinit = classDefinitionV3->deinit;
+            newestClassDefinition->equal = classDefinitionV3->equal;
+            newestClassDefinition->hash = classDefinitionV3->hash;
+            newestClassDefinition->copyDescription = classDefinitionV3->copyDescription;
 
             return newestClassDefinition;
         }

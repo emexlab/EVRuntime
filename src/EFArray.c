@@ -167,13 +167,12 @@ static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
     return EFAUTOTRANSFER(mutableStringRef);
 }
 
-EFClassDefinitionV2 EFArrayClass = {
+EFClassDefinitionNewest EFArrayClass = {
     .header = {
-        .version = 2,
+        .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDArray,
-        .name = NULL,
+        .name = EFSTR_FILESCOPE("EFArray"),
     },
-    .name = "EFArray",
     .init = NULL,
     .deinit = __EFArrayClassDeinit,
     .equal = __EFArrayClassEqual,
