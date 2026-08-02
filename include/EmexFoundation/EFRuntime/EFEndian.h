@@ -28,14 +28,12 @@
 #define kEFEndianBig    1
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
-#define kEFEndianHost   BW_BIG_ENDIAN
+#define kEFEndianHost   kEFEndianBig
 #else
-#define kEFEndianHost   BW_LITTLE_ENDIAN
+#define kEFEndianHost   kEFEndianLittle
 #endif
 
-typedef UInt8 EFEndian;
-
-#if BW_HOST_ENDIAN == kEFEndianBig
+#if kEFEndianHost == kEFEndianBig
 #define TO_HOST16(x) __builtin_bswap16(x)
 #define TO_HOST32(x) __builtin_bswap32(x)
 #define TO_HOST64(x) __builtin_bswap64(x)
@@ -44,6 +42,8 @@ typedef UInt8 EFEndian;
 #define TO_HOST32(x) (x)
 #define TO_HOST64(x) (x)
 #endif
+
+typedef UInt8 EFEndian;
 
 static inline UInt64 EFEndianBSwapN(UInt64 v,
                                     UInt8 num_bytes)
