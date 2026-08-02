@@ -45,8 +45,8 @@ typedef UInt8 EFEndian;
 #define TO_HOST64(x) (x)
 #endif
 
-static inline UInt64 bswap_n(UInt64 v,
-                             UInt8 num_bytes)
+static inline UInt64 EFEndianBSwapN(UInt64 v,
+                                    UInt8 num_bytes)
 {
     switch(num_bytes)
     {
@@ -61,8 +61,8 @@ static inline UInt64 bswap_n(UInt64 v,
     }
 }
 
-static inline EFUInt128 load_window_le(const UInt8 *p,
-                                       EFSize n)
+static inline EFUInt128 EFEndianLoadWindowLE(const UInt8 *p,
+                                             EFSize n)
 {
     EFUInt128 v = 0;
     for(EFSize i = 0; i < n; i++)
@@ -72,9 +72,9 @@ static inline EFUInt128 load_window_le(const UInt8 *p,
     return v;
 }
 
-static inline void store_window_le(UInt8 *p,
-                                   EFUInt128 v,
-                                   EFSize n)
+static inline void EFEndianStoreWindowLE(UInt8 *p,
+                                         EFUInt128 v,
+                                         EFSize n)
 {
     for(EFSize i = 0; i < n; i++)
     {

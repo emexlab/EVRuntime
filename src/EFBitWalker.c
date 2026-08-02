@@ -115,7 +115,7 @@ Boolean EFBitWalkerWrite(EFBitWalkerRef walkerRef,
         UInt8 num_bytes = (numBits + 7) / 8;
         if(walker->endian == kEFEndianBig)
         {
-            value = bswap_n(value, num_bytes);
+            value = EFEndianBSwapN(value, num_bytes);
         }
     }
 
@@ -126,9 +126,9 @@ Boolean EFBitWalkerWrite(EFBitWalkerRef walkerRef,
         return false;
     }
 
-    __uint128_t chunk = load_window_le(win, sizeof win);
+    __uint128_t chunk = EFEndianLoadWindowLE(win, sizeof win);
     chunk |= (__uint128_t)value << walker->bitIndex;
-    store_window_le(win, chunk, sizeof win);
+    EFEndianStoreWindowLE(win, chunk, sizeof win);
 
     EFFileHandleSeek(walker->fileHandle, walker->bytePos, kEFFileHandleSeekTypeSet);
     if(EFFileHandleWrite(walker->fileHandle, win, sizeof(win)) != (EFIndex)sizeof(win))
@@ -160,7 +160,7 @@ UInt64 EFBitWalkerRead(EFBitWalkerRef walkerRef,
         return false;
     }
 
-    __uint128_t chunk = load_window_le(win, sizeof win);
+    __uint128_t chunk = EFEndianLoadWindowLE(win, sizeof win);
     chunk >>= walker->bitIndex;
 
     UInt64 mask = (numBits == 64) ? UINT64_MAX : ((1ULL << numBits) - 1);
@@ -172,7 +172,7 @@ UInt64 EFBitWalkerRead(EFBitWalkerRef walkerRef,
         UInt8 numBytes = (numBits + 7) / 8;
         if(walker->endian == kEFEndianBig)
         {
-            value = bswap_n(value, numBytes);
+            value = EFEndianBSwapN(value, numBytes);
         }
     }
 
