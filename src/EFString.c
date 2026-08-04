@@ -1381,7 +1381,7 @@ EFNumberRef EFStringCopyNumber(EFAllocatorRef allocator,
                                EFStringRef stringRef)
 {
     __EFString string = (__EFString)stringRef;
-    if(string == NULL)
+    if(string == NULL || string->length <= 0)
     {
         return NULL;
     }
