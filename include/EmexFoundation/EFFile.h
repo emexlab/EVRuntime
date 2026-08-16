@@ -60,22 +60,22 @@ EF_EXTERN EFFilePolicy EFFilePolicyInNoCreate;
 
 EF_EXTERN EFTypeID EFFileGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFFileRef EFFileCreateWithPath(EFAllocatorRef allocatorRef, EFFilePolicy policy, EFStringRef stringRef);
-EF_EXTERN EF_RETURNS_RETAINED EFFileRef EFFileCreateWithURL(EFAllocatorRef allocatorRef, EFFilePolicy policy, EFURLRef urlRef);
-EF_EXTERN EF_RETURNS_RETAINED EFFileRef EFFileCreateWithString(EFAllocatorRef allocatorRef, EFFilePolicy policy, EFURLRef urlRef, EFStringRef stringRef);
+EF_EXTERN EF_RETURNS_RETAINED EFFileRef EFFileCreateWithPath(EFAllocatorRef allocator, EFFilePolicy policy, EFStringRef string);
+EF_EXTERN EF_RETURNS_RETAINED EFFileRef EFFileCreateWithURL(EFAllocatorRef allocator, EFFilePolicy policy, EFURLRef url);
+EF_EXTERN EF_RETURNS_RETAINED EFFileRef EFFileCreateWithString(EFAllocatorRef allocator, EFFilePolicy policy, EFURLRef url, EFStringRef string);
 
-EF_EXTERN Boolean EFFileOpen(EFFileRef fileRef);
-EF_EXTERN void EFFileClose(EFFileRef fileRef);
+EF_EXTERN Boolean EFFileOpen(EFFileRef file);
+EF_EXTERN void EFFileClose(EFFileRef file);
 
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileCopyFileHandle(EFAllocatorRef allocatorRef, EFFileRef fileRef);
-EF_EXTERN EF_RETURNS_RETAINED EFBitWalkerRef EFFileCopyBitWalker(EFAllocatorRef allocatorRef, EFFileRef fileRef, EFEndian endian);
-EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileCopyData(EFAllocatorRef allocatorRef, EFFileRef fileRef);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileCopyFileHandle(EFAllocatorRef allocator, EFFileRef file);
+EF_EXTERN EF_RETURNS_RETAINED EFBitWalkerRef EFFileCopyBitWalker(EFAllocatorRef allocator, EFFileRef file, EFEndian endian);
+EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileCopyData(EFAllocatorRef allocator, EFFileRef file);
 
-EF_EXTERN EFFileType EFFileGetType(EFFileRef fileRef);
+EF_EXTERN EFFileType EFFileGetType(EFFileRef file);
 
 EF_EXTERN EFFileType EFFileTypeForPath(EFStringRef path, Boolean mustExist);
-EF_EXTERN void EFFileUnlink(EFFileRef fileRef);
+EF_EXTERN void EFFileUnlink(EFFileRef file);
 
-EF_EXTERN EF_RETURNS_NOT_RETAINED EFURLRef EFFileGetURL(EFFileRef fileRef);
+EF_EXTERN EF_RETURNS_NOT_RETAINED EFURLRef EFFileGetURL(EFFileRef file);
 
 #endif /* EFFILE_H */

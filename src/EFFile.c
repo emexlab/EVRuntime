@@ -107,23 +107,23 @@ EFTypeID EFFileGetTypeID(void)
     return kEFTypeIDFile;
 }
 
-EFFileRef __EFFileCreate(EFAllocatorRef allocatorRef,
+EFFileRef __EFFileCreate(EFAllocatorRef allocator,
                          EFFilePolicy policy,
-                         EFURLRef urlRef,
+                         EFURLRef url,
                          Boolean care_about_file_exist_policy)
 {
-    if(urlRef == NULL)
+    if(url == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL __EFFile file = (__EFFile)EFObjectCreate(allocatorRef, EFFileGetTypeID(), (EFIndex)sizeof(struct __EFFile));
+    EFAUTOREL __EFFile file = (__EFFile)EFObjectCreate(allocator, EFFileGetTypeID(), (EFIndex)sizeof(struct __EFFile));
     if(file == NULL)
     {
         return NULL;
     }
 
-    file->url = EFRetain(urlRef);
+    file->url = EFRetain(url);
     if(file->url == NULL)
     {
         return NULL;
@@ -131,7 +131,7 @@ EFFileRef __EFFileCreate(EFAllocatorRef allocatorRef,
 
     file->policy = policy;
 
-    EFURLType urlType = EFURLGetType(urlRef);
+    EFURLType urlType = EFURLGetType(url);
     EFStringRef path = EFURLGetPath(file->url);
     file->type = EFFileTypeForPath(path, urlType == kEFURLTypePOSIX && policy.mustExist);
     if(urlType == kEFURLTypePOSIX)
@@ -156,49 +156,48 @@ EFFileRef __EFFileCreate(EFAllocatorRef allocatorRef,
     return (EFFileRef)EFAUTOTRANSFER(file);
 }
 
-EFFileRef EFFileCreateWithPath(EFAllocatorRef allocatorRef,
+EFFileRef EFFileCreateWithPath(EFAllocatorRef allocator,
                                EFFilePolicy policy,
-                               EFStringRef stringRef)
+                               EFStringRef string)
 {
-    EFAUTOREL EFURLRef urlRef = EFURLCreateWithString(allocatorRef, stringRef);
-    return __EFFileCreate(allocatorRef, policy, urlRef, true);
+    EFAUTOREL EFURLRef urlRef = EFURLCreateWithString(allocator, string);
+    return __EFFileCreate(allocator, policy, urlRef, true);
 }
 
-EFFileRef EFFileCreateWithURL(EFAllocatorRef allocatorRef,
+EFFileRef EFFileCreateWithURL(EFAllocatorRef allocator,
                               EFFilePolicy policy,
                               EFURLRef urlRef)
 {
-    return __EFFileCreate(allocatorRef, policy, urlRef, true);
+    return __EFFileCreate(allocator, policy, urlRef, true);
 }
 
-EFFileRef EFFileCreateWithString(EFAllocatorRef allocatorRef,
+EFFileRef EFFileCreateWithString(EFAllocatorRef allocator,
                                  EFFilePolicy policy,
                                  EFURLRef urlRef,
-                                 EFStringRef stringRef)
+                                 EFStringRef string)
 {
-    EFAUTOREL __EFFile file = (__EFFile)__EFFileCreate(allocatorRef, policy, urlRef, false);
+    EFAUTOREL __EFFile file = (__EFFile)__EFFileCreate(allocator, policy, urlRef, false);
     if(file == NULL)
     {
         return NULL;
     }
 
     /* setting unsaved values */
-    file->fileHandle = EFFileHandleCreate(allocatorRef);
+    file->fileHandle = EFFileHandleCreate(allocator);
     if(file->fileHandle == NULL)
     {
         return NULL;
     }
 
     /* TODO: shall be validated (wasn't even validated in original C version of emex_file_t) */
-    EFFileHandleWrite(file->fileHandle, (const UInt8*)EFStringGetCStringPtr(stringRef, kEFStringEncodingUTF8), EFStringGetLength(stringRef));
+    EFFileHandleWrite(file->fileHandle, (const UInt8*)EFStringGetCStringPtr(string, kEFStringEncodingUTF8), EFStringGetLength(string));
     EFFileHandleSeek(file->fileHandle, 0, kEFFileHandleSeekTypeSet);
 
     return (EFFileRef)EFAUTOTRANSFER(file);
 }
 
-Boolean EFFileOpen(EFFileRef fileRef)
+Boolean EFFileOpen(EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
     if(file == NULL)
     {
         return false;
@@ -215,7 +214,7 @@ Boolean EFFileOpen(EFFileRef fileRef)
     }
 
     /* initial open */
-    file->fileHandle = EFFileHandleCreateWithURLAndOptions(EFGetAllocator(fileRef), file->url, __EFFilePolicyToORW(file->policy.neededPermission) | (file->policy.createOnOpen ? (O_CREAT | O_TRUNC) : 0), 0755);
+    file->fileHandle = EFFileHandleCreateWithURLAndOptions(EFGetAllocator(file), file->url, __EFFilePolicyToORW(file->policy.neededPermission) | (file->policy.createOnOpen ? (O_CREAT | O_TRUNC) : 0), 0755);
     if(file->fileHandle == NULL)
     {
         return false;
@@ -224,9 +223,8 @@ Boolean EFFileOpen(EFFileRef fileRef)
     return true;
 }
 
-void EFFileClose(EFFileRef fileRef)
+void EFFileClose(EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
     if(file == NULL)
     {
         return;
@@ -237,39 +235,38 @@ void EFFileClose(EFFileRef fileRef)
 }
 
 EFFileHandleRef EFFileCopyFileHandle(EFAllocatorRef allocatorRef,
-                                     EFFileRef fileRef)
+                                     EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
-    if(file == NULL || !EFFileOpen(fileRef))
+    if(file == NULL || !EFFileOpen(file))
     {
         return NULL;
     }
+
     return EFFileHandleCreateCopy(allocatorRef, file->fileHandle);
 }
 
-EFBitWalkerRef EFFileCopyBitWalker(EFAllocatorRef allocatorRef,
-                                   EFFileRef fileRef,
+EFBitWalkerRef EFFileCopyBitWalker(EFAllocatorRef allocator,
+                                   EFFileRef file,
                                    EFEndian endian)
 {
-    __EFFile file = (__EFFile)fileRef;
-    if(file == NULL || !EFFileOpen(fileRef))
+    if(file == NULL || !EFFileOpen(file))
     {
         return NULL;
     }
-    return EFBitWalkerCreateWithHandle(allocatorRef, file->fileHandle, endian);
+
+    return EFBitWalkerCreateWithHandle(allocator, file->fileHandle, endian);
 }
 
-EFDataRef EFFileCopyData(EFAllocatorRef allocatorRef,
-                         EFFileRef fileRef)
+EFDataRef EFFileCopyData(EFAllocatorRef allocator,
+                         EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
-    if(file == NULL || !EFFileOpen(fileRef))
+    if(file == NULL || !EFFileOpen(file))
     {
         return NULL;
     }
 
     EFIndex length = EFFileHandleGetLength(file->fileHandle);
-    UInt8 *buffer = EFAllocatorAllocate(allocatorRef, length, 0);
+    UInt8 *buffer = EFAllocatorAllocate(allocator, length, 0);
     if(buffer == NULL)
     {
         return NULL;
@@ -279,42 +276,28 @@ EFDataRef EFFileCopyData(EFAllocatorRef allocatorRef,
     EFIndex readLength = EFFileHandleRead(file->fileHandle, buffer, length);
     if(length > readLength)
     {
-        EFAllocatorDeallocate(allocatorRef, buffer);
+        EFAllocatorDeallocate(allocator, buffer);
         return NULL;
     }
 
-    EFDataRef data = EFDataCreateWithBuffer(allocatorRef, buffer, length);
-    EFAllocatorDeallocate(allocatorRef, buffer);
+    EFDataRef data = EFDataCreateWithBuffer(allocator, buffer, length);
+    EFAllocatorDeallocate(allocator, buffer);
     return data;
 }
 
-EFFileType EFFileGetType(EFFileRef fileRef)
+EFFileType EFFileGetType(EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
     if(file == NULL)
     {
         return kEFFileTypeUnknown;
     }
+
     return file->type;
 }
 
-static inline const char *get_extension(const char *path)
-{
-    const char *base = strrchr(path, '/');
-    base = base ? base + 1 : path;
-
-    const char *dot = strrchr(base, '.');
-    if(!dot || dot == base)
-    {
-        return "";
-    }
-    return dot + 1;
-}
-
-EFFileType EFFileTypeForPath(EFStringRef pathRef,
+EFFileType EFFileTypeForPath(EFStringRef path,
                              Boolean mustExist)
 {
-    const char *path = EFStringGetCStringPtr(pathRef, kEFStringEncodingUTF8);
     if(path == NULL)
     {
         /* don't know?! */
@@ -322,7 +305,7 @@ EFFileType EFFileTypeForPath(EFStringRef pathRef,
     }
 
     struct stat st;
-    if(stat(path, &st) != 0)
+    if(stat(EFStringGetCStringPtr(path, kEFStringEncodingUTF8), &st) != 0)
     {
         if(!mustExist)
         {
@@ -339,43 +322,41 @@ EFFileType EFFileTypeForPath(EFStringRef pathRef,
     else if(S_ISREG(st.st_mode))
 extension_validation:
     {
-        /* needs SERIOUS OPTIMIZATION */
-        const char *extension = get_extension(path);
-        if(strcmp("e64", extension) == 0)
+        if(EFStringHasSuffix(path, EFSTR(".e64")))
         {
             return kEFFileTypeAssembly;
         }
-        else if(strcmp("e64inc", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".e64inc")))
         {
             return kEFFileTypeAssemblyIncludations;
         }
-        else if(strcmp("c", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".c")))
         {
             return kEFFileTypeC;
         }
-        else if(strcmp("h", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".h")))
         {
             return kEFFileTypeCHeader;
         }
-        else if(strcmp("cpp", extension) == 0 ||
-                strcmp("cxx", extension) == 0 ||
-                strcmp("cc", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".cpp")) ||
+                EFStringHasSuffix(path, EFSTR(".cxx")) ||
+                EFStringHasSuffix(path, EFSTR(".cc")))
         {
             return kEFFileTypeCXX;
         }
-        else if(strcmp("hpp", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".hpp")))
         {
             return kEFFileTypeCXXHeader;
         }
-        else if(strcmp("m", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".m")))
         {
             return kEFFileTypeObjC;
         }
-        else if(strcmp("mm", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".mm")))
         {
             return kEFFileTypeObjCXX;
         }
-        else if(strcmp("o", extension) == 0)
+        else if(EFStringHasSuffix(path, EFSTR(".o")))
         {
             return kEFFileTypeObject;
         }
@@ -385,9 +366,8 @@ extension_validation:
     return kEFFileTypeUnknown;
 }
 
-void EFFileUnlink(EFFileRef fileRef)
+void EFFileUnlink(EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
     if(file == NULL)
     {
         return;
@@ -396,12 +376,12 @@ void EFFileUnlink(EFFileRef fileRef)
     unlink(EFStringGetCStringPtr(EFURLGetPath(file->url), kEFStringEncodingUTF8));
 }
 
-EFURLRef EFFileGetURL(EFFileRef fileRef)
+EFURLRef EFFileGetURL(EFFileRef file)
 {
-    __EFFile file = (__EFFile)fileRef;
     if(file == NULL)
     {
         return NULL;
     }
+
     return file->url;
 }
