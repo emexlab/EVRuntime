@@ -108,16 +108,16 @@ EFTypeID EFProcessGetTypeID(void)
 
 extern char *const *environ;
 
-EFProcessRef EFProcessCreateWithCommand(EFAllocatorRef allocatorRef,
-                                        EFStringRef commandRef,
+EFProcessRef EFProcessCreateWithCommand(EFAllocatorRef allocator,
+                                        EFStringRef command,
                                         EFArrayRef arguments)
 {
-    if(commandRef == NULL || arguments == NULL)
+    if(command == NULL || arguments == NULL)
     {
         return NULL;
     }
 
-    const char *commandPtr = EFStringGetCStringPtr(commandRef, kEFStringEncodingUTF8);
+    const char *commandPtr = EFStringGetCStringPtr(command, kEFStringEncodingUTF8);
     if(commandPtr == NULL)
     {
         return NULL;
@@ -143,21 +143,21 @@ EFProcessRef EFProcessCreateWithCommand(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    __EFProcess process = (__EFProcess)EFProcessCreateWithProcessIdentifier(allocatorRef, pid);
+    __EFProcess process = (__EFProcess)EFProcessCreateWithProcessIdentifier(allocator, pid);
     process->weSpawnedThis = true;
     return (EFProcessRef)process;
 }
 
-EFProcessRef EFProcessCreateWithPath(EFAllocatorRef allocatorRef,
-                                     EFStringRef pathRef,
+EFProcessRef EFProcessCreateWithPath(EFAllocatorRef allocator,
+                                     EFStringRef path,
                                      EFArrayRef arguments)
 {
-    if(pathRef == NULL || arguments == NULL)
+    if(path == NULL || arguments == NULL)
     {
         return NULL;
     }
 
-    const char *pathPtr = EFStringGetCStringPtr(pathRef, kEFStringEncodingUTF8);
+    const char *pathPtr = EFStringGetCStringPtr(path, kEFStringEncodingUTF8);
     if(pathPtr == NULL)
     {
         return NULL;
@@ -183,12 +183,12 @@ EFProcessRef EFProcessCreateWithPath(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    __EFProcess process = (__EFProcess)EFProcessCreateWithProcessIdentifier(allocatorRef, pid);
+    __EFProcess process = (__EFProcess)EFProcessCreateWithProcessIdentifier(allocator, pid);
     process->weSpawnedThis = true;
     return (EFProcessRef)process;
 }
 
-EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
+EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocator,
                                                   SInt32 processIdentifier)
 {
     if(processIdentifier <= 0)
@@ -198,7 +198,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
 
     EFAUTOREL EFMutableArrayRef mutableArguments = NULL;
     EFAUTOREL EFStringRef executablePath = NULL;
-    EFAUTOREL EFStringRef commandRef = NULL;
+    EFAUTOREL EFStringRef command = NULL;
 
     SInt32 pid = 0;
     SInt32 ppid = 0;
@@ -275,7 +275,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     if(linkLen != -1)
     {
         linkTarget[linkLen] = '\0';
-        executablePath = EFStringCreateWithCString(allocatorRef, linkTarget, kEFStringEncodingUTF8);
+        executablePath = EFStringCreateWithCString(allocator, linkTarget, kEFStringEncodingUTF8);
     }
 
     char cmdlinePath[64];
@@ -284,7 +284,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     if(cmdFile != NULL)
     {
         EFSize capacity = 4096;
-        char *cmdBuffer = EFAllocatorAllocate(allocatorRef, capacity, 0);
+        char *cmdBuffer = EFAllocatorAllocate(allocator, capacity, 0);
         EFSize readBytes = 0;
 
         if(cmdBuffer != NULL)
@@ -300,7 +300,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
                 if(readBytes >= capacity - 1)
                 {
                     capacity *= 2;
-                    char *newBuf = EFAllocatorReallocate(allocatorRef, cmdBuffer, capacity, 0);
+                    char *newBuf = EFAllocatorReallocate(allocator, cmdBuffer, capacity, 0);
                     if(newBuf == NULL)
                     {
                         break;
@@ -329,7 +329,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
                 {
                     commandCString = cmdBuffer;
 
-                    mutableArguments = EFArrayCreateMutable(allocatorRef, kEFArrayCallbacksObjectCallbacks, linuxArgc);
+                    mutableArguments = EFArrayCreateMutable(allocator, kEFArrayCallbacksObjectCallbacks, linuxArgc);
                     if(mutableArguments != NULL)
                     {
                         char *cp = cmdBuffer;
@@ -338,7 +338,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
                         {
                             if(argIndex > 0)
                             {
-                                EFStringRef argument = EFStringCreateWithCString(allocatorRef, cp, kEFStringEncodingUTF8);
+                                EFStringRef argument = EFStringCreateWithCString(allocator, cp, kEFStringEncodingUTF8);
                                 if(argument != NULL)
                                 {
                                     EFArrayAppendValue(mutableArguments, argument);
@@ -352,12 +352,12 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
                 }
                 else
                 {
-                    EFAllocatorDeallocate(allocatorRef, cmdBuffer);
+                    EFAllocatorDeallocate(allocator, cmdBuffer);
                 }
             }
             else
             {
-                EFAllocatorDeallocate(allocatorRef, cmdBuffer);
+                EFAllocatorDeallocate(allocator, cmdBuffer);
             }
         }
         fclose(cmdFile);
@@ -382,7 +382,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    char *procArgs = EFAllocatorAllocate(allocatorRef, argMax, 0);
+    char *procArgs = EFAllocatorAllocate(allocator, argMax, 0);
     if(procArgs == NULL)
     {
         return NULL;
@@ -391,7 +391,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     size = (EFSize)argMax;
     if(sysctl(argsMib, 3, procArgs, &size, NULL, 0) == -1)
     {
-        EFAllocatorDeallocate(allocatorRef, procArgs);
+        EFAllocatorDeallocate(allocator, procArgs);
         goto skip_arg_copy;
     }
 
@@ -401,7 +401,7 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     char *cp = procArgs + sizeof(argc);
 
     /* NOTE: in this is the executable path! */
-    executablePath = EFStringCreateWithCString(allocatorRef, cp, kEFStringEncodingUTF8);
+    executablePath = EFStringCreateWithCString(allocator, cp, kEFStringEncodingUTF8);
     for(; cp < &procArgs[size]; cp++)
     {
         if(*cp == '\0')
@@ -420,14 +420,14 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
 
     if(cp >= &procArgs[size] || argc <= 0)
     {
-        EFAllocatorDeallocate(allocatorRef, procArgs);
+        EFAllocatorDeallocate(allocator, procArgs);
         return NULL;
     }
 
-    mutableArguments = EFArrayCreateMutable(allocatorRef, kEFArrayCallbacksObjectCallbacks, argc);
+    mutableArguments = EFArrayCreateMutable(allocator, kEFArrayCallbacksObjectCallbacks, argc);
     if(mutableArguments == NULL)
     {
-        EFAllocatorDeallocate(allocatorRef, procArgs);
+        EFAllocatorDeallocate(allocator, procArgs);
         return NULL;
     }
 
@@ -436,24 +436,24 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
     {
         if(arg_count > 0)
         {
-            EFAUTOREL EFStringRef argument = EFStringCreateWithCString(allocatorRef, cp, kEFStringEncodingUTF8);
+            EFAUTOREL EFStringRef argument = EFStringCreateWithCString(allocator, cp, kEFStringEncodingUTF8);
             if(argument == NULL || !EFArrayAppendValue(mutableArguments, argument))
             {
-                EFAllocatorDeallocate(allocatorRef, procArgs);
+                EFAllocatorDeallocate(allocator, procArgs);
                 return NULL;
             }
         }
         cp += strlen(cp) + 1;
         arg_count++;
     }
-    EFAllocatorDeallocate(allocatorRef, procArgs);
+    EFAllocatorDeallocate(allocator, procArgs);
 #elifdef __FreeBSD__
     SInt32 pathMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, processIdentifier };
     char pathBuf[1024];
     EFSize pathLen = sizeof(pathBuf);
     if(sysctl(pathMib, 4, pathBuf, &pathLen, NULL, 0) == 0 && pathLen > 0)
     {
-        executablePath = EFStringCreateWithCString(allocatorRef, pathBuf, kEFStringEncodingUTF8);
+        executablePath = EFStringCreateWithCString(allocator, pathBuf, kEFStringEncodingUTF8);
     }
 
     SInt32 argsMib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ARGS, processIdentifier };
@@ -461,12 +461,12 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
 
     if(sysctl(argsMib, 4, NULL, &argsSize, NULL, 0) == 0 && argsSize > 0)
     {
-        char *argsBuf = EFAllocatorAllocate(allocatorRef, argsSize, 0);
+        char *argsBuf = EFAllocatorAllocate(allocator, argsSize, 0);
         if(argsBuf != NULL)
         {
             if(sysctl(argsMib, 4, argsBuf, &argsSize, NULL, 0) == 0)
             {
-                mutableArguments = EFArrayCreateMutable(allocatorRef, kEFArrayCallbacksObjectCallbacks, 0);
+                mutableArguments = EFArrayCreateMutable(allocator, kEFArrayCallbacksObjectCallbacks, 0);
                 if(mutableArguments != NULL)
                 {
                     char *cp = argsBuf;
@@ -477,17 +477,17 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
                     }
                     while(cp < end && *cp != '\0')
                     {
-                        EFAUTOREL EFStringRef argument = EFStringCreateWithCString(allocatorRef, cp, kEFStringEncodingUTF8);
+                        EFAUTOREL EFStringRef argument = EFStringCreateWithCString(allocator, cp, kEFStringEncodingUTF8);
                         if(argument == NULL || !EFArrayAppendValue(mutableArguments, argument))
                         {
-                            EFAllocatorDeallocate(allocatorRef, argsBuf);
+                            EFAllocatorDeallocate(allocator, argsBuf);
                             return NULL;
                         }
                         cp += strlen(cp) + 1;
                     }
                 }
             }
-            EFAllocatorDeallocate(allocatorRef, argsBuf);
+            EFAllocatorDeallocate(allocator, argsBuf);
         }
     }
 #endif /* __APPLE__ || __FreeBSD__ || __linux__ */
@@ -496,13 +496,13 @@ EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocatorRef,
 skip_arg_copy:
 #endif /* __APPLE__ */
 
-    if(mutableArguments == NULL && (mutableArguments = EFArrayCreate(allocatorRef, kEFArrayCallbacksObjectCallbacks, NULL, 0)) == NULL)
+    if(mutableArguments == NULL && (mutableArguments = EFArrayCreate(allocator, kEFArrayCallbacksObjectCallbacks, NULL, 0)) == NULL)
     {
         return NULL;
     }
 
-    commandRef = EFStringCreateWithCString(allocatorRef, commandCString, kEFStringEncodingUTF8);
-    if(executablePath == NULL && (executablePath = EFRetainTry(commandRef)) == NULL)
+    command = EFStringCreateWithCString(allocator, commandCString, kEFStringEncodingUTF8);
+    if(executablePath == NULL && (executablePath = EFRetainTry(command)) == NULL)
     {
         return NULL;
     }
@@ -514,7 +514,7 @@ skip_arg_copy:
     }
 #endif
 
-    if(commandRef == NULL)
+    if(command == NULL)
     {
         return NULL;
     }
@@ -522,21 +522,21 @@ skip_arg_copy:
     EFAUTOREL EFArrayRef arguments = NULL;
     if(mutableArguments != NULL)
     {
-        arguments = EFArrayCreateCopy(allocatorRef, mutableArguments);
+        arguments = EFArrayCreateCopy(allocator, mutableArguments);
         if(arguments == NULL)
         {
             return NULL;
         }
     }
 
-    __EFProcess process = (__EFProcess)EFObjectCreate(allocatorRef, EFProcessGetTypeID(), (EFIndex)sizeof(struct __EFProcess));
+    __EFProcess process = (__EFProcess)EFObjectCreate(allocator, EFProcessGetTypeID(), (EFIndex)sizeof(struct __EFProcess));
     if(process == NULL)
     {
         return NULL;
     }
 
     process->executablePath = EFAUTOTRANSFER(executablePath);
-    process->command = EFAUTOTRANSFER(commandRef);
+    process->command = EFAUTOTRANSFER(command);
     process->arguments = EFAUTOTRANSFER(arguments);
     process->processIdentifier = pid;
     process->parentProcessIdentifier = ppid;
@@ -549,9 +549,8 @@ skip_arg_copy:
     return (EFProcessRef)process;
 }
 
-SInt32 EFProcessGetProcessIdentifier(EFProcessRef processRef)
+SInt32 EFProcessGetProcessIdentifier(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
@@ -560,9 +559,8 @@ SInt32 EFProcessGetProcessIdentifier(EFProcessRef processRef)
     return process->processIdentifier;
 }
 
-SInt32 EFProcessGetParentProcessIdentifier(EFProcessRef processRef)
+SInt32 EFProcessGetParentProcessIdentifier(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
@@ -571,9 +569,8 @@ SInt32 EFProcessGetParentProcessIdentifier(EFProcessRef processRef)
     return process->parentProcessIdentifier;
 }
 
-SInt32 EFProcessGetUserIdentifier(EFProcessRef processRef)
+SInt32 EFProcessGetUserIdentifier(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
@@ -582,9 +579,8 @@ SInt32 EFProcessGetUserIdentifier(EFProcessRef processRef)
     return process->userIdentifier;
 }
 
-SInt32 EFProcessGetGroupIdentifier(EFProcessRef processRef)
+SInt32 EFProcessGetGroupIdentifier(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
@@ -593,9 +589,8 @@ SInt32 EFProcessGetGroupIdentifier(EFProcessRef processRef)
     return process->groupIdentifier;
 }
 
-SInt32 EFProcessGetProcessGroupIdentifier(EFProcessRef processRef)
+SInt32 EFProcessGetProcessGroupIdentifier(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
@@ -604,9 +599,8 @@ SInt32 EFProcessGetProcessGroupIdentifier(EFProcessRef processRef)
     return process->processGroupIdentifier;
 }
 
-SInt32 EFProcessGetSessionIdentifier(EFProcessRef processRef)
+SInt32 EFProcessGetSessionIdentifier(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
@@ -615,10 +609,9 @@ SInt32 EFProcessGetSessionIdentifier(EFProcessRef processRef)
     return process->sessionIdentifier;
 }
 
-EFStringRef EFProcessCopyUserName(EFAllocatorRef allocatorRef,
-                                  EFProcessRef processRef)
+EFStringRef EFProcessCopyUserName(EFAllocatorRef allocator,
+                                  EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return NULL;
@@ -626,13 +619,12 @@ EFStringRef EFProcessCopyUserName(EFAllocatorRef allocatorRef,
 
     struct passwd *pw = getpwuid(process->userIdentifier);
     const char *username = (pw != NULL) ? pw->pw_name : NULL;
-    return EFStringCreateWithCString(allocatorRef, username, kEFStringEncodingUTF8);
+    return EFStringCreateWithCString(allocator, username, kEFStringEncodingUTF8);
 }
 
-EFStringRef EFProcessCopyGroupName(EFAllocatorRef allocatorRef,
-                                   EFProcessRef processRef)
+EFStringRef EFProcessCopyGroupName(EFAllocatorRef allocator,
+                                   EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return NULL;
@@ -640,12 +632,11 @@ EFStringRef EFProcessCopyGroupName(EFAllocatorRef allocatorRef,
 
     struct group *gr = getgrgid(process->groupIdentifier);
     const char *groupname = (gr != NULL) ? gr->gr_name : NULL;
-    return EFStringCreateWithCString(allocatorRef, groupname, kEFStringEncodingUTF8);
+    return EFStringCreateWithCString(allocator, groupname, kEFStringEncodingUTF8);
 }
 
-EFStringRef EFProcessGetCommand(EFProcessRef processRef)
+EFStringRef EFProcessGetCommand(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return NULL;
@@ -654,9 +645,8 @@ EFStringRef EFProcessGetCommand(EFProcessRef processRef)
     return process->command;
 }
 
-EFStringRef EFProcessGetExecutablePath(EFProcessRef processRef)
+EFStringRef EFProcessGetExecutablePath(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return NULL;
@@ -665,9 +655,8 @@ EFStringRef EFProcessGetExecutablePath(EFProcessRef processRef)
     return process->executablePath;
 }
 
-EFArrayRef EFProcessGetArguments(EFProcessRef processRef)
+EFArrayRef EFProcessGetArguments(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return NULL;
@@ -676,10 +665,9 @@ EFArrayRef EFProcessGetArguments(EFProcessRef processRef)
     return process->arguments;
 }
 
-Boolean EFProcessSendSignal(EFProcessRef processRef,
+Boolean EFProcessSendSignal(EFProcessRef process,
                             SInt32 signal)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return false;
@@ -688,29 +676,28 @@ Boolean EFProcessSendSignal(EFProcessRef processRef,
     return kill(process->processIdentifier, signal) == 0;
 }
 
-Boolean EFProcessSuspend(EFProcessRef processRef)
+Boolean EFProcessSuspend(EFProcessRef process)
 {
-    return EFProcessSendSignal(processRef, SIGSTOP);
+    return EFProcessSendSignal(process, SIGSTOP);
 }
 
-Boolean EFProcessResume(EFProcessRef processRef)
+Boolean EFProcessResume(EFProcessRef process)
 {
-    return EFProcessSendSignal(processRef, SIGCONT);
+    return EFProcessSendSignal(process, SIGCONT);
 }
 
-Boolean EFProcessTerminate(EFProcessRef processRef)
+Boolean EFProcessTerminate(EFProcessRef process)
 {
-    return EFProcessSendSignal(processRef, SIGTERM);
+    return EFProcessSendSignal(process, SIGTERM);
 }
 
-Boolean EFProcessForceKill(EFProcessRef processRef)
+Boolean EFProcessForceKill(EFProcessRef process)
 {
-    return EFProcessSendSignal(processRef, SIGKILL);
+    return EFProcessSendSignal(process, SIGKILL);
 }
 
-Boolean EFProcessIsAlive(EFProcessRef processRef)
+Boolean EFProcessIsAlive(EFProcessRef process)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return false;
@@ -726,11 +713,10 @@ extern EFProcessRef EFProcessGetCurrentProcess(void)
     return EFProcessCurrent;
 }
 
-SInt32 EFProcessWaitPID(EFProcessRef processRef,
+SInt32 EFProcessWaitPID(EFProcessRef process,
                         SInt32 *status,
                         SInt32 options)
 {
-    __EFProcess process = (__EFProcess)processRef;
     if(process == NULL)
     {
         return -1;
