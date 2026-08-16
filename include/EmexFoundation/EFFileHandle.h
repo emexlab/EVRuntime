@@ -41,35 +41,35 @@ typedef enum: UInt8 {
 
 EF_EXTERN EFTypeID EFFileHandleGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef, SInt32 fd);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef, EFStringRef pathStringRef, SInt32 flg, ...);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef, EFURLRef urlRef, SInt32 flg, ...);
-EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateCopy(EFAllocatorRef allocatorRef, EFFileHandleRef fileHandleRef);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocator);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocator, SInt32 fd);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocator, EFStringRef pathString, SInt32 flg, ...);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocator, EFURLRef url, SInt32 flg, ...);
+EF_EXTERN EF_RETURNS_RETAINED EFFileHandleRef EFFileHandleCreateCopy(EFAllocatorRef allocator, EFFileHandleRef fileHandle);
 
-EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandleRef, EFIndex length);
-EF_EXTERN Boolean EFFileHandleWriteData(EFFileHandleRef fileHandleRef, EFDataRef dataRef);
+EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandle, EFIndex length);
+EF_EXTERN Boolean EFFileHandleWriteData(EFFileHandleRef fileHandle, EFDataRef data);
 
-EF_EXTERN EFIndex EFFileHandleRead(EFFileHandleRef fileHandleRef, UInt8 *buffer, EFIndex length);
-EF_EXTERN EFIndex EFFileHandleWrite(EFFileHandleRef fileHandleRef, const UInt8 *buffer, EFIndex length);
-EF_EXTERN EFIndex EFFileHandleTruncate(EFFileHandleRef fileHandleRef, EFIndex length);
+EF_EXTERN EFIndex EFFileHandleRead(EFFileHandleRef fileHandle, UInt8 *buffer, EFIndex length);
+EF_EXTERN EFIndex EFFileHandleWrite(EFFileHandleRef fileHandle, const UInt8 *buffer, EFIndex length);
+EF_EXTERN EFIndex EFFileHandleTruncate(EFFileHandleRef fileHandle, EFIndex length);
 
-EF_EXTERN EFIndex EFFileHandleSeek(EFFileHandleRef fileHandleRef, EFIndex offset, EFFileHandleSeekType seekType);
-EF_EXTERN void EFFileHandleSync(EFFileHandleRef fileHandleRef);
+EF_EXTERN EFIndex EFFileHandleSeek(EFFileHandleRef fileHandle, EFIndex offset, EFFileHandleSeekType seekType);
+EF_EXTERN void EFFileHandleSync(EFFileHandleRef fileHandle);
 
-EF_EXTERN EFIndex EFFileHandleGetLength(EFFileHandleRef fileHandleRef);
-EF_EXTERN Boolean EFFileHandleIsReadable(EFFileHandleRef fileHandleRef);
-EF_EXTERN Boolean EFFileHandleIsWritable(EFFileHandleRef fileHandleRef);
+EF_EXTERN EFIndex EFFileHandleGetLength(EFFileHandleRef fileHandle);
+EF_EXTERN Boolean EFFileHandleIsReadable(EFFileHandleRef fileHandle);
+EF_EXTERN Boolean EFFileHandleIsWritable(EFFileHandleRef fileHandle);
 
-EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileHandleCopyDataForRange(EFAllocatorRef allocatorRef, EFFileHandleRef fileHandleRef, EFRange range);
+EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFFileHandleCopyDataForRange(EFAllocatorRef allocator, EFFileHandleRef fileHandle, EFRange range);
 
-EF_EXTERN char *EFFileHandleGets(EFFileHandleRef fileHandleRef, char *s, SInt32 n);
-EF_EXTERN void EFFileHandlePutc(EFFileHandleRef fileHandleRef, char c);
-EF_EXTERN void EFFileHandlePuts(EFFileHandleRef fileHandleRef, const char *s);
-EF_EXTERN void EFFileHandlePrintf(EFFileHandleRef fileHandleRef, const char *format, ...);
+EF_EXTERN char *EFFileHandleGets(EFFileHandleRef fileHandle, char *s, SInt32 n);
+EF_EXTERN void EFFileHandlePutc(EFFileHandleRef fileHandle, char c);
+EF_EXTERN void EFFileHandlePuts(EFFileHandleRef fileHandle, const char *s);
+EF_EXTERN void EFFileHandlePrintf(EFFileHandleRef fileHandle, const char *format, ...);
 
-EF_EXTERN SInt32 EFFileHandleGetFileDescriptor(EFFileHandleRef fileHandleRef);
+EF_EXTERN SInt32 EFFileHandleGetFileDescriptor(EFFileHandleRef fileHandle);
 
-EF_EXTERN EF_RETURNS_RETAINED EFMappingRef EFFileHandleCopyMapping(EFAllocatorRef allocatorRef, EFFileHandleRef fileHandleRef);
+EF_EXTERN EF_RETURNS_RETAINED EFMappingRef EFFileHandleCopyMapping(EFAllocatorRef allocator, EFFileHandleRef fileHandle);
 
 #endif /* EFFILEHANDLE_H */

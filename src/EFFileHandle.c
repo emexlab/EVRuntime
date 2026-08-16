@@ -79,9 +79,9 @@ EFTypeID EFFileHandleGetTypeID(void)
     return kEFTypeIDFileHandle;
 }
 
-EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef)
+EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocator)
 {
-    EFAUTOREL __EFFileHandle fileHandle = (__EFFileHandle)EFObjectCreate(allocatorRef, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
+    EFAUTOREL __EFFileHandle fileHandle = (__EFFileHandle)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
     if(fileHandle == NULL)
     {
         return NULL;
@@ -100,7 +100,7 @@ EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef)
     return (EFFileHandleRef)EFAUTOTRANSFER(fileHandle);
 }
 
-EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef,
+EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocator,
                                                      SInt32 fd)
 {
     fd = dup(fd);
@@ -109,7 +109,7 @@ EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef
         return NULL;
     }
 
-    EFAUTOREL __EFFileHandle fileHandle = (__EFFileHandle)EFObjectCreate(allocatorRef, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
+    EFAUTOREL __EFFileHandle fileHandle = (__EFFileHandle)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
     if(fileHandle == NULL)
     {
         return NULL;
@@ -130,12 +130,12 @@ EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocatorRef
     return (EFFileHandleRef)EFAUTOTRANSFER(fileHandle);
 }
 
-EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef,
-                                                     EFStringRef pathStringRef,
+EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocator,
+                                                     EFStringRef pathString,
                                                      SInt32 flg,
                                                      ...)
 {
-    EFAUTOREL EFURLRef urlRef = EFURLCreateWithString(allocatorRef, pathStringRef);
+    EFAUTOREL EFURLRef urlRef = EFURLCreateWithString(allocator, pathString);
     if(urlRef == NULL)
     {
         return NULL;
@@ -151,19 +151,19 @@ EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocatorRef
         va_end(ap);
     }
 
-    return EFFileHandleCreateWithURLAndOptions(allocatorRef, urlRef, flg, mode);
+    return EFFileHandleCreateWithURLAndOptions(allocator, urlRef, flg, mode);
 }
 
-static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
-                                                   EFURLRef urlRef)
+static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocator,
+                                                   EFURLRef url)
 {
-    EFArrayRef pathComponents = EFURLGetPathComponents(urlRef);
+    EFArrayRef pathComponents = EFURLGetPathComponents(url);
     if(pathComponents == NULL || EFArrayGetCount(pathComponents) <= 0)
     {
         return NULL;
     }
 
-    EFAUTOREL EFStringRef path = EFURLCopyPathWithoutHostname(allocatorRef, urlRef);
+    EFAUTOREL EFStringRef path = EFURLCopyPathWithoutHostname(allocator, url);
     const char *pathCPtr = EFStringGetCStringPtr(path, kEFStringEncodingUTF8);
     const char *hostNameCPtr = EFStringGetCStringPtr(EFArrayGetValueAtIndex(pathComponents, 0), kEFStringEncodingUTF8);
     if(pathCPtr == NULL || hostNameCPtr == NULL)
@@ -173,7 +173,7 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
 
     FILE *sslPipe = NULL;
     SInt32 sockfd = -1;
-    EFURLType urlType = EFURLGetType(urlRef);
+    EFURLType urlType = EFURLGetType(url);
     switch(urlType)
     {
         case kEFURLTypeHTTP:
@@ -259,7 +259,7 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
         }
     }
 
-    EFFileHandleRef virtualHandle = EFFileHandleCreate(allocatorRef);
+    EFFileHandleRef virtualHandle = EFFileHandleCreate(allocator);
     if(!virtualHandle)
     {
         if(sslPipe)
@@ -294,22 +294,23 @@ static EFFileHandleRef __EFFileHandleCreateNetDesc(EFAllocatorRef allocatorRef,
     return virtualHandle;
 }
 
-EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef,
-                                                    EFURLRef urlRef,
+EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocator,
+                                                    EFURLRef url,
                                                     SInt32 flg,
                                                     ...)
 {
-    if(urlRef == NULL)
+    if(url == NULL)
     {
         return NULL;
     }
 
-    if(EFURLGetType(urlRef) == kEFURLTypeHTTP || EFURLGetType(urlRef) == kEFURLTypeHTTPS)
+    EFURLType type = EFURLGetType(url);
+    if(type == kEFURLTypeHTTP || type == kEFURLTypeHTTPS)
     {
-        return __EFFileHandleCreateNetDesc(allocatorRef, urlRef);
+        return __EFFileHandleCreateNetDesc(allocator, url);
     }
 
-    const char *str = EFStringGetCStringPtr(EFURLGetPath(urlRef), kEFStringEncodingASCII);
+    const char *str = EFStringGetCStringPtr(EFURLGetPath(url), kEFStringEncodingASCII);
     if(str == NULL)
     {
         return NULL;
@@ -332,21 +333,20 @@ EFFileHandleRef EFFileHandleCreateWithURLAndOptions(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    EFFileHandleRef fileHandleRef = EFFileHandleCreateWithFileDescriptor(allocatorRef, fd);
+    EFFileHandleRef fileHandleRef = EFFileHandleCreateWithFileDescriptor(allocator, fd);
     close(fd);
     return fileHandleRef;
 }
 
-EFFileHandleRef EFFileHandleCreateCopy(EFAllocatorRef allocatorRef,
-                                       EFFileHandleRef fileHandleRef)
+EFFileHandleRef EFFileHandleCreateCopy(EFAllocatorRef allocator,
+                                       EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL __EFFileHandle newFileHandle = (__EFFileHandle)EFObjectCreate(allocatorRef, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
+    EFAUTOREL __EFFileHandle newFileHandle = (__EFFileHandle)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
     if(fileHandle == NULL)
     {
         return NULL;
@@ -365,16 +365,15 @@ EFFileHandleRef EFFileHandleCreateCopy(EFAllocatorRef allocatorRef,
     return (EFFileHandleRef)EFAUTOTRANSFER(newFileHandle);
 }
 
-EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandleRef,
+EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandle,
                                EFIndex length)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
-    if(fileHandle == NULL || !fileHandle->readable || (EFFileHandleGetLength(fileHandleRef) + EFFileHandleSeek(fileHandleRef, 0, kEFFileHandleSeekTypeCur)) < length)
+    if(fileHandle == NULL || !fileHandle->readable || (EFFileHandleGetLength(fileHandle) + EFFileHandleSeek(fileHandle, 0, kEFFileHandleSeekTypeCur)) < length)
     {
         return NULL;
     }
 
-    EFAUTOREL EFMutableDataRef mutableData = EFDataCreateMutable(EFGetAllocator(fileHandleRef), length);
+    EFAUTOREL EFMutableDataRef mutableData = EFDataCreateMutable(EFGetAllocator(fileHandle), length);
     if(mutableData == NULL)
     {
         return NULL;
@@ -393,17 +392,16 @@ EFDataRef EFFileHandleReadData(EFFileHandleRef fileHandleRef,
     return EFAUTOTRANSFER(mutableData);
 }
 
-Boolean EFFileHandleWriteData(EFFileHandleRef fileHandleRef,
-                              EFDataRef dataRef)
+Boolean EFFileHandleWriteData(EFFileHandleRef fileHandle,
+                              EFDataRef data)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
-    if(fileHandle == NULL || dataRef == NULL || !fileHandle->writable)
+    if(fileHandle == NULL || data == NULL || !fileHandle->writable)
     {
         return false;
     }
 
-    const EFIndex length = EFDataGetLength(dataRef);
-    const UInt8 *buffer = EFDataGetPtr(dataRef);
+    const EFIndex length = EFDataGetLength(data);
+    const UInt8 *buffer = EFDataGetPtr(data);
     if(buffer == NULL)
     {
         return false;
@@ -412,11 +410,10 @@ Boolean EFFileHandleWriteData(EFFileHandleRef fileHandleRef,
     return (EFIndex)write(fileHandle->fileDescriptor, buffer, length);
 }
 
-EFIndex EFFileHandleRead(EFFileHandleRef fileHandleRef,
+EFIndex EFFileHandleRead(EFFileHandleRef fileHandle,
                          UInt8 *buffer,
                          EFIndex length)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return -1;
@@ -425,11 +422,10 @@ EFIndex EFFileHandleRead(EFFileHandleRef fileHandleRef,
     return (EFIndex)read(fileHandle->fileDescriptor, buffer, (EFSize)length);
 }
 
-EFIndex EFFileHandleWrite(EFFileHandleRef fileHandleRef,
+EFIndex EFFileHandleWrite(EFFileHandleRef fileHandle,
                           const UInt8 *buffer,
                           EFIndex length)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return -1;
@@ -438,10 +434,9 @@ EFIndex EFFileHandleWrite(EFFileHandleRef fileHandleRef,
     return (EFIndex)write(fileHandle->fileDescriptor, buffer, (EFSize)length);
 }
 
-EFIndex EFFileHandleTruncate(EFFileHandleRef fileHandleRef,
+EFIndex EFFileHandleTruncate(EFFileHandleRef fileHandle,
                              EFIndex length)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return -1;
@@ -450,11 +445,10 @@ EFIndex EFFileHandleTruncate(EFFileHandleRef fileHandleRef,
     return (EFIndex)ftruncate(fileHandle->fileDescriptor, length);
 }
 
-EFIndex EFFileHandleSeek(EFFileHandleRef fileHandleRef,
+EFIndex EFFileHandleSeek(EFFileHandleRef fileHandle,
                          EFIndex offset,
                          EFFileHandleSeekType seekType)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return -1;
@@ -479,9 +473,8 @@ EFIndex EFFileHandleSeek(EFFileHandleRef fileHandleRef,
     return (EFIndex)lseek(fileHandle->fileDescriptor, offset, a);
 }
 
-void EFFileHandleSync(EFFileHandleRef fileHandleRef)
+void EFFileHandleSync(EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return;
@@ -490,9 +483,8 @@ void EFFileHandleSync(EFFileHandleRef fileHandleRef)
     fsync(fileHandle->fileDescriptor);
 }
 
-EFIndex EFFileHandleGetLength(EFFileHandleRef fileHandleRef)
+EFIndex EFFileHandleGetLength(EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return -1;
@@ -506,9 +498,8 @@ EFIndex EFFileHandleGetLength(EFFileHandleRef fileHandleRef)
     return (EFIndex)fdstat.st_size;
 }
 
-Boolean EFFileHandleIsReadable(EFFileHandleRef fileHandleRef)
+Boolean EFFileHandleIsReadable(EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return false;
@@ -517,9 +508,8 @@ Boolean EFFileHandleIsReadable(EFFileHandleRef fileHandleRef)
     return fileHandle->readable;
 }
 
-Boolean EFFileHandleIsWritable(EFFileHandleRef fileHandleRef)
+Boolean EFFileHandleIsWritable(EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return false;
@@ -528,54 +518,53 @@ Boolean EFFileHandleIsWritable(EFFileHandleRef fileHandleRef)
     return fileHandle->writable;
 }
 
-EFDataRef EFFileHandleCopyDataForRange(EFAllocatorRef allocatorRef,
-                                       EFFileHandleRef fileHandleRef,
+EFDataRef EFFileHandleCopyDataForRange(EFAllocatorRef allocator,
+                                       EFFileHandleRef fileHandle,
                                        EFRange range)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
-        allocatorRef = EFGetAllocator(fileHandleRef);
+        allocator = EFGetAllocator(fileHandle);
     }
 
-    EFIndex backupPosition = EFFileHandleSeek(fileHandleRef, 0, kEFFileHandleSeekTypeCur);  /* to be restored */
-    EFIndex position = EFFileHandleSeek(fileHandleRef, range.location, kEFFileHandleSeekTypeSet);
+    EFIndex backupPosition = EFFileHandleSeek(fileHandle, 0, kEFFileHandleSeekTypeCur); /* to be restored */
+    EFIndex position = EFFileHandleSeek(fileHandle, range.location, kEFFileHandleSeekTypeSet);
     if(position != range.location)
     {
         goto out_failed_restore_position;
     }
 
-    EFMutableDataRef mutableDataRef = EFDataCreateMutable(allocatorRef, range.length);
+    EFMutableDataRef mutableDataRef = EFDataCreateMutable(allocator, range.length);
     if(mutableDataRef == NULL)
     {
         goto out_failed_restore_position;
     }
 
     UInt8 *dataBuffer = EFDataGetMutablePtr(mutableDataRef);
-    EFIndex read = EFFileHandleRead(fileHandleRef, dataBuffer, range.length);
+    EFIndex read = EFFileHandleRead(fileHandle, dataBuffer, range.length);
     if(read < range.length)
     {
         EFRelease(mutableDataRef);
         goto out_failed_restore_position;
     }
 
-    EFFileHandleSeek(fileHandleRef, backupPosition, kEFFileHandleSeekTypeSet);
+    EFFileHandleSeek(fileHandle, backupPosition, kEFFileHandleSeekTypeSet);
 
-    EFDataRef dataRef = EFDataCreateCopy(allocatorRef, mutableDataRef);
+    EFDataRef dataRef = EFDataCreateCopy(allocator, mutableDataRef);
     EFRelease(mutableDataRef);
     return dataRef;
 
 out_failed_restore_position:
-    EFFileHandleSeek(fileHandleRef, backupPosition, kEFFileHandleSeekTypeSet);
+    EFFileHandleSeek(fileHandle, backupPosition, kEFFileHandleSeekTypeSet);
     return NULL;
 }
 
-char *EFFileHandleGets(EFFileHandleRef fileHandleRef,
+char *EFFileHandleGets(EFFileHandleRef fileHandle,
                        char *s,
                        SInt32 n)
 {
@@ -594,7 +583,7 @@ char *EFFileHandleGets(EFFileHandleRef fileHandleRef,
     while(i < n - 1)
     {
         char c;
-        EFIndex r = EFFileHandleRead(fileHandleRef, (UInt8*)&c, (EFIndex)1);
+        EFIndex r = EFFileHandleRead(fileHandle, (UInt8*)&c, (EFIndex)1);
 
         if(r < 0)
         {
@@ -621,28 +610,28 @@ char *EFFileHandleGets(EFFileHandleRef fileHandleRef,
     return s;
 }
 
-void EFFileHandlePutc(EFFileHandleRef fileHandleRef,
+void EFFileHandlePutc(EFFileHandleRef fileHandle,
                       char c)
 {
-    EFFileHandleWrite(fileHandleRef, (const UInt8*)&c, (EFIndex)sizeof(c));
+    EFFileHandleWrite(fileHandle, (const UInt8*)&c, (EFIndex)sizeof(c));
 }
 
-void EFFileHandlePuts(EFFileHandleRef fileHandleRef,
+void EFFileHandlePuts(EFFileHandleRef fileHandle,
                       const char *s)
 {
-    EFFileHandleWrite(fileHandleRef, (const UInt8*)s, strlen(s));
+    EFFileHandleWrite(fileHandle, (const UInt8*)s, strlen(s));
 }
 
-void EFFileHandlePrintf(EFFileHandleRef fileHandleRef,
+void EFFileHandlePrintf(EFFileHandleRef fileHandle,
                         const char *format,
                         ...)
 {
-    if(fileHandleRef == NULL || format == NULL)
+    if(fileHandle == NULL || format == NULL)
     {
         return;
     }
 
-    EFStringRef formatStr = EFStringCreateWithCString(EFGetAllocator(fileHandleRef), format, kEFStringEncodingUTF8);
+    EFStringRef formatStr = EFStringCreateWithCString(EFGetAllocator(fileHandle), format, kEFStringEncodingUTF8);
     if(formatStr == NULL)
     {
         return;
@@ -654,12 +643,11 @@ void EFFileHandlePrintf(EFFileHandleRef fileHandleRef,
     EFRelease(formatStr);
     va_end(arguments);
 
-    EFFileHandlePuts(fileHandleRef, EFStringGetCStringPtr(resultRef, kEFStringEncodingUTF8));
+    EFFileHandlePuts(fileHandle, EFStringGetCStringPtr(resultRef, kEFStringEncodingUTF8));
 }
 
-SInt32 EFFileHandleGetFileDescriptor(EFFileHandleRef fileHandleRef)
+SInt32 EFFileHandleGetFileDescriptor(EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return -1;
@@ -668,10 +656,9 @@ SInt32 EFFileHandleGetFileDescriptor(EFFileHandleRef fileHandleRef)
     return fileHandle->fileDescriptor;
 }
 
-EFMappingRef EFFileHandleCopyMapping(EFAllocatorRef allocatorRef,
-                                     EFFileHandleRef fileHandleRef)
+EFMappingRef EFFileHandleCopyMapping(EFAllocatorRef allocator,
+                                     EFFileHandleRef fileHandle)
 {
-    __EFFileHandle fileHandle = (__EFFileHandle)fileHandleRef;
     if(fileHandle == NULL)
     {
         return NULL;
@@ -681,5 +668,5 @@ EFMappingRef EFFileHandleCopyMapping(EFAllocatorRef allocatorRef,
     protFlags |= fileHandle->readable ? PROT_READ : 0;
     protFlags |= fileHandle->writable ? PROT_WRITE : 0;
 
-    return EFMappingCreate(allocatorRef, NULL, (EFSize)EFFileHandleGetLength(fileHandleRef), protFlags, MAP_SHARED, fileHandle->fileDescriptor, 0);
+    return EFMappingCreate(allocator, NULL, (EFSize)EFFileHandleGetLength(fileHandle), protFlags, MAP_SHARED, fileHandle->fileDescriptor, 0);
 }
