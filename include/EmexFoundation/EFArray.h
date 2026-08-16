@@ -30,7 +30,7 @@
 typedef Boolean (*EFArrayAppendCallback)(void *ptr);
 typedef void (*EFArrayRemoveCallback)(void *ptr);
 typedef Boolean (*EFArrayEqualCallback)(void *ptr1, void *ptr2);
-typedef EFStringRef (*EFArrayCopyDescriptionCallback)(EFAllocatorRef allocatorRef, void *ptr);
+typedef EFStringRef (*EFArrayCopyDescriptionCallback)(EFAllocatorRef allocator, void *ptr);
 
 typedef struct EFArrayCallbacks {
     EFArrayAppendCallback append;
@@ -44,20 +44,20 @@ EF_EXTERN EFArrayCallbacks kEFArrayCallbacksObjectCallbacks;
 
 EF_EXTERN EFTypeID EFArrayGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFArrayRef EFArrayCreate(EFAllocatorRef allocatorRef, EFArrayCallbacks callbacks, void **values, EFIndex valuesCount);
-EF_EXTERN EF_RETURNS_RETAINED EFMutableArrayRef EFArrayCreateMutable(EFAllocatorRef allocatorRef, EFArrayCallbacks callbacks, EFIndex capacity);
-EF_EXTERN EF_RETURNS_RETAINED EFMutableArrayRef EFArrayCreateMutableCopy(EFAllocatorRef allocatorRef, EFArrayRef arrayRef);
-EF_EXTERN EF_RETURNS_RETAINED EFArrayRef EFArrayCreateCopy(EFAllocatorRef allocatorRef, EFArrayRef arrayRef);
+EF_EXTERN EF_RETURNS_RETAINED EFArrayRef EFArrayCreate(EFAllocatorRef allocator, EFArrayCallbacks callbacks, void **values, EFIndex valuesCount);
+EF_EXTERN EF_RETURNS_RETAINED EFMutableArrayRef EFArrayCreateMutable(EFAllocatorRef allocator, EFArrayCallbacks callbacks, EFIndex capacity);
+EF_EXTERN EF_RETURNS_RETAINED EFMutableArrayRef EFArrayCreateMutableCopy(EFAllocatorRef allocator, EFArrayRef array);
+EF_EXTERN EF_RETURNS_RETAINED EFArrayRef EFArrayCreateCopy(EFAllocatorRef allocator, EFArrayRef array);
 
-EF_EXTERN EFIndex EFArrayGetCount(EFArrayRef arrayRef);
-EF_EXTERN EF_RETURNS_NOT_RETAINED void *EFArrayGetValueAtIndex(EFArrayRef arrayRef, EFIndex index);
+EF_EXTERN EFIndex EFArrayGetCount(EFArrayRef array);
+EF_EXTERN EF_RETURNS_NOT_RETAINED void *EFArrayGetValueAtIndex(EFArrayRef array, EFIndex index);
 
-EF_EXTERN Boolean EFArrayAppendValue(EFMutableArrayRef mutableArrayRef, void *value);
-EF_EXTERN Boolean EFArrayInsertValueAtIndex(EFMutableArrayRef mutableArrayRef, EFIndex index, void *ptr);
-EF_EXTERN void EFArrayRemoveValueAtIndex(EFMutableArrayRef mutableArrayRef, EFIndex index);
+EF_EXTERN Boolean EFArrayAppendValue(EFMutableArrayRef mutableArray, void *value);
+EF_EXTERN Boolean EFArrayInsertValueAtIndex(EFMutableArrayRef mutableArray, EFIndex index, void *ptr);
+EF_EXTERN void EFArrayRemoveValueAtIndex(EFMutableArrayRef mutableArray, EFIndex index);
 
-EF_EXTERN Boolean EFArrayAppendValuesOfArray(EFMutableArrayRef mutableArrayRef, EFArrayRef otherArrayRef);
-EF_EXTERN Boolean EFArrayInsertValuesOfArrayAtIndex(EFMutableArrayRef mutableArrayRef, EFIndex index, EFArrayRef otherArrayRef);    /* unimplemented */
-EF_EXTERN void EFArrayRemoveValuesInRange(EFMutableArrayRef mutableArrayRef, EFRange range);
+EF_EXTERN Boolean EFArrayAppendValuesOfArray(EFMutableArrayRef mutableArray, EFArrayRef otherArrayRef);
+EF_EXTERN Boolean EFArrayInsertValuesOfArrayAtIndex(EFMutableArrayRef mutableArray, EFIndex index, EFArrayRef otherArray);  /* unimplemented */
+EF_EXTERN void EFArrayRemoveValuesInRange(EFMutableArrayRef mutableArray, EFRange range);
 
 #endif /* EFARRAY_H */
