@@ -59,17 +59,17 @@ EFTypeID EFBitWalkerGetTypeID(void)
     return kEFTypeIDBitWalker;
 }
 
-EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocatorRef,
-                                           EFFileHandleRef fileHandleRef,
+EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocator,
+                                           EFFileHandleRef fileHandle,
                                            EFEndian endian)
 {
-    EFAUTOREL __EFBitWalker walker = (__EFBitWalker)EFObjectCreate(allocatorRef, EFBitWalkerGetTypeID(), (EFIndex)sizeof(struct __EFBitWalker));
+    EFAUTOREL __EFBitWalker walker = (__EFBitWalker)EFObjectCreate(allocator, EFBitWalkerGetTypeID(), (EFIndex)sizeof(struct __EFBitWalker));
     if(walker == NULL)
     {
         return NULL;
     }
 
-    walker->fileHandle = EFFileHandleCreateCopy(allocatorRef, fileHandleRef);
+    walker->fileHandle = EFFileHandleCreateCopy(allocator, fileHandle);
     if(walker->fileHandle == NULL)
     {
         return NULL;
@@ -81,9 +81,8 @@ EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocatorRef,
     return (EFBitWalkerRef)EFAUTOTRANSFER(walker);
 }
 
-void EFBitWalkerReset(EFBitWalkerRef walkerRef)
+void EFBitWalkerReset(EFBitWalkerRef walker)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return;
@@ -93,11 +92,10 @@ void EFBitWalkerReset(EFBitWalkerRef walkerRef)
     walker->bitIndex = 0;
 }
 
-Boolean EFBitWalkerWrite(EFBitWalkerRef walkerRef,
+Boolean EFBitWalkerWrite(EFBitWalkerRef walker,
                          UInt64 value,
                          UInt8 numBits)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL || numBits == 0 || numBits > 64)
     {
         return false;
@@ -144,10 +142,9 @@ Boolean EFBitWalkerWrite(EFBitWalkerRef walkerRef,
     return true;
 }
 
-UInt64 EFBitWalkerRead(EFBitWalkerRef walkerRef,
+UInt64 EFBitWalkerRead(EFBitWalkerRef walker,
                        UInt8 numBits)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL || numBits == 0 || numBits > 64)
     {
         return false;
@@ -179,45 +176,42 @@ UInt64 EFBitWalkerRead(EFBitWalkerRef walkerRef,
     return value;
 }
 
-EFIndex EFBitWalkerWriteBuffer(EFBitWalkerRef walkerRef,
+EFIndex EFBitWalkerWriteBuffer(EFBitWalkerRef walker,
                                const char *buffer,
                                EFIndex length)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return -1;
     }
 
-    EFBitWalkerAlignByte(walkerRef);
+    EFBitWalkerAlignByte(walker);
     EFFileHandleSeek(walker->fileHandle, walker->bytePos, kEFFileHandleSeekTypeSet);
     EFIndex written = EFFileHandleWrite(walker->fileHandle, (const UInt8*)buffer, length);
     walker->bytePos += written;
     return written;
 }
 
-EFIndex EFBitWalkerReadBuffer(EFBitWalkerRef walkerRef,
+EFIndex EFBitWalkerReadBuffer(EFBitWalkerRef walker,
                               char *buffer,
                               EFIndex length)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return -1;
     }
 
-    EFBitWalkerAlignByte(walkerRef);
+    EFBitWalkerAlignByte(walker);
     EFFileHandleSeek(walker->fileHandle, walker->bytePos, kEFFileHandleSeekTypeSet);
     EFIndex reddit = EFFileHandleRead(walker->fileHandle, (UInt8*)buffer, length);
     walker->bytePos += reddit;
     return reddit;  /* obviously it is a joke lol */
 }
 
-void EFBitWalkerSeek(EFBitWalkerRef walkerRef,
+void EFBitWalkerSeek(EFBitWalkerRef walker,
                      EFIndex bytePos,
                      UInt8 bitIndex)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return;
@@ -227,10 +221,9 @@ void EFBitWalkerSeek(EFBitWalkerRef walkerRef,
     walker->bitIndex = bitIndex;
 }
 
-void EFBitWalkerSkip(EFBitWalkerRef walkerRef,
+void EFBitWalkerSkip(EFBitWalkerRef walker,
                      EFIndex numBits)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return;
@@ -241,9 +234,8 @@ void EFBitWalkerSkip(EFBitWalkerRef walkerRef,
     walker->bitIndex = tmp & 7;
 }
 
-EFIndex EFBitWalkerBytesUsed(EFBitWalkerRef walkerRef)
+EFIndex EFBitWalkerBytesUsed(EFBitWalkerRef walker)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return -1;
@@ -252,9 +244,8 @@ EFIndex EFBitWalkerBytesUsed(EFBitWalkerRef walkerRef)
     return walker->bytePos + ((walker->bitIndex == 0) ? 0 : 1);
 }
 
-void EFBitWalkerAlignByte(EFBitWalkerRef walkerRef)
+void EFBitWalkerAlignByte(EFBitWalkerRef walker)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return;
@@ -267,9 +258,8 @@ void EFBitWalkerAlignByte(EFBitWalkerRef walkerRef)
     }
 }
 
-void EFBitWalkerSync(EFBitWalkerRef walkerRef)
+void EFBitWalkerSync(EFBitWalkerRef walker)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return;
@@ -278,9 +268,8 @@ void EFBitWalkerSync(EFBitWalkerRef walkerRef)
     EFFileHandleSync(walker->fileHandle);
 }
 
-EFBitWalkerPosition EFBitWalkerGetPosition(EFBitWalkerRef walkerRef)
+EFBitWalkerPosition EFBitWalkerGetPosition(EFBitWalkerRef walker)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return (EFBitWalkerPosition){
@@ -295,10 +284,9 @@ EFBitWalkerPosition EFBitWalkerGetPosition(EFBitWalkerRef walkerRef)
     };
 }
 
-void EFBitWalkerSetPosition(EFBitWalkerRef walkerRef,
+void EFBitWalkerSetPosition(EFBitWalkerRef walker,
                             EFBitWalkerPosition position)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return;
@@ -308,12 +296,12 @@ void EFBitWalkerSetPosition(EFBitWalkerRef walkerRef,
     walker->bitIndex = position.bitIndex;
 }
 
-EFFileHandleRef EFBitWalkerGetHandle(EFBitWalkerRef walkerRef)
+EFFileHandleRef EFBitWalkerGetHandle(EFBitWalkerRef walker)
 {
-    __EFBitWalker walker = (__EFBitWalker)walkerRef;
     if(walker == NULL)
     {
         return NULL;
     }
+
     return walker->fileHandle;
 }

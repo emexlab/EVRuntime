@@ -34,25 +34,25 @@ typedef struct {
 
 EF_EXTERN EFTypeID EFBitWalkerGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocatorRef, EFFileHandleRef fileHandleRef, EFEndian endian);
+EF_EXTERN EF_RETURNS_RETAINED EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocator, EFFileHandleRef fileHandle, EFEndian endian);
 
-EF_EXTERN void EFBitWalkerReset(EFBitWalkerRef walkerRef);
+EF_EXTERN void EFBitWalkerReset(EFBitWalkerRef walker);
 
-EF_EXTERN Boolean EFBitWalkerWrite(EFBitWalkerRef walkerRef, UInt64 value, UInt8 numBits);
-EF_EXTERN UInt64 EFBitWalkerRead(EFBitWalkerRef walkerRef, UInt8 numBits);
-EF_EXTERN EFIndex EFBitWalkerWriteBuffer(EFBitWalkerRef walkerRef, const char *buffer, EFIndex length);
-EF_EXTERN EFIndex EFBitWalkerReadBuffer(EFBitWalkerRef walkerRef, char *buffer, EFIndex length);
+EF_EXTERN Boolean EFBitWalkerWrite(EFBitWalkerRef walker, UInt64 value, UInt8 numBits);
+EF_EXTERN UInt64 EFBitWalkerRead(EFBitWalkerRef walker, UInt8 numBits);
+EF_EXTERN EFIndex EFBitWalkerWriteBuffer(EFBitWalkerRef walker, const char *buffer, EFIndex length);
+EF_EXTERN EFIndex EFBitWalkerReadBuffer(EFBitWalkerRef walker, char *buffer, EFIndex length);
 
-EF_EXTERN void EFBitWalkerSeek(EFBitWalkerRef walkerRef, EFIndex bytePos, UInt8 bitIndex);
-EF_EXTERN void EFBitWalkerSkip(EFBitWalkerRef walkerRef, EFIndex numBits);
+EF_EXTERN void EFBitWalkerSeek(EFBitWalkerRef walker, EFIndex bytePos, UInt8 bitIndex);
+EF_EXTERN void EFBitWalkerSkip(EFBitWalkerRef walker, EFIndex numBits);
 
-EF_EXTERN EFIndex EFBitWalkerBytesUsed(EFBitWalkerRef walkerRef);
-EF_EXTERN void EFBitWalkerAlignByte(EFBitWalkerRef walkerRef);
-EF_EXTERN void EFBitWalkerSync(EFBitWalkerRef walkerRef);
+EF_EXTERN EFIndex EFBitWalkerBytesUsed(EFBitWalkerRef walker);
+EF_EXTERN void EFBitWalkerAlignByte(EFBitWalkerRef walker);
+EF_EXTERN void EFBitWalkerSync(EFBitWalkerRef walker);
 
-EF_EXTERN EFBitWalkerPosition EFBitWalkerGetPosition(EFBitWalkerRef walkerRef);
-EF_EXTERN void EFBitWalkerSetPosition(EFBitWalkerRef walkerRef, EFBitWalkerPosition position);
+EF_EXTERN EFBitWalkerPosition EFBitWalkerGetPosition(EFBitWalkerRef walker);
+EF_EXTERN void EFBitWalkerSetPosition(EFBitWalkerRef walker, EFBitWalkerPosition position);
 
-EF_EXTERN EF_RETURNS_NOT_RETAINED EFFileHandleRef EFBitWalkerGetHandle(EFBitWalkerRef walkerRef);
+EF_EXTERN EF_RETURNS_NOT_RETAINED EFFileHandleRef EFBitWalkerGetHandle(EFBitWalkerRef walker);
 
 #endif /* EFBITWALKER_H */
