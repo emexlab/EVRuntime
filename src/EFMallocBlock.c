@@ -63,19 +63,19 @@ EFTypeID EFMallocBlockGetTypeID(void)
     return kEFTypeIDMallocBlock;
 }
 
-EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocatorRef,
+EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocator,
                                      EFSize size)
 {
-    return EFMallocBlockCreateWithDeinitHandler(allocatorRef, size, NULL);
+    return EFMallocBlockCreateWithDeinitHandler(allocator, size, NULL);
 }
 
-EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocatorRef,
+EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocator,
                                                       EFSize size,
                                                       EFObjectDeinitCallback deinitCallback)
 {
     assert(size > sizeof(struct __EFMallocBlock));
 
-    __EFMallocBlock block = (__EFMallocBlock)EFObjectCreate(allocatorRef, EFMallocBlockGetTypeID(), size);
+    __EFMallocBlock block = (__EFMallocBlock)EFObjectCreate(allocator, EFMallocBlockGetTypeID(), size);
     if(block == NULL)
     {
         return NULL;
@@ -87,9 +87,8 @@ EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocatorRe
     return (EFMallocBlockRef)block;
 }
 
-EFSize EFMallocBlockGetSize(EFMallocBlockRef blockRef)
+EFSize EFMallocBlockGetSize(EFMallocBlockRef block)
 {
-    __EFMallocBlock block = (__EFMallocBlock)blockRef;
     if(block == NULL)
     {
         return 0;

@@ -34,10 +34,10 @@
 
 EF_EXTERN EFTypeID EFMappingGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef, void *addr, EFSize size, SInt32 prot, SInt32 flags, SInt32 fd, EFOffset offset);
+EF_EXTERN EF_RETURNS_RETAINED EFMappingRef EFMappingCreate(EFAllocatorRef allocator, void *addr, EFSize size, SInt32 prot, SInt32 flags, SInt32 fd, EFOffset offset);
 
-EF_EXTERN void *EFMappingGetAddress(EFMappingRef mappingRef);
-EF_EXTERN EFSize EFMappingGetSize(EFMappingRef mappingRef);
-EF_EXTERN void EFMappingDisableUnmap(EFMappingRef mappingRef);
+EF_EXTERN void *EFMappingGetAddress(EFMappingRef mapping);
+EF_EXTERN EFSize EFMappingGetSize(EFMappingRef mapping);
+EF_EXTERN void EFMappingDisableUnmap(EFMappingRef mapping);
 
 #endif /* EFMAPPING_H */

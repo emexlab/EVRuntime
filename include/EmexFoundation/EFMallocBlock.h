@@ -29,9 +29,9 @@
 
 EF_EXTERN EFTypeID EFMallocBlockGetTypeID(void);
 
-EF_EXTERN EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocatorRef, EFSize size);
-EF_EXTERN EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocatorRef, EFSize size, EFObjectDeinitCallback deinitCallback);
+EF_EXTERN EFMallocBlockRef EFMallocBlockCreate(EFAllocatorRef allocator, EFSize size);
+EF_EXTERN EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocator, EFSize size, EFObjectDeinitCallback deinitCallback);
 
-EF_EXTERN EFSize EFMallocBlockGetSize(EFMallocBlockRef blockRef);
+EF_EXTERN EFSize EFMallocBlockGetSize(EFMallocBlockRef block);
 
 #endif /* EFMALLOCBLOCK_H */

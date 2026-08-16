@@ -70,7 +70,7 @@ EFTypeID EFMappingGetTypeID(void)
     return kEFTypeIDMapping;
 }
 
-EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef,
+EFMappingRef EFMappingCreate(EFAllocatorRef allocator,
                              void *addr,
                              EFSize size,
                              SInt32 prot,
@@ -78,7 +78,7 @@ EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef,
                              SInt32 fd,
                              EFOffset offset)
 {
-    EFAUTOREL __EFMapping mapping = (__EFMapping)EFObjectCreate(allocatorRef, EFMappingGetTypeID(), (EFIndex)sizeof(struct __EFMapping));
+    EFAUTOREL __EFMapping mapping = (__EFMapping)EFObjectCreate(allocator, EFMappingGetTypeID(), (EFIndex)sizeof(struct __EFMapping));
     if(mapping == NULL)
     {
         return NULL;
@@ -95,20 +95,18 @@ EFMappingRef EFMappingCreate(EFAllocatorRef allocatorRef,
     return (EFMappingRef)EFAUTOTRANSFER(mapping);
 }
 
-void *EFMappingGetAddress(EFMappingRef mappingRef)
+void *EFMappingGetAddress(EFMappingRef mapping)
 {
-    __EFMapping mapping = (__EFMapping)mappingRef;
     if(mapping == NULL)
     {
         return NULL;
     }
 
-    return (EFMappingRef)mapping->addr;
+    return mapping->addr;
 }
 
-EFSize EFMappingGetSize(EFMappingRef mappingRef)
+EFSize EFMappingGetSize(EFMappingRef mapping)
 {
-    __EFMapping mapping = (__EFMapping)mappingRef;
     if(mapping == NULL)
     {
         return -1;
@@ -117,9 +115,8 @@ EFSize EFMappingGetSize(EFMappingRef mappingRef)
     return mapping->size;
 }
 
-void EFMappingDisableUnmap(EFMappingRef mappingRef)
+void EFMappingDisableUnmap(EFMappingRef mapping)
 {
-    __EFMapping mapping = (__EFMapping)mappingRef;
     if(mapping == NULL)
     {
         return;
