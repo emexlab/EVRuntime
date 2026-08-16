@@ -102,7 +102,7 @@ EFTypeID EFNumberGetTypeID(void)
     return kEFTypeIDNumber;
 }
 
-EFNumberRef EFNumberCreate(EFAllocatorRef allocatorRef,
+EFNumberRef EFNumberCreate(EFAllocatorRef allocator,
                            EFNumberType type,
                            const void *value)
 {
@@ -111,7 +111,7 @@ EFNumberRef EFNumberCreate(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    EFAUTOREL __EFNumber number = (__EFNumber)EFObjectCreate(allocatorRef, EFNumberGetTypeID(), (EFIndex)sizeof(struct __EFNumber));
+    EFAUTOREL __EFNumber number = (__EFNumber)EFObjectCreate(allocator, EFNumberGetTypeID(), (EFIndex)sizeof(struct __EFNumber));
     if(number == NULL)
     {
         return NULL;
@@ -156,9 +156,8 @@ EFNumberRef EFNumberCreate(EFAllocatorRef allocatorRef,
     return (EFNumberRef)EFAUTOTRANSFER(number);
 }
 
-EFIndex EFNumberGetByteSize(EFNumberRef numberRef)
+EFIndex EFNumberGetByteSize(EFNumberRef number)
 {
-    __EFNumber number = (__EFNumber)numberRef;
     if(number == NULL)
     {
         return 0;
@@ -185,9 +184,8 @@ EFIndex EFNumberGetByteSize(EFNumberRef numberRef)
     }
 }
 
-EFNumberType EFNumberGetType(EFNumberRef numberRef)
+EFNumberType EFNumberGetType(EFNumberRef number)
 {
-    __EFNumber number = (__EFNumber)numberRef;
     if(number == NULL)
     {
         return kEFNumberTypeOverflow;
@@ -196,11 +194,10 @@ EFNumberType EFNumberGetType(EFNumberRef numberRef)
     return number->type;
 }
 
-Boolean EFNumberGetValue(EFNumberRef numberRef,
+Boolean EFNumberGetValue(EFNumberRef number,
                          EFNumberType type,
                          void *value)
 {
-    __EFNumber number = (__EFNumber)numberRef;
     if(number == NULL || value == NULL)
     {
         return false;
@@ -239,12 +236,9 @@ Boolean EFNumberGetValue(EFNumberRef numberRef,
     }
 }
 
-EFComparisonResult EFNumberCompare(EFNumberRef numberRef,
-                                   EFNumberRef otherNumberRef)
+EFComparisonResult EFNumberCompare(EFNumberRef number,
+                                   EFNumberRef otherNumber)
 {
-    __EFNumber number = (__EFNumber)numberRef;
-    __EFNumber otherNumber = (__EFNumber)otherNumberRef;
-
     if(number == NULL || otherNumber == NULL || number->type == kEFNumberTypeOverflow || otherNumber->type == kEFNumberTypeOverflow)
     {
         /* nothing to compare */

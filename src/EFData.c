@@ -73,7 +73,7 @@ EFTypeID EFDataGetTypeID(void)
     return kEFTypeIDData;
 }
 
-static inline EFDataRef __EFDataCreate(EFAllocatorRef allocatorRef,
+static inline EFDataRef __EFDataCreate(EFAllocatorRef allocator,
                                        const UInt8 *buffer,
                                        EFIndex length,
                                        Boolean isInlined,
@@ -84,7 +84,7 @@ static inline EFDataRef __EFDataCreate(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    EFAUTOREL __EFData data = (__EFData)EFObjectCreate(allocatorRef, EFDataGetTypeID(), (EFIndex)(sizeof(struct __EFData) + (isInlined ? length : 0)));
+    EFAUTOREL __EFData data = (__EFData)EFObjectCreate(allocator, EFDataGetTypeID(), (EFIndex)(sizeof(struct __EFData) + (isInlined ? length : 0)));
     if(data == NULL)
     {
         return NULL;
@@ -92,7 +92,7 @@ static inline EFDataRef __EFDataCreate(EFAllocatorRef allocatorRef,
 
     if(isMutable)
     {
-        data->buffer = EFAllocatorAllocate(allocatorRef, length, 0);
+        data->buffer = EFAllocatorAllocate(allocator, length, 0);
         if(data->buffer == NULL)
         {
             return NULL;
@@ -123,25 +123,24 @@ needs_copy:
     return (EFDataRef)EFAUTOTRANSFER(data);
 }
 
-static inline EFDataRef __EFDataCreateCopy(EFAllocatorRef allocatorRef,
-                                           EFDataRef dataRef,
+static inline EFDataRef __EFDataCreateCopy(EFAllocatorRef allocator,
+                                           EFDataRef data,
                                            Boolean isMutable)
 {
-    __EFData data = (__EFData)dataRef;
     if(data == NULL)
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
-        allocatorRef = EFGetAllocator(dataRef);
+        allocator = EFGetAllocator(data);
     }
     
-    return __EFDataCreate(allocatorRef, data->buffer, data->length, true, isMutable);
+    return __EFDataCreate(allocator, data->buffer, data->length, true, isMutable);
 }
 
-EFDataRef EFDataCreateWithBuffer(EFAllocatorRef allocatorRef,
+EFDataRef EFDataCreateWithBuffer(EFAllocatorRef allocator,
                                  const UInt8 *buffer,
                                  EFIndex length)
 {
@@ -150,10 +149,10 @@ EFDataRef EFDataCreateWithBuffer(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    return (EFDataRef)__EFDataCreate(allocatorRef, buffer, length, true, false);
+    return (EFDataRef)__EFDataCreate(allocator, buffer, length, true, false);
 }
 
-EFDataRef EFDataCreateWithBufferNoCopy(EFAllocatorRef allocatorRef,
+EFDataRef EFDataCreateWithBufferNoCopy(EFAllocatorRef allocator,
                                        const UInt8 *buffer,
                                        EFIndex length)
 {
@@ -162,30 +161,29 @@ EFDataRef EFDataCreateWithBufferNoCopy(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    return (EFDataRef)__EFDataCreate(allocatorRef, buffer, length, false, false);
+    return (EFDataRef)__EFDataCreate(allocator, buffer, length, false, false);
 }
 
-EFMutableDataRef EFDataCreateMutable(EFAllocatorRef allocatorRef,
+EFMutableDataRef EFDataCreateMutable(EFAllocatorRef allocator,
                                      EFIndex capacity)
 {
-    return __EFDataCreate(allocatorRef, NULL, capacity, true, true);
+    return __EFDataCreate(allocator, NULL, capacity, true, true);
 }
 
-EFDataRef EFDataCreateCopy(EFAllocatorRef allocatorRef,
-                           EFDataRef dataRef)
+EFDataRef EFDataCreateCopy(EFAllocatorRef allocator,
+                           EFDataRef data)
 {
-    return __EFDataCreateCopy(allocatorRef, dataRef, false);
+    return __EFDataCreateCopy(allocator, data, false);
 }
 
-EFMutableDataRef EFDataCreateMutableCopy(EFAllocatorRef allocatorRef,
-                                         EFDataRef dataRef)
+EFMutableDataRef EFDataCreateMutableCopy(EFAllocatorRef allocator,
+                                         EFDataRef data)
 {
-    return __EFDataCreateCopy(allocatorRef, dataRef, true);
+    return __EFDataCreateCopy(allocator, data, true);
 }
 
-EFIndex EFDataGetLength(EFDataRef dataRef)
+EFIndex EFDataGetLength(EFDataRef data)
 {
-    __EFData data = (__EFData)dataRef;
     if(data == NULL)
     {
         return 0;
@@ -194,9 +192,8 @@ EFIndex EFDataGetLength(EFDataRef dataRef)
     return data->length;
 }
 
-const UInt8 *EFDataGetPtr(EFDataRef dataRef)
+const UInt8 *EFDataGetPtr(EFDataRef data)
 {
-    __EFData data = (__EFData)dataRef;
     if(data == NULL)
     {
         return NULL;
@@ -205,9 +202,8 @@ const UInt8 *EFDataGetPtr(EFDataRef dataRef)
     return data->buffer;
 }
 
-UInt8 *EFDataGetMutablePtr(EFMutableDataRef mutableDataRef)
+UInt8 *EFDataGetMutablePtr(EFMutableDataRef mutableData)
 {
-    __EFData mutableData = (__EFData)mutableDataRef;
     if(mutableData == NULL || !mutableData->isMutable)
     {
         return NULL;
@@ -216,11 +212,10 @@ UInt8 *EFDataGetMutablePtr(EFMutableDataRef mutableDataRef)
     return mutableData->buffer;
 }
 
-Boolean EFDataCopyRangeToBuffer(EFDataRef dataRef,
+Boolean EFDataCopyRangeToBuffer(EFDataRef data,
                                 EFRange range,
                                 UInt8 *buffer)
 {
-    __EFData data = (__EFData)dataRef;
     if(data == NULL || data->length < range.location || data->length < (range.location + range.length))
     {
         return false;
@@ -230,10 +225,9 @@ Boolean EFDataCopyRangeToBuffer(EFDataRef dataRef,
     return true;
 }
 
-Boolean EFDataSetLength(EFMutableDataRef mutableDataRef,
+Boolean EFDataSetLength(EFMutableDataRef mutableData,
                         EFIndex length)
 {
-    __EFData mutableData = (__EFData)mutableDataRef;
     if(mutableData == NULL || !mutableData->isMutable || length < 0)
     {
         return false;
@@ -244,7 +238,7 @@ Boolean EFDataSetLength(EFMutableDataRef mutableDataRef,
         return true;
     }
 
-    void *newp = EFAllocatorReallocate(EFGetAllocator(mutableDataRef), mutableData->buffer, length, 0);
+    void *newp = EFAllocatorReallocate(EFGetAllocator(mutableData), mutableData->buffer, length, 0);
     if(newp == NULL)
     {
         return false;
@@ -259,10 +253,9 @@ Boolean EFDataSetLength(EFMutableDataRef mutableDataRef,
     return true;
 }
 
-Boolean EFDataIncreaseLength(EFMutableDataRef mutableDataRef,
+Boolean EFDataIncreaseLength(EFMutableDataRef mutableData,
                              EFIndex extraLength)
 {
-    __EFData mutableData = (__EFData)mutableDataRef;
     if(mutableData == NULL || !mutableData->isMutable || extraLength < 0)
     {
         return false;
@@ -275,20 +268,19 @@ Boolean EFDataIncreaseLength(EFMutableDataRef mutableDataRef,
         return false;
     }
 
-    return EFDataSetLength(mutableDataRef, newLength);
+    return EFDataSetLength(mutableData, newLength);
 }
 
-Boolean EFDataAppendBuffer(EFMutableDataRef mutableDataRef,
+Boolean EFDataAppendBuffer(EFMutableDataRef mutableData,
                            const UInt8 *buffer,
                            EFIndex length)
 {
-    __EFData mutableData = (__EFData)mutableDataRef;
     if(mutableData == NULL || !mutableData->isMutable)
     {
         return false;
     }
 
-    if(!EFDataIncreaseLength(mutableDataRef, length))
+    if(!EFDataIncreaseLength(mutableData, length))
     {
         return false;
     }
@@ -297,18 +289,4 @@ Boolean EFDataAppendBuffer(EFMutableDataRef mutableDataRef,
     memcpy(ptr, buffer, (EFSize)length);
 
     return true;
-}
-
-Boolean EFDataReplaceBufferInRange(EFMutableDataRef mutableDataRef,
-                                   EFRange range,
-                                   const UInt8 *newBytes,
-                                   EFIndex newLength)
-{
-    return false;
-}
-
-Boolean EFDataDeleteBufferInRange(EFMutableDataRef mutableDataRef,
-                                  EFRange range)
-{
-    return false;
 }
