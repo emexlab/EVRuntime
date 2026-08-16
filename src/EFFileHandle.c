@@ -37,7 +37,7 @@
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
-#include <EmexFoundation/CrossSupport/VFD.h>
+#include <EmexFoundation/CrossSupport/MFD.h>
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFFileHandle.h>
 #include <EmexFoundation/EFUUID.h>
@@ -87,7 +87,7 @@ EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocatorRef)
         return NULL;
     }
 
-    fileHandle->fileDescriptor = VFDCreate();   /* likely read-write */
+    fileHandle->fileDescriptor = MFDCreate();   /* likely read-write */
     if(fileHandle->fileDescriptor < 0)
     {
         return NULL;

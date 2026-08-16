@@ -39,11 +39,11 @@
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
-#include <EmexFoundation/CrossSupport/VFD.h>
+#include <EmexFoundation/CrossSupport/MFD.h>
 #include <EmexFoundation/EFString.h>
 #include <EmexFoundation/EFUUID.h>
 
-SInt32 VFDCreate(void)
+SInt32 MFDCreate(void)
 {
     /* we need some unique string */
     EFAUTOREL EFUUIDRef uuid = EFUUIDCreate(kEFAllocatorDefault);

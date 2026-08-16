@@ -27,6 +27,6 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFBase.h>
 
-EF_EXTERN SInt32 VFDCreate(void);
+EF_EXTERN SInt32 MFDCreate(void);
 
 #endif /* CROSSSUPORT_VFD_H */
