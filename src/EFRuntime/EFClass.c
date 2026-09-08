@@ -48,6 +48,7 @@ extern EFClassDefinitionNewest EFMappingClass;
 extern EFClassDefinitionNewest EFProcessClass;
 extern EFClassDefinitionNewest EFMallocBlockClass;
 extern EFClassDefinitionNewest EFArrayClass;
+extern EFClassDefinitionNewest EFDictionaryClass;
 extern EFClassDefinitionNewest EFFileManagerClass;
 
 static pthread_mutex_t efClassLock = PTHREAD_MUTEX_INITIALIZER;
@@ -70,7 +71,7 @@ static Boolean __EFClassTableExtendIfNeeded(void)
         {
             return false;
         }
-        
+
         efClassTable[kEFTypeIDNone]         = NULL;
         efClassTable[kEFTypeIDString]       = &EFStringClass;
         efClassTable[kEFTypeIDNumber]       = &EFNumberClass;
@@ -84,7 +85,7 @@ static Boolean __EFClassTableExtendIfNeeded(void)
         efClassTable[kEFTypeIDProcess]      = &EFProcessClass;
         efClassTable[kEFTypeIDMallocBlock]  = &EFMallocBlockClass;
         efClassTable[kEFTypeIDArray]        = &EFArrayClass;
-        efClassTable[kEFTypeIDDictionary]   = NULL;
+        efClassTable[kEFTypeIDDictionary]   = &EFDictionaryClass;
         efClassTable[kEFTypeIDFileManager]  = &EFFileManagerClass;
         efClassCapacity = 1024;
     }

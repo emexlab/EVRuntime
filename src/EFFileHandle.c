@@ -61,7 +61,7 @@ static void __EVFileHandleDeinit(EFObjectRef fileHandleRef)
     close(fileHandle->fileDescriptor);
 }
 
-EFClassDefinitionNewest EFFileHandleClass = {
+EF_HIDDEN EFClassDefinitionNewest EFFileHandleClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDFileHandle,

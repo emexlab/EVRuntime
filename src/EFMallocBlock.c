@@ -45,7 +45,7 @@ static void __EFMallocBlockDeinit(EFObjectRef blockRef)
     }
 }
 
-EFClassDefinitionNewest EFMallocBlockClass = {
+EF_HIDDEN EFClassDefinitionNewest EFMallocBlockClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDMallocBlock,

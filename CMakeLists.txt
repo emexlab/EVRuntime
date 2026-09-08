@@ -36,6 +36,7 @@ add_library(EmexFoundation ${LIB_TYPE}
     src/EFMapping.c
     src/EFMallocBlock.c
     src/EFFileManager.c
+    src/EFDictionary.c
 )
 
 target_include_directories(EmexFoundation

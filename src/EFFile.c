@@ -89,7 +89,7 @@ static void __EFBitWalkerDeinit(EFObjectRef fileRef)
     EFReleaseTry(file->fileHandle);
 }
 
-EFClassDefinitionNewest EFFileClass = {
+EF_HIDDEN EFClassDefinitionNewest EFFileClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDFile,

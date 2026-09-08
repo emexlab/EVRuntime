@@ -85,7 +85,7 @@ static EFStringRef __EFNumberCopyDescription(EFObjectRef numberRef)
     }
 }
 
-EFClassDefinitionNewest EFNumberClass = {
+EF_HIDDEN EFClassDefinitionNewest EFNumberClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDNumber,

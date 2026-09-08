@@ -30,7 +30,7 @@
 #include <EmexFoundation/EFURL.h>
 #include <EmexFoundation/EFArray.h>
 
-EFTypeID EFFileManagerGetTypeID(void);
+EF_EXTERN EFTypeID EFFileManagerGetTypeID(void);
 
 /* MARK: later virtual file systems will be supported by those managers */
 EF_EXTERN EF_RETURNS_NOT_RETAINED EFFileManagerRef EFFileManagerGetDefaultManager(void);

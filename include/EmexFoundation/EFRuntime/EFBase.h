@@ -80,7 +80,7 @@
 
 #if defined(__GNUC__) || defined(__clang__)
 #define EF_EXTERN __attribute__((visibility("default"))) extern
-#define EF_HIDDEN __attribute__((visibility("hidden"))) extern
+#define EF_HIDDEN __attribute__((visibility("hidden")))
 #else
 #define EF_EXTERN
 #define EF_HIDDEN
@@ -161,6 +161,8 @@ typedef struct __EFString *EFStringRef;
 typedef struct __EFString *EFMutableStringRef;
 typedef struct __EFArray *EFArrayRef;
 typedef struct __EFArray *EFMutableArrayRef;
+typedef struct __EFDictionary *EFDictionaryRef;
+typedef struct __EFDictionary *EFMutableDictionaryRef;
 typedef struct __EFBitWalker *EFBitWalkerRef;
 typedef struct __EFData *EFDataRef;
 typedef struct __EFData *EFMutableDataRef;

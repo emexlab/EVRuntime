@@ -41,7 +41,7 @@ static void __EFBitWalkerDeinit(EFObjectRef walkerRef)
     EFRelease(walker->fileHandle);
 }
 
-EFClassDefinitionNewest EFBitWalkerClass = {
+EF_HIDDEN EFClassDefinitionNewest EFBitWalkerClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDBitWalker,

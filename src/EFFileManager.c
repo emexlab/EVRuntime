@@ -40,7 +40,7 @@ typedef struct __EFFileManager {
     EFObject super;
 } *__EFFileManager;
 
-EFClassDefinitionNewest EFFileManagerClass = {
+EF_HIDDEN EFClassDefinitionNewest EFFileManagerClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDFileManager,

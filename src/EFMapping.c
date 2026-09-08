@@ -52,7 +52,7 @@ static void __EFMappingDeinit(EFObjectRef objectRef)
     }
 }
 
-EFClassDefinitionNewest EFMappingClass = {
+EF_HIDDEN EFClassDefinitionNewest EFMappingClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDMapping,

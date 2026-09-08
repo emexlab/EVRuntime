@@ -228,7 +228,7 @@ static EFHashCode __EFStringHash(EFObjectRef stringRef)
     return (EFHashCode)hash;
 }
 
-EFClassDefinitionNewest EFStringClass = {
+EF_HIDDEN EFClassDefinitionNewest EFStringClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDString,

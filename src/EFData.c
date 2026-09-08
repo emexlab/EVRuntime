@@ -55,7 +55,7 @@ static EFStringRef __EFDataCopyDescription(EFObjectRef dataRef)
     return EFStringCreateWithFormat(EFGetAllocator(dataRef), EFSTR("<%@ %p>{buffer = %p, length = %ld}"), data->isMutable ? EFSTR("EFMutableData") : EFSTR("EFData"), dataRef, data->buffer, data->length);
 }
 
-EFClassDefinitionNewest EFDataClass = {
+EF_HIDDEN EFClassDefinitionNewest EFDataClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
         .typeID = kEFTypeIDData,
