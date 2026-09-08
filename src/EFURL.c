@@ -157,6 +157,12 @@ EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef,
     }
 
 six_feet_under:
+    if(EFStringEqual(pathString, EFSTR("/")))
+    {
+        url->pathComponents = EFArrayCreate(kEFAllocatorDefault, kEFArrayCallbacksObjectCallbacks, NULL, 0);
+        return (EFURLRef)EFAUTOTRANSFER(url);
+    }
+
     url->pathComponents = EFStringComponentsSplitBySeparator(pathString, EFSTR("/"));
     if(url->pathComponents == NULL)
     {
