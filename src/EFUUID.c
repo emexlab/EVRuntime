@@ -85,17 +85,17 @@ EFTypeID EFUUIDGetTypeID(void)
     return kEFTypeIDUUID;
 }
 
-EFUUIDRef EFUUIDCreate(EFAllocatorRef allocatorRef)
+EFUUIDRef EFUUIDCreate(EFAllocatorRef allocator)
 {
-    EFAUTOREL __EFUUID uuid = (__EFUUID)EFObjectCreate(allocatorRef, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
+    EFAUTOREL EFUUIDRef uuid = (EFUUIDRef)EFObjectCreate(allocator, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
     if(uuid == NULL || getentropy(&(uuid->bytes), sizeof(uuid->bytes)) != 0)
     {
         return NULL;
     }
-    return (EFUUIDRef)EFAUTOTRANSFER(uuid);
+    return EFAUTOTRANSFER(uuid);
 }
 
-EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocatorRef,
+EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocator,
                                 UInt8 byte0,
                                 UInt8 byte1,
                                 UInt8 byte2,
@@ -113,7 +113,7 @@ EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocatorRef,
                                 UInt8 byte14,
                                 UInt8 byte15)
 {
-    __EFUUID uuid = (__EFUUID)EFObjectCreate(allocatorRef, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
+    EFUUIDRef uuid = (EFUUIDRef)EFObjectCreate(allocator, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
     if(uuid == NULL)
     {
         return NULL;
@@ -136,19 +136,18 @@ EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocatorRef,
     uuid->bytes.byte14 = byte14;
     uuid->bytes.byte15 = byte15;
 
-    return (EFUUIDRef)uuid;
+    return uuid;
 }
 
-EFUUIDRef EFUUIDCreateWithUUIDBytes(EFAllocatorRef allocatorRef,
+EFUUIDRef EFUUIDCreateWithUUIDBytes(EFAllocatorRef allocator,
                                     EFUUIDBytes uuidBytes)
 {
-    return EFUUIDCreateWithBytes(allocatorRef, uuidBytes.byte0, uuidBytes.byte1, uuidBytes.byte2, uuidBytes.byte3, uuidBytes.byte4, uuidBytes.byte5, uuidBytes.byte6, uuidBytes.byte7, uuidBytes.byte8, uuidBytes.byte9, uuidBytes.byte10, uuidBytes.byte11, uuidBytes.byte12, uuidBytes.byte13, uuidBytes.byte14, uuidBytes.byte15);
+    return EFUUIDCreateWithBytes(allocator, uuidBytes.byte0, uuidBytes.byte1, uuidBytes.byte2, uuidBytes.byte3, uuidBytes.byte4, uuidBytes.byte5, uuidBytes.byte6, uuidBytes.byte7, uuidBytes.byte8, uuidBytes.byte9, uuidBytes.byte10, uuidBytes.byte11, uuidBytes.byte12, uuidBytes.byte13, uuidBytes.byte14, uuidBytes.byte15);
 }
 
-EFStringRef EFUUIDCreateString(EFAllocatorRef allocatorRef,
-                               EFUUIDRef uuidRef)
+EFStringRef EFUUIDCreateString(EFAllocatorRef allocator,
+                               EFUUIDRef uuid)
 {
-    __EFUUID uuid = (__EFUUID)uuidRef;
     if(uuid == NULL)
     {
         return NULL;
@@ -178,12 +177,11 @@ EFStringRef EFUUIDCreateString(EFAllocatorRef allocatorRef,
     _intToHexChars(uuid->bytes.byte15, &buf[34], 2);
     buf[36] = '\0';
 
-    return EFStringCreateWithCString(allocatorRef, buf, kEFStringEncodingUTF8);
+    return EFStringCreateWithCString(allocator, buf, kEFStringEncodingUTF8);
 }
 
-EFUUIDBytes EFUUIDGetBytes(EFUUIDRef uuidRef)
+EFUUIDBytes EFUUIDGetBytes(EFUUIDRef uuid)
 {
-    __EFUUID uuid = (__EFUUID)uuidRef;
     if(uuid == NULL)
     {
         return (EFUUIDBytes){};

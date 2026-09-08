@@ -143,9 +143,9 @@ EFProcessRef EFProcessCreateWithCommand(EFAllocatorRef allocator,
         return NULL;
     }
 
-    __EFProcess process = (__EFProcess)EFProcessCreateWithProcessIdentifier(allocator, pid);
+    EFProcessRef process = (EFProcessRef)EFProcessCreateWithProcessIdentifier(allocator, pid);
     process->weSpawnedThis = true;
-    return (EFProcessRef)process;
+    return process;
 }
 
 EFProcessRef EFProcessCreateWithPath(EFAllocatorRef allocator,
@@ -183,9 +183,9 @@ EFProcessRef EFProcessCreateWithPath(EFAllocatorRef allocator,
         return NULL;
     }
 
-    __EFProcess process = (__EFProcess)EFProcessCreateWithProcessIdentifier(allocator, pid);
+    EFProcessRef process = (EFProcessRef)EFProcessCreateWithProcessIdentifier(allocator, pid);
     process->weSpawnedThis = true;
-    return (EFProcessRef)process;
+    return process;
 }
 
 EFProcessRef EFProcessCreateWithProcessIdentifier(EFAllocatorRef allocator,
@@ -529,7 +529,7 @@ skip_arg_copy:
         }
     }
 
-    __EFProcess process = (__EFProcess)EFObjectCreate(allocator, EFProcessGetTypeID(), (EFIndex)sizeof(struct __EFProcess));
+    EFProcessRef process = (EFProcessRef)EFObjectCreate(allocator, EFProcessGetTypeID(), (EFIndex)sizeof(struct __EFProcess));
     if(process == NULL)
     {
         return NULL;
@@ -546,7 +546,7 @@ skip_arg_copy:
     process->sessionIdentifier = sid;
     process->weSpawnedThis = false;
 
-    return (EFProcessRef)process;
+    return process;
 }
 
 SInt32 EFProcessGetProcessIdentifier(EFProcessRef process)

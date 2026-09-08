@@ -117,7 +117,7 @@ EFFileRef __EFFileCreate(EFAllocatorRef allocator,
         return NULL;
     }
 
-    EFAUTOREL __EFFile file = (__EFFile)EFObjectCreate(allocator, EFFileGetTypeID(), (EFIndex)sizeof(struct __EFFile));
+    EFAUTOREL EFFileRef file = (EFFileRef)EFObjectCreate(allocator, EFFileGetTypeID(), (EFIndex)sizeof(struct __EFFile));
     if(file == NULL)
     {
         return NULL;
@@ -153,7 +153,7 @@ EFFileRef __EFFileCreate(EFAllocatorRef allocator,
         }
     }
 
-    return (EFFileRef)EFAUTOTRANSFER(file);
+    return EFAUTOTRANSFER(file);
 }
 
 EFFileRef EFFileCreateWithPath(EFAllocatorRef allocator,
@@ -176,7 +176,7 @@ EFFileRef EFFileCreateWithString(EFAllocatorRef allocator,
                                  EFURLRef urlRef,
                                  EFStringRef string)
 {
-    EFAUTOREL __EFFile file = (__EFFile)__EFFileCreate(allocator, policy, urlRef, false);
+    EFAUTOREL EFFileRef file = (EFFileRef)__EFFileCreate(allocator, policy, urlRef, false);
     if(file == NULL)
     {
         return NULL;
@@ -193,7 +193,7 @@ EFFileRef EFFileCreateWithString(EFAllocatorRef allocator,
     EFFileHandleWrite(file->fileHandle, (const UInt8*)EFStringGetCStringPtr(string, kEFStringEncodingUTF8), EFStringGetLength(string));
     EFFileHandleSeek(file->fileHandle, 0, kEFFileHandleSeekTypeSet);
 
-    return (EFFileRef)EFAUTOTRANSFER(file);
+    return EFAUTOTRANSFER(file);
 }
 
 Boolean EFFileOpen(EFFileRef file)

@@ -71,21 +71,21 @@ EFTypeID EFURLGetTypeID(void)
     return kEFTypeIDURL;
 }
 
-EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef,
-                               EFStringRef stringRefRaw)
+EFURLRef EFURLCreateWithString(EFAllocatorRef allocator,
+                               EFStringRef string)
 {
-    if(stringRefRaw == NULL)
+    if(string == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL EFStringRef stringRef = EFRetainTry(stringRefRaw);
-    if(stringRef == NULL)
+    EFAUTOREL EFStringRef ownedString = EFRetainTry(string);
+    if(ownedString == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL __EFURL url = (__EFURL)EFObjectCreate(allocatorRef, EFURLGetTypeID(), (EFIndex)sizeof(struct __EFURL));
+    EFAUTOREL EFURLRef url = (EFURLRef)EFObjectCreate(allocator, EFURLGetTypeID(), (EFIndex)sizeof(struct __EFURL));
     if(url == NULL)
     {
         return NULL;
@@ -94,45 +94,45 @@ EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef,
     EFAUTOREL EFStringRef pathString = NULL;
 
     url->type = kEFURLTypePOSIX;
-    if(EFStringEqualRange(stringRef, EFSTR("http://"), EFRangeMake(0, 7)))
+    if(EFStringEqualRange(ownedString, EFSTR("http://"), EFRangeMake(0, 7)))
     {
         url->type = kEFURLTypeHTTP;
-        pathString = EFStringCreateCopyWithRange(allocatorRef, stringRef, EFRangeMake(7, EFStringGetLength(stringRef) - 7));
+        pathString = EFStringCreateCopyWithRange(allocator, ownedString, EFRangeMake(7, EFStringGetLength(ownedString) - 7));
     }
-    else if(EFStringEqualRange(stringRef, EFSTR("https://"), EFRangeMake(0, 8)))
+    else if(EFStringEqualRange(ownedString, EFSTR("https://"), EFRangeMake(0, 8)))
     {
         url->type = kEFURLTypeHTTPS;
-        pathString = EFStringCreateCopyWithRange(allocatorRef, stringRef, EFRangeMake(8, EFStringGetLength(stringRef) - 8));
+        pathString = EFStringCreateCopyWithRange(allocator, ownedString, EFRangeMake(8, EFStringGetLength(ownedString) - 8));
     }
     else
     {
         url->type = kEFURLTypePOSIX;
-        pathString = EFRetain(stringRef);
+        pathString = EFRetain(ownedString);
 
-        char *tmpPath = EFAllocatorAllocate(allocatorRef, PATH_MAX, 0);
-        if(realpath(EFStringGetCStringPtr(stringRef, kEFStringEncodingUTF8), tmpPath) == NULL)
+        char *tmpPath = EFAllocatorAllocate(allocator, PATH_MAX, 0);
+        if(realpath(EFStringGetCStringPtr(ownedString, kEFStringEncodingUTF8), tmpPath) == NULL)
         {
-            if(EFStringHasPrefix(stringRef, EFSTR("/")))
+            if(EFStringHasPrefix(ownedString, EFSTR("/")))
             {
-                pathString = EFRetain(stringRef);
+                pathString = EFRetain(ownedString);
                 goto six_feet_under;
             }
 
             /* need to take cwd env */
             if(getcwd(tmpPath, PATH_MAX) == NULL)
             {
-                EFAllocatorDeallocate(allocatorRef, tmpPath);
+                EFAllocatorDeallocate(allocator, tmpPath);
                 return NULL;
             }
 
-            EFAUTOREL EFStringRef cwd = EFStringCreateWithCString(allocatorRef, tmpPath, kEFStringEncodingUTF8);
-            EFAllocatorDeallocate(allocatorRef, tmpPath);
+            EFAUTOREL EFStringRef cwd = EFStringCreateWithCString(allocator, tmpPath, kEFStringEncodingUTF8);
+            EFAllocatorDeallocate(allocator, tmpPath);
             if(cwd == NULL)
             {
                 return NULL;
             }
 
-            EFAUTOREL EFMutableArrayRef pathComponents = EFArrayCreateMutable(allocatorRef, kEFArrayCallbacksObjectCallbacks, 0);
+            EFAUTOREL EFMutableArrayRef pathComponents = EFArrayCreateMutable(allocator, kEFArrayCallbacksObjectCallbacks, 0);
             EFAUTOREL EFArrayRef pathComponentsCwdBase = EFStringComponentsSplitBySeparator(cwd, EFSTR("/"));
             EFAUTOREL EFArrayRef pathComponentsEnd = EFStringComponentsSplitBySeparator(pathString, EFSTR("/"));
             if(pathComponents == NULL || pathComponentsCwdBase == NULL || pathComponentsEnd == NULL ||
@@ -143,11 +143,11 @@ EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef,
             }
 
             url->pathComponents = EFAUTOTRANSFER(pathComponents);
-            return (EFURLRef)EFAUTOTRANSFER(url);
+            return EFAUTOTRANSFER(url);
         }
         else
         {
-            EFStringRef newStringRef = EFStringCreateWithCString(allocatorRef, tmpPath, kEFStringEncodingUTF8);
+            EFStringRef newStringRef = EFStringCreateWithCString(allocator, tmpPath, kEFStringEncodingUTF8);
             if(newStringRef != NULL)
             {
                 EFReleaseTry(pathString);
@@ -160,7 +160,7 @@ six_feet_under:
     if(EFStringEqual(pathString, EFSTR("/")))
     {
         url->pathComponents = EFArrayCreate(kEFAllocatorDefault, kEFArrayCallbacksObjectCallbacks, NULL, 0);
-        return (EFURLRef)EFAUTOTRANSFER(url);
+        return EFAUTOTRANSFER(url);
     }
 
     url->pathComponents = EFStringComponentsSplitBySeparator(pathString, EFSTR("/"));
@@ -169,26 +169,25 @@ six_feet_under:
         return NULL;
     }
 
-    return (EFURLRef)EFAUTOTRANSFER(url);
+    return EFAUTOTRANSFER(url);
 }
 
-EFURLRef EFURLCreateByAppendingPathComponent(EFAllocatorRef allocatorRef,
-                                             EFURLRef urlRef,
+EFURLRef EFURLCreateByAppendingPathComponent(EFAllocatorRef allocator,
+                                             EFURLRef url,
                                              EFStringRef pathComponent)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL || pathComponent == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL EFMutableArrayRef mutablePathComponents = EFArrayCreateMutableCopy(allocatorRef, url->pathComponents);
+    EFAUTOREL EFMutableArrayRef mutablePathComponents = EFArrayCreateMutableCopy(allocator, url->pathComponents);
     if(!EFArrayAppendValue(mutablePathComponents, pathComponent))
     {
         return NULL;
     }
 
-    EFAUTOREL __EFURL newUrl = (__EFURL)EFObjectCreate(allocatorRef, EFURLGetTypeID(), (EFIndex)sizeof(struct __EFURL));
+    EFAUTOREL EFURLRef newUrl = (EFURLRef)EFObjectCreate(allocator, EFURLGetTypeID(), (EFIndex)sizeof(struct __EFURL));
     if(newUrl == NULL)
     {
         return NULL;
@@ -197,26 +196,25 @@ EFURLRef EFURLCreateByAppendingPathComponent(EFAllocatorRef allocatorRef,
     newUrl->type = url->type;
     newUrl->pathComponents = EFAUTOTRANSFER(mutablePathComponents);
 
-    return (EFURLRef)EFAUTOTRANSFER(newUrl);
+    return EFAUTOTRANSFER(newUrl);
 }
 
-EFURLRef EFURLCreateByDeletingLastPathComponent(EFAllocatorRef allocatorRef,
-                                                EFURLRef urlRef)
+EFURLRef EFURLCreateByDeletingLastPathComponent(EFAllocatorRef allocator,
+                                                EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL EFMutableArrayRef mutablePathComponents = EFArrayCreateMutableCopy(allocatorRef, url->pathComponents);
+    EFAUTOREL EFMutableArrayRef mutablePathComponents = EFArrayCreateMutableCopy(allocator, url->pathComponents);
     if(mutablePathComponents == NULL)
     {
         return NULL;
     }
     EFArrayRemoveValueAtIndex(mutablePathComponents, EFArrayGetCount(mutablePathComponents) - 1);
 
-    EFAUTOREL __EFURL newUrl = (__EFURL)EFObjectCreate(allocatorRef, EFURLGetTypeID(), (EFIndex)sizeof(struct __EFURL));
+    EFAUTOREL EFURLRef newUrl = (EFURLRef)EFObjectCreate(allocator, EFURLGetTypeID(), (EFIndex)sizeof(struct __EFURL));
     if(newUrl == NULL)
     {
         return NULL;
@@ -225,20 +223,19 @@ EFURLRef EFURLCreateByDeletingLastPathComponent(EFAllocatorRef allocatorRef,
     newUrl->type = url->type;
     newUrl->pathComponents = EFAUTOTRANSFER(mutablePathComponents);
 
-    return (EFURLRef)EFAUTOTRANSFER(newUrl);
+    return EFAUTOTRANSFER(newUrl);
 }
 
-EFURLRef EFURLCreateByReplacingLastPathComponent(EFAllocatorRef allocatorRef,
-                                                 EFURLRef urlRef,
+EFURLRef EFURLCreateByReplacingLastPathComponent(EFAllocatorRef allocator,
+                                                 EFURLRef url,
                                                  EFStringRef pathComponent)
 {
-    EFAUTOREL EFURLRef secondURL = EFURLCreateByDeletingLastPathComponent(allocatorRef, urlRef);
-    return EFURLCreateByAppendingPathComponent(allocatorRef, secondURL, pathComponent);
+    EFAUTOREL EFURLRef secondURL = EFURLCreateByDeletingLastPathComponent(allocator, url);
+    return EFURLCreateByAppendingPathComponent(allocator, secondURL, pathComponent);
 }
 
-EFURLType EFURLGetType(EFURLRef urlRef)
+EFURLType EFURLGetType(EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return kEFURLTypePOSIX;
@@ -246,9 +243,8 @@ EFURLType EFURLGetType(EFURLRef urlRef)
     return url->type;
 }
 
-EFArrayRef EFURLGetPathComponents(EFURLRef urlRef)
+EFArrayRef EFURLGetPathComponents(EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return NULL;
@@ -256,10 +252,9 @@ EFArrayRef EFURLGetPathComponents(EFURLRef urlRef)
     return url->pathComponents;
 }
 
-EFStringRef EFURLCopyPath(EFAllocatorRef allocatorRef,
-                          EFURLRef urlRef)
+EFStringRef EFURLCopyPath(EFAllocatorRef allocator,
+                          EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return NULL;
@@ -280,7 +275,7 @@ EFStringRef EFURLCopyPath(EFAllocatorRef allocatorRef,
             break;
     }
 
-    EFAUTOREL EFMutableStringRef mutableString = EFStringCreateMutableCopy(allocatorRef, prefix);
+    EFAUTOREL EFMutableStringRef mutableString = EFStringCreateMutableCopy(allocator, prefix);
 
     EFIndex pathComponentCount = EFArrayGetCount(url->pathComponents);
     for(EFIndex index = 0; index < pathComponentCount; index++)
@@ -299,16 +294,15 @@ EFStringRef EFURLCopyPath(EFAllocatorRef allocatorRef,
     return EFAUTOTRANSFER(mutableString);
 }
 
-EFStringRef EFURLCopyPathWithoutPrefix(EFAllocatorRef allocatorRef,
-                                       EFURLRef urlRef)
+EFStringRef EFURLCopyPathWithoutPrefix(EFAllocatorRef allocator,
+                                       EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL EFMutableStringRef mutableString = EFStringCreateMutableCopy(allocatorRef, EFSTR(""));
+    EFAUTOREL EFMutableStringRef mutableString = EFStringCreateMutableCopy(allocator, EFSTR(""));
 
     EFIndex pathComponentCount = EFArrayGetCount(url->pathComponents);
     for(EFIndex index = 0; index < pathComponentCount; index++)
@@ -327,16 +321,15 @@ EFStringRef EFURLCopyPathWithoutPrefix(EFAllocatorRef allocatorRef,
     return EFAUTOTRANSFER(mutableString);
 }
 
-EFStringRef EFURLCopyPathWithoutHostname(EFAllocatorRef allocatorRef,
-                                         EFURLRef urlRef)
+EFStringRef EFURLCopyPathWithoutHostname(EFAllocatorRef allocator,
+                                         EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return NULL;
     }
 
-    EFAUTOREL EFMutableStringRef mutableString = EFStringCreateMutableCopy(allocatorRef, EFSTR(""));
+    EFAUTOREL EFMutableStringRef mutableString = EFStringCreateMutableCopy(allocator, EFSTR(""));
 
     EFIndex pathComponentCount = EFArrayGetCount(url->pathComponents);
     for(EFIndex index = 1; index < pathComponentCount; index++)
@@ -355,9 +348,8 @@ EFStringRef EFURLCopyPathWithoutHostname(EFAllocatorRef allocatorRef,
     return EFAUTOTRANSFER(mutableString);
 }
 
-EFStringRef EFURLGetPath(EFURLRef urlRef)
+EFStringRef EFURLGetPath(EFURLRef url)
 {
-    __EFURL url = (__EFURL)urlRef;
     if(url == NULL)
     {
         return NULL;
@@ -366,7 +358,7 @@ EFStringRef EFURLGetPath(EFURLRef urlRef)
     if(url->pathString == NULL)
     {
 EFSUPPRESS_DEPRECATED_START
-        url->pathString = EFURLCopyPath(EFGetAllocator(urlRef), urlRef);
+        url->pathString = EFURLCopyPath(EFGetAllocator(url), url);
 EFSUPPRESS_DEPRECATED_END
     }
 
@@ -374,22 +366,22 @@ EFSUPPRESS_DEPRECATED_END
 }
 
 /* compatibility layer */
-EFURLRef EFURLCreateURLByAppendingPathComponent(EFAllocatorRef allocatorRef,
-                                                EFURLRef urlRef,
+EFURLRef EFURLCreateURLByAppendingPathComponent(EFAllocatorRef allocator,
+                                                EFURLRef url,
                                                 EFStringRef pathComponent)
 {
-    return EFURLCreateByAppendingPathComponent(allocatorRef, urlRef, pathComponent);
+    return EFURLCreateByAppendingPathComponent(allocator, url, pathComponent);
 }
 
-EFURLRef EFURLCreateURLByDeletingLastPathComponent(EFAllocatorRef allocatorRef,
-                                                   EFURLRef urlRef)
+EFURLRef EFURLCreateURLByDeletingLastPathComponent(EFAllocatorRef allocator,
+                                                   EFURLRef url)
 {
-    return EFURLCreateByDeletingLastPathComponent(allocatorRef, urlRef);
+    return EFURLCreateByDeletingLastPathComponent(allocator, url);
 }
 
-EFURLRef EFURLCreateURLByReplacingLastPathComponent(EFAllocatorRef allocatorRef,
-                                                    EFURLRef urlRef,
+EFURLRef EFURLCreateURLByReplacingLastPathComponent(EFAllocatorRef allocator,
+                                                    EFURLRef url,
                                                     EFStringRef pathComponent)
 {
-    return EFURLCreateByReplacingLastPathComponent(allocatorRef, urlRef, pathComponent);
+    return EFURLCreateByReplacingLastPathComponent(allocator, url, pathComponent);
 }

@@ -48,11 +48,11 @@ typedef struct {
 
 EF_EXTERN EFTypeID EFUUIDGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreate(EFAllocatorRef allocatorRef);
-EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocatorRef, UInt8 byte0, UInt8 byte1, UInt8 byte2, UInt8 byte3, UInt8 byte4, UInt8 byte5, UInt8 byte6, UInt8 byte7, UInt8 byte8, UInt8 byte9, UInt8 byte10, UInt8 byte11, UInt8 byte12, UInt8 byte13, UInt8 byte14, UInt8 byte15);
-EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreateWithUUIDBytes(EFAllocatorRef allocatorRef, EFUUIDBytes uuidBytes);
+EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreate(EFAllocatorRef allocator);
+EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreateWithBytes(EFAllocatorRef allocator, UInt8 byte0, UInt8 byte1, UInt8 byte2, UInt8 byte3, UInt8 byte4, UInt8 byte5, UInt8 byte6, UInt8 byte7, UInt8 byte8, UInt8 byte9, UInt8 byte10, UInt8 byte11, UInt8 byte12, UInt8 byte13, UInt8 byte14, UInt8 byte15);
+EF_EXTERN EF_RETURNS_RETAINED EFUUIDRef EFUUIDCreateWithUUIDBytes(EFAllocatorRef allocator, EFUUIDBytes uuidBytes);
 
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFUUIDCreateString(EFAllocatorRef allocatorRef, EFUUIDRef uuidRef);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFUUIDCreateString(EFAllocatorRef allocator, EFUUIDRef uuidRef);
 EF_EXTERN EFUUIDBytes EFUUIDGetBytes(EFUUIDRef uuidRef);
 
 #endif /* EFUUID_H */

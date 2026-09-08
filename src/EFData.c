@@ -84,7 +84,7 @@ static inline EFDataRef __EFDataCreate(EFAllocatorRef allocator,
         return NULL;
     }
 
-    EFAUTOREL __EFData data = (__EFData)EFObjectCreate(allocator, EFDataGetTypeID(), (EFIndex)(sizeof(struct __EFData) + (isInlined ? length : 0)));
+    EFAUTOREL EFDataRef data = (EFDataRef)EFObjectCreate(allocator, EFDataGetTypeID(), (EFIndex)(sizeof(struct __EFData) + (isInlined ? length : 0)));
     if(data == NULL)
     {
         return NULL;
@@ -120,7 +120,7 @@ needs_copy:
     data->isInlined = !isMutable && isInlined;  /* isInlined is only possible when isMutable is not enabled */
     data->isMutable = isMutable;
 
-    return (EFDataRef)EFAUTOTRANSFER(data);
+    return EFAUTOTRANSFER(data);
 }
 
 static inline EFDataRef __EFDataCreateCopy(EFAllocatorRef allocator,
@@ -149,7 +149,7 @@ EFDataRef EFDataCreateWithBuffer(EFAllocatorRef allocator,
         return NULL;
     }
 
-    return (EFDataRef)__EFDataCreate(allocator, buffer, length, true, false);
+    return __EFDataCreate(allocator, buffer, length, true, false);
 }
 
 EFDataRef EFDataCreateWithBufferNoCopy(EFAllocatorRef allocator,
@@ -161,7 +161,7 @@ EFDataRef EFDataCreateWithBufferNoCopy(EFAllocatorRef allocator,
         return NULL;
     }
 
-    return (EFDataRef)__EFDataCreate(allocator, buffer, length, false, false);
+    return __EFDataCreate(allocator, buffer, length, false, false);
 }
 
 EFMutableDataRef EFDataCreateMutable(EFAllocatorRef allocator,

@@ -75,7 +75,7 @@ EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocator,
 {
     assert(size > sizeof(struct __EFMallocBlock));
 
-    __EFMallocBlock block = (__EFMallocBlock)EFObjectCreate(allocator, EFMallocBlockGetTypeID(), size);
+    EFMallocBlockRef block = (EFMallocBlockRef)EFObjectCreate(allocator, EFMallocBlockGetTypeID(), size);
     if(block == NULL)
     {
         return NULL;
@@ -84,7 +84,7 @@ EFMallocBlockRef EFMallocBlockCreateWithDeinitHandler(EFAllocatorRef allocator,
     block->size = size;
     block->deinitCallback = deinitCallback;
 
-    return (EFMallocBlockRef)block;
+    return block;
 }
 
 EFSize EFMallocBlockGetSize(EFMallocBlockRef block)

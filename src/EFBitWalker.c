@@ -63,7 +63,7 @@ EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocator,
                                            EFFileHandleRef fileHandle,
                                            EFEndian endian)
 {
-    EFAUTOREL __EFBitWalker walker = (__EFBitWalker)EFObjectCreate(allocator, EFBitWalkerGetTypeID(), (EFIndex)sizeof(struct __EFBitWalker));
+    EFAUTOREL EFBitWalkerRef walker = (EFBitWalkerRef)EFObjectCreate(allocator, EFBitWalkerGetTypeID(), (EFIndex)sizeof(struct __EFBitWalker));
     if(walker == NULL)
     {
         return NULL;
@@ -78,7 +78,7 @@ EFBitWalkerRef EFBitWalkerCreateWithHandle(EFAllocatorRef allocator,
     walker->bitIndex = 0;
     walker->endian = endian;
 
-    return (EFBitWalkerRef)EFAUTOTRANSFER(walker);
+    return EFAUTOTRANSFER(walker);
 }
 
 void EFBitWalkerReset(EFBitWalkerRef walker)

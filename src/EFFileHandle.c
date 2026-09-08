@@ -81,7 +81,7 @@ EFTypeID EFFileHandleGetTypeID(void)
 
 EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocator)
 {
-    EFAUTOREL __EFFileHandle fileHandle = (__EFFileHandle)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
+    EFAUTOREL EFFileHandleRef fileHandle = (EFFileHandleRef)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
     if(fileHandle == NULL)
     {
         return NULL;
@@ -97,7 +97,7 @@ EFFileHandleRef EFFileHandleCreate(EFAllocatorRef allocator)
     fileHandle->readable = true;
     fileHandle->writable = true;
 
-    return (EFFileHandleRef)EFAUTOTRANSFER(fileHandle);
+    return EFAUTOTRANSFER(fileHandle);
 }
 
 EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocator,
@@ -109,7 +109,7 @@ EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocator,
         return NULL;
     }
 
-    EFAUTOREL __EFFileHandle fileHandle = (__EFFileHandle)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
+    EFAUTOREL EFFileHandleRef fileHandle = (EFFileHandleRef)EFObjectCreate(allocator, EFFileHandleGetTypeID(), (EFIndex)sizeof(struct __EFFileHandle));
     if(fileHandle == NULL)
     {
         return NULL;
@@ -127,7 +127,7 @@ EFFileHandleRef EFFileHandleCreateWithFileDescriptor(EFAllocatorRef allocator,
     fileHandle->readable = access_mode == O_RDONLY || access_mode == O_RDWR;
     fileHandle->writable = access_mode == O_WRONLY || access_mode == O_RDWR;
 
-    return (EFFileHandleRef)EFAUTOTRANSFER(fileHandle);
+    return EFAUTOTRANSFER(fileHandle);
 }
 
 EFFileHandleRef EFFileHandleCreateWithPathAndOptions(EFAllocatorRef allocator,

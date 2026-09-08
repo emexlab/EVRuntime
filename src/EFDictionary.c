@@ -85,7 +85,7 @@ static EFMutableDictionaryRef __EFDictionaryCreate(EFAllocatorRef allocatorRef,
         bucketsIndex++;
     }
 
-    __EFDictionary dictionary = (__EFDictionary)EFObjectCreate(allocatorRef, EFDictionaryGetTypeID(), (EFIndex)sizeof(struct __EFDictionary));
+    EFMutableDictionaryRef dictionary = (EFMutableDictionaryRef)EFObjectCreate(allocatorRef, EFDictionaryGetTypeID(), (EFIndex)sizeof(struct __EFDictionary));
     if(dictionary == NULL)
     {
         return NULL;
@@ -97,7 +97,7 @@ static EFMutableDictionaryRef __EFDictionaryCreate(EFAllocatorRef allocatorRef,
     dictionary->metadata = EFAllocatorAllocate(allocatorRef, buckets, 0);
     if(dictionary->keys == NULL || dictionary->values == NULL || dictionary->metadata == NULL)
     {
-        EFRelease((EFDictionaryRef)dictionary);
+        EFRelease(dictionary);
         return NULL;
     }
 
@@ -111,7 +111,7 @@ static EFMutableDictionaryRef __EFDictionaryCreate(EFAllocatorRef allocatorRef,
     dictionary->keyCallbacks = keyCallbacks   ? *keyCallbacks   : (EFDictionaryKeyCallbacks){0};
     dictionary->valueCallbacks = valueCallbacks ? *valueCallbacks : (EFDictionaryValueCallbacks){0};
 
-    return (EFMutableDictionaryRef)dictionary;
+    return dictionary;
 }
 
 

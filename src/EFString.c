@@ -246,7 +246,7 @@ EFTypeID EFStringGetTypeID(void)
     return kEFTypeIDString;
 }
 
-static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
+static inline EFStringRef __EFStringCreate(EFAllocatorRef allocator,
                                            const UInt8 *buffer,
                                            EFIndex length,
                                            EFStringEncoding encoding,
@@ -264,7 +264,7 @@ static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
         return NULL;
     }
 
-    __EFString string = (__EFString)EFObjectCreate(allocatorRef, EFStringGetTypeID(), (EFIndex)(sizeof(struct __EFString) + (isInlined ? (length + 1) : 0)));
+    EFStringRef string = (EFStringRef)EFObjectCreate(allocator, EFStringGetTypeID(), (EFIndex)(sizeof(struct __EFString) + (isInlined ? (length + 1) : 0)));
     if(string == NULL)
     {
         return NULL;
@@ -272,10 +272,10 @@ static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
 
     if(isMutable)
     {
-        string->buffer = EFAllocatorAllocate(allocatorRef, (EFIndex)(length + 1), 0);
+        string->buffer = EFAllocatorAllocate(allocator, (EFIndex)(length + 1), 0);
         if(string->buffer == NULL)
         {
-            EFRelease((EFStringRef)string);
+            EFRelease(string);
             return NULL;
         }
         goto needs_copy;    /* skips past the string->buffer pointer assignment of a inlined string */
@@ -298,29 +298,28 @@ static inline EFStringRef __EFStringCreate(EFAllocatorRef allocatorRef,
     string->isInlined = !isMutable && isInlined;    /* isInlined is only possible when isMutable is not enabled */
     string->isMutable = isMutable;
 
-    return (EFStringRef)string;
+    return string;
 }
 
-static inline EFStringRef __EFStringCreateCopy(EFAllocatorRef allocatorRef,
-                                               EFStringRef stringRef,
+static inline EFStringRef __EFStringCreateCopy(EFAllocatorRef allocator,
+                                               EFStringRef string,
                                                Boolean isMutable)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL)
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
         /* falling back to the same allocator used to allocate the source x3 */
-        allocatorRef = EFGetAllocator(stringRef);
+        allocator = EFGetAllocator(string);
     }
 
-    return __EFStringCreate(allocatorRef, (const UInt8*)string->buffer, string->length, string->encoding, true, isMutable);
+    return __EFStringCreate(allocator, (const UInt8*)string->buffer, string->length, string->encoding, true, isMutable);
 }
 
-static inline EFStringRef __EFStringCreateWithCString(EFAllocatorRef allocatorRef,
+static inline EFStringRef __EFStringCreateWithCString(EFAllocatorRef allocator,
                                                       const char *str,
                                                       EFStringEncoding encoding,
                                                       Boolean isInlined)
@@ -331,37 +330,37 @@ static inline EFStringRef __EFStringCreateWithCString(EFAllocatorRef allocatorRe
     }
 
     EFSize length = strlen(str);
-    return __EFStringCreate(allocatorRef, (const UInt8*)str, length, encoding, isInlined, false);
+    return __EFStringCreate(allocator, (const UInt8*)str, length, encoding, isInlined, false);
 }
 
-EFStringRef EFStringCreateWithBuffer(EFAllocatorRef allocatorRef,
+EFStringRef EFStringCreateWithBuffer(EFAllocatorRef allocator,
                                      const UInt8 *buffer,
                                      EFIndex length,
                                      EFStringEncoding encoding)
 {
-    return __EFStringCreate(allocatorRef, buffer, length, encoding, true, false);
+    return __EFStringCreate(allocator, buffer, length, encoding, true, false);
 }
 
-EFStringRef EFStringCreateWithBufferNoCopy(EFAllocatorRef allocatorRef,
+EFStringRef EFStringCreateWithBufferNoCopy(EFAllocatorRef allocator,
                                            const UInt8 *buffer,
                                            EFIndex length,
                                            EFStringEncoding encoding)
 {
-    return __EFStringCreate(allocatorRef, buffer, length, encoding, false, false);
+    return __EFStringCreate(allocator, buffer, length, encoding, false, false);
 }
 
-EFStringRef EFStringCreateWithCString(EFAllocatorRef allocatorRef,
+EFStringRef EFStringCreateWithCString(EFAllocatorRef allocator,
                                       const char *str,
                                       EFStringEncoding encoding)
 {
-    return __EFStringCreateWithCString(allocatorRef, str, encoding, true);
+    return __EFStringCreateWithCString(allocator, str, encoding, true);
 }
 
-EFStringRef EFStringCreateWithCStringNoCopy(EFAllocatorRef allocatorRef,
+EFStringRef EFStringCreateWithCStringNoCopy(EFAllocatorRef allocator,
                                             const char *str,
                                             EFStringEncoding encoding)
 {
-    return __EFStringCreateWithCString(allocatorRef, str, encoding, false);
+    return __EFStringCreateWithCString(allocator, str, encoding, false);
 }
 
 typedef struct {
@@ -679,87 +678,84 @@ EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef,
     return resultRef;
 }
 
-EFStringRef EFStringCreateWithFormat(EFAllocatorRef allocatorRef,
-                                     EFStringRef formatStringRef,
+EFStringRef EFStringCreateWithFormat(EFAllocatorRef allocator,
+                                     EFStringRef formatString,
                                      ...)
 {
     va_list arguments;
-    va_start(arguments, formatStringRef);
-    EFStringRef resultRef = EFStringCreateWithFormatAndArguments(allocatorRef, formatStringRef, arguments);
+    va_start(arguments, formatString);
+    EFStringRef resultRef = EFStringCreateWithFormatAndArguments(allocator, formatString, arguments);
     va_end(arguments);
     return resultRef;
 }
 
-EFStringRef EFStringCreateCopy(EFAllocatorRef allocatorRef,
-                               EFStringRef stringRef)
+EFStringRef EFStringCreateCopy(EFAllocatorRef allocator,
+                               EFStringRef string)
 {
-    return __EFStringCreateCopy(allocatorRef, stringRef, false);
+    return __EFStringCreateCopy(allocator, string, false);
 }
 
-EFStringRef EFStringCreateCopyWithRange(EFAllocatorRef allocatorRef,
-                                        EFStringRef stringRef,
+EFStringRef EFStringCreateCopyWithRange(EFAllocatorRef allocator,
+                                        EFStringRef string,
                                         EFRange range)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL || range.location > string->length || (range.location + range.length) > string->length)
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
         /* falling back to the same allocator used to allocate the source x3 */
-        allocatorRef = EFGetAllocator(stringRef);
+        allocator = EFGetAllocator(string);
     }
 
-    return __EFStringCreate(allocatorRef, (const UInt8*)(string->buffer + range.location), range.length, string->encoding, true, false);
+    return __EFStringCreate(allocator, (const UInt8*)(string->buffer + range.location), range.length, string->encoding, true, false);
 }
 
-EFMutableStringRef EFStringCreateMutableCopy(EFAllocatorRef allocatorRef,
-                                             EFStringRef stringRef)
+EFMutableStringRef EFStringCreateMutableCopy(EFAllocatorRef allocator,
+                                             EFStringRef string)
 {
-    return __EFStringCreateCopy(allocatorRef, stringRef, true);
+    return __EFStringCreateCopy(allocator, string, true);
 }
 
-EFMutableStringRef EFStringCreateMutableCopyWithRange(EFAllocatorRef allocatorRef,
-                                                      EFStringRef stringRef,
+EFMutableStringRef EFStringCreateMutableCopyWithRange(EFAllocatorRef allocator,
+                                                      EFStringRef string,
                                                       EFRange range)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL || range.location > string->length || (range.location + range.length) > string->length)
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
         /* falling back to the same allocator used to allocate the source x3 */
-        allocatorRef = EFGetAllocator(stringRef);
+        allocator = EFGetAllocator(string);
     }
 
-    return __EFStringCreate(allocatorRef, (const UInt8*)(string->buffer + range.location), range.length, string->encoding, true, true);
+    return __EFStringCreate(allocator, (const UInt8*)(string->buffer + range.location), range.length, string->encoding, true, true);
 }
 
-EFStringRef EFStringCreateWithContentsOfURL(EFAllocatorRef allocatorRef,
-                                            EFURLRef urlRef,
+EFStringRef EFStringCreateWithContentsOfURL(EFAllocatorRef allocator,
+                                            EFURLRef url,
                                             EFStringEncoding encoding)
 {
-    EFAUTOREL EFFileHandleRef fileHandleRef = EFFileHandleCreateWithURLAndOptions(allocatorRef, urlRef, O_RDONLY);
+    EFAUTOREL EFFileHandleRef fileHandleRef = EFFileHandleCreateWithURLAndOptions(allocator, url, O_RDONLY);
     EFAUTOREL EFDataRef dataRef = EFFileHandleReadData(fileHandleRef, EFFileHandleGetLength(fileHandleRef));
-    return EFStringCreateFromExternalRepresentation(allocatorRef, dataRef, encoding);
+    return EFStringCreateFromExternalRepresentation(allocator, dataRef, encoding);
 }
 
-Boolean EFStringSaveTofURL(EFStringRef stringRef,
-                           EFURLRef urlRef)
+Boolean EFStringSaveTofURL(EFStringRef string,
+                           EFURLRef url)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL)
     {
         return false;
     }
 
-    EFAllocatorRef allocatorRef = EFGetAllocator(stringRef);
-    EFAUTOREL EFFileHandleRef fileHandleRef = EFFileHandleCreateWithURLAndOptions(allocatorRef, urlRef, O_CREAT | O_TRUNC | O_WRONLY, 0644);
+    EFAllocatorRef allocatorRef = EFGetAllocator(string);
+    EFAUTOREL EFFileHandleRef fileHandleRef = EFFileHandleCreateWithURLAndOptions(allocatorRef, url, O_CREAT | O_TRUNC | O_WRONLY, 0644);
     if(EFFileHandleWrite(fileHandleRef, (const UInt8*)string->buffer, string->length) < string->length)
     {
         return false;
@@ -767,15 +763,14 @@ Boolean EFStringSaveTofURL(EFStringRef stringRef,
     return true;
 }
 
-const char *EFStringGetCStringPtr(EFStringRef stringRef,
+const char *EFStringGetCStringPtr(EFStringRef string,
                                   EFStringEncoding encoding)
 {
-    if(stringRef == NULL)
+    if(string == NULL)
     {
         return NULL;
     }
 
-    __EFString string = (__EFString)stringRef;
     if(!__EFStringValidateEncoding(encoding, string->buffer, string->length))
     {
         return NULL;
@@ -784,51 +779,49 @@ const char *EFStringGetCStringPtr(EFStringRef stringRef,
     return string->buffer;
 }
 
-EFDataRef EFStringCreateExternalRepresentation(EFAllocatorRef allocatorRef,
-                                               EFStringRef stringRef,
+EFDataRef EFStringCreateExternalRepresentation(EFAllocatorRef allocator,
+                                               EFStringRef string,
                                                EFStringEncoding encoding)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL || !__EFStringValidateEncoding(encoding, string->buffer, string->length))
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
-        allocatorRef = EFGetAllocator(stringRef);
+        allocator = EFGetAllocator(string);
     }
 
-    return EFDataCreateWithBuffer(allocatorRef, (const UInt8*)string->buffer, string->length);
+    return EFDataCreateWithBuffer(allocator, (const UInt8*)string->buffer, string->length);
 }
 
-EFStringRef EFStringCreateFromExternalRepresentation(EFAllocatorRef allocatorRef,
-                                                     EFDataRef dataRef,
+EFStringRef EFStringCreateFromExternalRepresentation(EFAllocatorRef allocator,
+                                                     EFDataRef data,
                                                      EFStringEncoding encoding)
 {
-    if(dataRef == NULL)
+    if(data == NULL)
     {
         return NULL;
     }
 
-    if(allocatorRef == NULL)
+    if(allocator == NULL)
     {
-        allocatorRef = EFGetAllocator(dataRef);
+        allocator = EFGetAllocator(data);
     }
 
-    EFIndex dataLength = EFDataGetLength(dataRef);
-    const UInt8 *dataBuffer = EFDataGetPtr(dataRef);
+    EFIndex dataLength = EFDataGetLength(data);
+    const UInt8 *dataBuffer = EFDataGetPtr(data);
     if(dataBuffer == NULL)
     {
         return NULL;
     }
 
-    return __EFStringCreate(allocatorRef, dataBuffer, dataLength, encoding, true, false);
+    return __EFStringCreate(allocator, dataBuffer, dataLength, encoding, true, false);
 }
 
-EFIndex EFStringGetLength(EFStringRef stringRef)
+EFIndex EFStringGetLength(EFStringRef string)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL)
     {
         return 0;
@@ -837,18 +830,18 @@ EFIndex EFStringGetLength(EFStringRef stringRef)
     return string->length;
 }
 
-Boolean EFStringGetCString(EFStringRef stringRef,
+Boolean EFStringGetCString(EFStringRef string,
                            char *str,
                            EFIndex length,
                            EFStringEncoding encoding)
 {
-    const char *str_ptr = EFStringGetCStringPtr(stringRef, encoding);
+    const char *str_ptr = EFStringGetCStringPtr(string, encoding);
     if(str_ptr == NULL || length < 0)
     {
         return false;
     }
 
-    EFIndex stringLength = EFStringGetLength(stringRef);
+    EFIndex stringLength = EFStringGetLength(string);
     if((stringLength + 1) > length)
     {
         /* buffer is too small */
@@ -860,11 +853,9 @@ Boolean EFStringGetCString(EFStringRef stringRef,
     return true;
 }
 
-Boolean EFStringHasPrefix(EFStringRef stringRef,
-                          EFStringRef prefixRef)
+Boolean EFStringHasPrefix(EFStringRef string,
+                          EFStringRef prefix)
 {
-    __EFString string = (__EFString)stringRef;
-    __EFString prefix = (__EFString)prefixRef;
     if(string == NULL || prefix == NULL)
     {
         return false;
@@ -896,11 +887,9 @@ Boolean EFStringHasPrefix(EFStringRef stringRef,
     return strncmp(prefix->buffer, string->buffer, (EFSize)prefix->length) == 0;
 }
 
-Boolean EFStringHasSuffix(EFStringRef stringRef,
-                          EFStringRef suffixRef)
+Boolean EFStringHasSuffix(EFStringRef string,
+                          EFStringRef suffix)
 {
-    __EFString string = (__EFString)stringRef;
-    __EFString suffix = (__EFString)suffixRef;
     if(string == NULL || suffix == NULL)
     {
         return false;
@@ -932,11 +921,9 @@ Boolean EFStringHasSuffix(EFStringRef stringRef,
     return strncmp(suffix->buffer, (string->buffer + string->length) - suffix->length, (EFSize)suffix->length) == 0;
 }
 
-Boolean EFStringEqual(EFStringRef stringRef1,
-                      EFStringRef stringRef2)
+Boolean EFStringEqual(EFStringRef string1,
+                      EFStringRef string2)
 {
-    __EFString string1 = (__EFString)stringRef1;
-    __EFString string2 = (__EFString)stringRef2;
     if(string1 == NULL || string2 == NULL)
     {
         return false;
@@ -965,12 +952,10 @@ Boolean EFStringEqual(EFStringRef stringRef1,
     return (memcmp(string1->buffer, string2->buffer, length) == 0);
 }
 
-Boolean EFStringEqualRange(EFStringRef stringRef1,
-                           EFStringRef stringRef2,
+Boolean EFStringEqualRange(EFStringRef string,
+                           EFStringRef rangeString,
                            EFRange range)
 {
-    __EFString string = (__EFString)stringRef1;
-    __EFString rangeString = (__EFString)stringRef2;
     if(string == NULL || rangeString == NULL)
     {
         return false;
@@ -1002,11 +987,9 @@ Boolean EFStringEqualRange(EFStringRef stringRef1,
     return (memcmp(string->buffer + range.location, rangeString->buffer, range.length) == 0);
 }
 
-EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef stringRef,
-                                              EFStringRef separatorStringRef)
+EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef string,
+                                              EFStringRef separatorString)
 {
-    __EFString string = (__EFString)stringRef;
-    __EFString separatorString = (__EFString)separatorStringRef;
     if(string == NULL || separatorString == NULL)
     {
         return NULL;
@@ -1035,7 +1018,7 @@ EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef stringRef,
     }
 
     /* gotta need a array */
-    EFAllocatorRef allocatorRef = EFGetAllocator(stringRef);
+    EFAllocatorRef allocatorRef = EFGetAllocator(string);
     EFMutableArrayRef componentsArrayRef = EFArrayCreateMutable(allocatorRef, kEFArrayCallbacksObjectCallbacks, componentCount);
     if(componentsArrayRef == NULL)
     {
@@ -1100,9 +1083,8 @@ static Boolean __EFIsWhitespace(char c)
     return c == ' '  || c == '\t' || c == '\n' || c == '\r' || c == '\v' || c == '\f';
 }
 
-Boolean EFStringTrimWhitespace(EFMutableStringRef mutableStringRef)
+Boolean EFStringTrimWhitespace(EFMutableStringRef mutableString)
 {
-    __EFString mutableString = (__EFString)mutableStringRef;
     if(mutableString == NULL || !mutableString->isMutable)
     {
         return false;
@@ -1139,11 +1121,9 @@ Boolean EFStringTrimWhitespace(EFMutableStringRef mutableStringRef)
     return true;
 }
 
-Boolean EFStringAppendString(EFMutableStringRef mutableStringRef,
-                             EFStringRef stringRef)
+Boolean EFStringAppendString(EFMutableStringRef mutableString,
+                             EFStringRef appendString)
 {
-    __EFString mutableString = (__EFString)mutableStringRef;
-    __EFString appendString = (__EFString)stringRef;
     if(mutableString == NULL || !mutableString->isMutable || appendString == NULL) /* string must be mutable to be compatible with operations like appending */
     {
         return false;
@@ -1156,7 +1136,7 @@ Boolean EFStringAppendString(EFMutableStringRef mutableStringRef,
     }
 
     EFIndex totalNewLength = mutableString->length + appendString->length + 1;
-    char *newp = EFAllocatorReallocate(EFGetAllocator(mutableStringRef), mutableString->buffer, totalNewLength, 0);
+    char *newp = EFAllocatorReallocate(EFGetAllocator(mutableString), mutableString->buffer, totalNewLength, 0);
     if(newp == NULL)
     {
         return false;
@@ -1170,21 +1150,21 @@ Boolean EFStringAppendString(EFMutableStringRef mutableStringRef,
     return true;
 }
 
-Boolean EFStringAppendFormat(EFMutableStringRef mutableStringRef,
-                             EFStringRef formatStringRef,
+Boolean EFStringAppendFormat(EFMutableStringRef mutableString,
+                             EFStringRef formatString,
                              ...)
 {
-    __EFString mutableString = (__EFString)mutableStringRef;
     if(mutableString == NULL || !mutableString->isMutable)
     {
         return false;
     }
-    EFAllocatorRef allocatorRef = EFGetAllocator(mutableStringRef);
+    
+    EFAllocatorRef allocatorRef = EFGetAllocator(mutableString);
 
     /* creating the formatted string to append */
     va_list arguments;
-    va_start(arguments, formatStringRef);
-    EFStringRef resultRef = EFStringCreateWithFormatAndArguments(allocatorRef, formatStringRef, arguments);
+    va_start(arguments, formatString);
+    EFStringRef resultRef = EFStringCreateWithFormatAndArguments(allocatorRef, formatString, arguments);
     va_end(arguments);
 
     if(resultRef == NULL)
@@ -1193,15 +1173,14 @@ Boolean EFStringAppendFormat(EFMutableStringRef mutableStringRef,
         return false;
     }
 
-    Boolean success = EFStringAppendString(mutableStringRef, resultRef);
+    Boolean success = EFStringAppendString(mutableString, resultRef);
     EFRelease(resultRef);   /* release regardless of succession */
     return success;
 }
 
-Boolean EFStringDelete(EFMutableStringRef mutableStringRef,
+Boolean EFStringDelete(EFMutableStringRef mutableString,
                        EFRange range)
 {
-    __EFString mutableString = (__EFString)mutableStringRef;
     if(mutableString == NULL || range.location < 0 || range.length < 0)
     {
         return false;
@@ -1371,15 +1350,14 @@ static Boolean __EFStringExtractNumberCharacter(const char *line,
     return true;
 }
 
-Boolean EFStringIsNumber(EFStringRef stringRef)
+Boolean EFStringIsNumber(EFStringRef string)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL)
     {
         return false;
     }
 
-    const char *ptr = EFStringGetCStringPtr(stringRef, kEFStringEncodingASCII);
+    const char *ptr = EFStringGetCStringPtr(string, kEFStringEncodingASCII);
     if(ptr == NULL)
     {
         return false;
@@ -1403,15 +1381,14 @@ Boolean EFStringIsNumber(EFStringRef stringRef)
 }
 
 EFNumberRef EFStringCopyNumber(EFAllocatorRef allocator,
-                               EFStringRef stringRef)
+                               EFStringRef string)
 {
-    __EFString string = (__EFString)stringRef;
     if(string == NULL || string->length <= 0)
     {
         return NULL;
     }
 
-    const char *ptr = EFStringGetCStringPtr(stringRef, kEFStringEncodingASCII);
+    const char *ptr = EFStringGetCStringPtr(string, kEFStringEncodingASCII);
     if(ptr == NULL || setjmp(OverflowJmpBuf) != 0)
     {
         return EFNumberCreate(allocator, kEFNumberTypeOverflow, NULL);
@@ -1437,12 +1414,10 @@ EFNumberRef EFStringCopyNumber(EFAllocatorRef allocator,
     return NULL;
 }
 
-EFRange EFStringFind(EFStringRef stringRef,
-                     EFStringRef findStringRef,
+EFRange EFStringFind(EFStringRef string,
+                     EFStringRef findString,
                      EFStringCompareFlags compareOptions)
 {
-    __EFString string = (__EFString)stringRef;
-    __EFString findString = (__EFString)findStringRef;
     if(string == NULL || findString == NULL)
     {
         return EFRangeZero;

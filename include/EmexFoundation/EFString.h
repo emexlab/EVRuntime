@@ -93,43 +93,43 @@ typedef struct __EFString {
 
 EF_EXTERN EFTypeID EFStringGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithBuffer(EFAllocatorRef allocatorRef, const UInt8 *buffer, EFIndex length, EFStringEncoding encoding);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithBufferNoCopy(EFAllocatorRef allocatorRef, const UInt8 *buffer, EFIndex length, EFStringEncoding encoding);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithCString(EFAllocatorRef allocatorRef, const char *str, EFStringEncoding encoding);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithCStringNoCopy(EFAllocatorRef allocatorRef, const char *str, EFStringEncoding encoding);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocatorRef, EFStringRef format, va_list arguments);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithFormat(EFAllocatorRef allocatorRef, EFStringRef format, ...);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateCopy(EFAllocatorRef allocatorRef, EFStringRef stringRef);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateCopyWithRange(EFAllocatorRef allocatorRef, EFStringRef stringRef, EFRange range);
-EF_EXTERN EF_RETURNS_RETAINED EFMutableStringRef EFStringCreateMutableCopy(EFAllocatorRef allocatorRef, EFStringRef stringRef);
-EF_EXTERN EF_RETURNS_RETAINED EFMutableStringRef EFStringCreateMutableCopyWithRange(EFAllocatorRef allocatorRef, EFStringRef stringRef, EFRange range);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithBuffer(EFAllocatorRef allocator, const UInt8 *buffer, EFIndex length, EFStringEncoding encoding);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithBufferNoCopy(EFAllocatorRef allocator, const UInt8 *buffer, EFIndex length, EFStringEncoding encoding);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithCString(EFAllocatorRef allocator, const char *str, EFStringEncoding encoding);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithCStringNoCopy(EFAllocatorRef allocator, const char *str, EFStringEncoding encoding);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithFormatAndArguments(EFAllocatorRef allocator, EFStringRef format, va_list arguments);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithFormat(EFAllocatorRef allocator, EFStringRef format, ...);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateCopy(EFAllocatorRef allocator, EFStringRef string);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateCopyWithRange(EFAllocatorRef allocator, EFStringRef string, EFRange range);
+EF_EXTERN EF_RETURNS_RETAINED EFMutableStringRef EFStringCreateMutableCopy(EFAllocatorRef allocator, EFStringRef string);
+EF_EXTERN EF_RETURNS_RETAINED EFMutableStringRef EFStringCreateMutableCopyWithRange(EFAllocatorRef allocator, EFStringRef string, EFRange range);
 
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithContentsOfURL(EFAllocatorRef allocatorRef, EFURLRef urlRef, EFStringEncoding encoding);
-EF_EXTERN Boolean EFStringSaveTofURL(EFStringRef stringRef, EFURLRef urlRef);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateWithContentsOfURL(EFAllocatorRef allocator, EFURLRef url, EFStringEncoding encoding);
+EF_EXTERN Boolean EFStringSaveTofURL(EFStringRef string, EFURLRef url);
 
-EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFStringCreateExternalRepresentation(EFAllocatorRef allocatorRef, EFStringRef stringRef, EFStringEncoding encoding);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateFromExternalRepresentation(EFAllocatorRef allocatorRef, EFDataRef dataRef, EFStringEncoding encoding);
+EF_EXTERN EF_RETURNS_RETAINED EFDataRef EFStringCreateExternalRepresentation(EFAllocatorRef allocator, EFStringRef string, EFStringEncoding encoding);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFStringCreateFromExternalRepresentation(EFAllocatorRef allocator, EFDataRef data, EFStringEncoding encoding);
 
-EF_EXTERN const char *EFStringGetCStringPtr(EFStringRef stringRef, EFStringEncoding encoding);
-EF_EXTERN EFIndex EFStringGetLength(EFStringRef stringRef);
-EF_EXTERN Boolean EFStringGetCString(EFStringRef stringRef, char *str, EFIndex length, EFStringEncoding encoding);
+EF_EXTERN const char *EFStringGetCStringPtr(EFStringRef string, EFStringEncoding encoding);
+EF_EXTERN EFIndex EFStringGetLength(EFStringRef string);
+EF_EXTERN Boolean EFStringGetCString(EFStringRef string, char *str, EFIndex length, EFStringEncoding encoding);
 
-EF_EXTERN Boolean EFStringHasPrefix(EFStringRef stringRef, EFStringRef prefixRef);
-EF_EXTERN Boolean EFStringHasSuffix(EFStringRef stringRef, EFStringRef suffixRef);
+EF_EXTERN Boolean EFStringHasPrefix(EFStringRef string, EFStringRef prefixRef);
+EF_EXTERN Boolean EFStringHasSuffix(EFStringRef string, EFStringRef suffixRef);
 
-EF_EXTERN Boolean EFStringEqual(EFStringRef stringRef1, EFStringRef stringRef2);
-EF_EXTERN Boolean EFStringEqualRange(EFStringRef stringRef1, EFStringRef stringRef2, EFRange range);  /* range applies to the first string */
+EF_EXTERN Boolean EFStringEqual(EFStringRef string1, EFStringRef string2);
+EF_EXTERN Boolean EFStringEqualRange(EFStringRef string, EFStringRef rangeString, EFRange range);   /* range applies to the first string */
 
-EF_EXTERN EF_RETURNS_RETAINED EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef stringRef, EFStringRef separatorStringRef);
+EF_EXTERN EF_RETURNS_RETAINED EFArrayRef EFStringComponentsSplitBySeparator(EFStringRef string, EFStringRef separatorString);
 
-EF_EXTERN Boolean EFStringTrimWhitespace(EFMutableStringRef mutableStringRef);
-EF_EXTERN Boolean EFStringAppendString(EFMutableStringRef mutableStringRef, EFStringRef stringRef);
-EF_EXTERN Boolean EFStringAppendFormat(EFMutableStringRef mutableStringRef, EFStringRef format, ...);
-EF_EXTERN Boolean EFStringDelete(EFMutableStringRef mutableStringRef, EFRange range);
+EF_EXTERN Boolean EFStringTrimWhitespace(EFMutableStringRef mutableString);
+EF_EXTERN Boolean EFStringAppendString(EFMutableStringRef mutableString, EFStringRef appendString);
+EF_EXTERN Boolean EFStringAppendFormat(EFMutableStringRef mutableString, EFStringRef formatString, ...);
+EF_EXTERN Boolean EFStringDelete(EFMutableStringRef mutableString, EFRange range);
 
-EF_EXTERN Boolean EFStringIsNumber(EFStringRef stringRef);
-EF_EXTERN EF_RETURNS_RETAINED EFNumberRef EFStringCopyNumber(EFAllocatorRef allocator, EFStringRef stringRef);
+EF_EXTERN Boolean EFStringIsNumber(EFStringRef string);
+EF_EXTERN EF_RETURNS_RETAINED EFNumberRef EFStringCopyNumber(EFAllocatorRef allocator, EFStringRef string);
 
-EF_EXTERN EFRange EFStringFind(EFStringRef stringRef,  EFStringRef findStringRef,  EFStringCompareFlags compareOptions);  /* unimplemented (later for torvalds dick ass linux proc fs to find fields like UID/GID and so on) */
+EF_EXTERN EFRange EFStringFind(EFStringRef string,  EFStringRef findString,  EFStringCompareFlags compareOptions);  /* unimplemented (later for torvalds dick ass linux proc fs to find fields like UID/GID and so on) */
 
 #endif /* EFSTRING_H */

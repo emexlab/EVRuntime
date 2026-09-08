@@ -82,7 +82,7 @@ EFArrayCallbacks kEFArrayCallbacksObjectCallbacks = &(struct EFArrayCallbacks){
 
 static void __EFArrayClassDeinit(EFObjectRef arrayRef)
 {
-    __EFArray array = (__EFArray)arrayRef;
+    EFArrayRef array = (EFArrayRef)arrayRef;
     if(array->callbacks->release)
     {
         for(EFIndex index = 0; index < array->itemsCount; index++)
@@ -124,7 +124,7 @@ static Boolean __EFArrayClassEqual(EFObjectRef arrayRef1,
 
 static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
 {
-    __EFArray array = (__EFArray)arrayRef;
+    EFArrayRef array = (EFArrayRef)arrayRef;
     EFAllocatorRef allocatorRef = EFGetAllocator(arrayRef);
 
     EFAUTOREL EFStringRef baseStringRef = EFStringCreateWithFormat(allocatorRef, EFSTR("<%@ %p>{count = %ld, items = {"), array->isMutable ? EFSTR("EFMutableArray") : EFSTR("EFArray"), arrayRef, array->itemsCount);
@@ -240,7 +240,7 @@ EFMutableArrayRef EFArrayCreateMutable(EFAllocatorRef allocator,
         }
     }
 
-    __EFArray array = (__EFArray)EFObjectCreate(allocator, EFArrayGetTypeID(), (EFIndex)sizeof(struct __EFArray));
+    EFMutableArrayRef array = (EFMutableArrayRef)EFObjectCreate(allocator, EFArrayGetTypeID(), (EFIndex)sizeof(struct __EFArray));
     if(array == NULL)
     {
         EFAllocatorDeallocate(allocator, items);
@@ -253,7 +253,7 @@ EFMutableArrayRef EFArrayCreateMutable(EFAllocatorRef allocator,
     array->itemsCapacity = capacity;
     array->items = items;
 
-    return (EFMutableArrayRef)array;
+    return array;
 }
 
 static EFArrayRef __EFArrayCreateCopy(EFAllocatorRef allocator,
@@ -279,21 +279,21 @@ static EFArrayRef __EFArrayCreateCopy(EFAllocatorRef allocator,
         }
     }
 
-    ((__EFArray)newArray)->isMutable = isMutable;
+    newArray->isMutable = isMutable;
 
-    return (EFArrayRef)EFAUTOTRANSFER(newArray);
+    return EFAUTOTRANSFER(newArray);
 }
 
 EFMutableArrayRef EFArrayCreateMutableCopy(EFAllocatorRef allocator,
                                            EFArrayRef array)
 {
-    return (EFMutableArrayRef)__EFArrayCreateCopy(allocator, array, true);
+    return __EFArrayCreateCopy(allocator, array, true);
 }
 
 EFArrayRef EFArrayCreateCopy(EFAllocatorRef allocator,
                              EFArrayRef array)
 {
-    return (EFMutableArrayRef)__EFArrayCreateCopy(allocator, array, false);
+    return __EFArrayCreateCopy(allocator, array, false);
 }
 
 EFIndex EFArrayGetCount(EFArrayRef array)

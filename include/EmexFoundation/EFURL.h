@@ -35,23 +35,23 @@ typedef enum: UInt8 {
 
 EF_EXTERN EFTypeID EFURLGetTypeID(void);
 
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateWithString(EFAllocatorRef allocatorRef, EFStringRef string);
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByAppendingPathComponent(EFAllocatorRef allocatorRef, EFURLRef urlRef, EFStringRef pathComponent);
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByDeletingLastPathComponent(EFAllocatorRef allocatorRef, EFURLRef urlRef);
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByReplacingLastPathComponent(EFAllocatorRef allocatorRef, EFURLRef urlRef, EFStringRef pathComponent);
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateWithString(EFAllocatorRef allocator, EFStringRef string);
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByAppendingPathComponent(EFAllocatorRef allocator, EFURLRef url, EFStringRef pathComponent);
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByDeletingLastPathComponent(EFAllocatorRef allocator, EFURLRef url);
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateByReplacingLastPathComponent(EFAllocatorRef allocator, EFURLRef url, EFStringRef pathComponent);
 
-EF_EXTERN EFURLType EFURLGetType(EFURLRef urlRef);
-EF_EXTERN EF_RETURNS_NOT_RETAINED EFArrayRef EFURLGetPathComponents(EFURLRef urlRef);
+EF_EXTERN EFURLType EFURLGetType(EFURLRef url);
+EF_EXTERN EF_RETURNS_NOT_RETAINED EFArrayRef EFURLGetPathComponents(EFURLRef url);
 
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPath(EFAllocatorRef allocatorRef, EFURLRef urlRef) EFDEPRECATED("use EFURLGetPath() instead, which is better since a URL object can't mutate anyways, which is the realization I had.");
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPathWithoutPrefix(EFAllocatorRef allocatorRef, EFURLRef urlRef);
-EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPathWithoutHostname(EFAllocatorRef allocatorRef, EFURLRef urlRef);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPath(EFAllocatorRef allocator, EFURLRef url) EFDEPRECATED("use EFURLGetPath() instead, which is better since a URL object can't mutate anyways, which is the realization I had.");
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPathWithoutPrefix(EFAllocatorRef allocator, EFURLRef url);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFURLCopyPathWithoutHostname(EFAllocatorRef allocator, EFURLRef url);
 
-EF_EXTERN EF_RETURNS_NOT_RETAINED EFStringRef EFURLGetPath(EFURLRef urlRef);
+EF_EXTERN EF_RETURNS_NOT_RETAINED EFStringRef EFURLGetPath(EFURLRef url);
 
 /* compatibility layer */
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateURLByAppendingPathComponent(EFAllocatorRef allocatorRef, EFURLRef urlRef, EFStringRef pathComponent) EFDEPRECATED("use EFURLCreateByAppendingPathComponent() instead.");
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateURLByDeletingLastPathComponent(EFAllocatorRef allocatorRef, EFURLRef urlRef) EFDEPRECATED("use EFURLCreateByDeletingLastPathComponent() instead.");
-EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateURLByReplacingLastPathComponent(EFAllocatorRef allocatorRef, EFURLRef urlRef, EFStringRef pathComponent) EFDEPRECATED("use EFURLCreateByReplacingLastPathComponent() instead.");
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateURLByAppendingPathComponent(EFAllocatorRef allocator, EFURLRef url, EFStringRef pathComponent) EFDEPRECATED("use EFURLCreateByAppendingPathComponent() instead.");
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateURLByDeletingLastPathComponent(EFAllocatorRef allocator, EFURLRef url) EFDEPRECATED("use EFURLCreateByDeletingLastPathComponent() instead.");
+EF_EXTERN EF_RETURNS_RETAINED EFURLRef EFURLCreateURLByReplacingLastPathComponent(EFAllocatorRef allocator, EFURLRef url, EFStringRef pathComponent) EFDEPRECATED("use EFURLCreateByReplacingLastPathComponent() instead.");
 
 #endif /* EFURL_H */

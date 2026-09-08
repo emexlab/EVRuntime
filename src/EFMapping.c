@@ -78,7 +78,7 @@ EFMappingRef EFMappingCreate(EFAllocatorRef allocator,
                              SInt32 fd,
                              EFOffset offset)
 {
-    EFAUTOREL __EFMapping mapping = (__EFMapping)EFObjectCreate(allocator, EFMappingGetTypeID(), (EFIndex)sizeof(struct __EFMapping));
+    EFAUTOREL EFMappingRef mapping = (EFMappingRef)EFObjectCreate(allocator, EFMappingGetTypeID(), (EFIndex)sizeof(struct __EFMapping));
     if(mapping == NULL)
     {
         return NULL;
@@ -92,7 +92,7 @@ EFMappingRef EFMappingCreate(EFAllocatorRef allocator,
     mapping->size = size;
     mapping->unmap = true;
 
-    return (EFMappingRef)EFAUTOTRANSFER(mapping);
+    return EFAUTOTRANSFER(mapping);
 }
 
 void *EFMappingGetAddress(EFMappingRef mapping)
