@@ -136,21 +136,23 @@ typedef enum: UInt8 {
 } EFRootType;
 
 typedef enum: unsigned long {
-    kEFTypeIDNone =         0,
-    kEFTypeIDString =       1,
-    kEFTypeIDNumber =       2,
-    kEFTypeIDURL =          3,
-    kEFTypeIDUUID =         4,
-    kEFTypeIDData =         5,
-    kEFTypeIDFileHandle =   6,
-    kEFTypeIDFile =         7,
-    kEFTypeIDBitWalker =    8,
-    kEFTypeIDMapping =      9,
-    kEFTypeIDProcess =      10,
-    kEFTypeIDMallocBlock =  11,
-    kEFTypeIDArray =        12,
-    kEFTypeIDDictionary =   13, /* unimplemented */
-    kEFTypeIDFileManager =  14,
+    kEFTypeIDNone =                     0,
+    kEFTypeIDString =                   1,
+    kEFTypeIDNumber =                   2,
+    kEFTypeIDURL =                      3,
+    kEFTypeIDUUID =                     4,
+    kEFTypeIDData =                     5,
+    kEFTypeIDFileHandle =               6,
+    kEFTypeIDFile =                     7,
+    kEFTypeIDBitWalker =                8,
+    kEFTypeIDMapping =                  9,
+    kEFTypeIDProcess =                  10,
+    kEFTypeIDMallocBlock =              11,
+    kEFTypeIDArray =                    12,
+    kEFTypeIDDictionary =               13, /* unimplemented */
+    kEFTypeIDFileManager =              14,
+    kEFTypeIDStringCoordinateSpace =    15,
+    kEFTypeIDStringCoordinateString =   16,
 } EFTypeID;
 
 typedef void *EFObjectRef;      /* so the compiler shuts up */
@@ -174,6 +176,8 @@ typedef struct __EFURL *EFURLRef;
 typedef struct __EFUUID *EFUUIDRef;
 typedef struct __EFMallocBlock *EFMallocBlockRef;
 typedef struct __EFFileManager *EFFileManagerRef;
+typedef struct __EFStringCoordinateSpace *EFStringCoordinateSpaceRef;
+typedef struct __EFStringCoordinateString *EFStringCoordinateStringRef;
 
 typedef void (*EFObjectInitCallback)(EFObjectRef ref);
 typedef void (*EFObjectDeinitCallback)(EFObjectRef ref);
