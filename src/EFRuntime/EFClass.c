@@ -50,12 +50,10 @@ extern EFClassDefinitionNewest EFMallocBlockClass;
 extern EFClassDefinitionNewest EFArrayClass;
 extern EFClassDefinitionNewest EFDictionaryClass;
 extern EFClassDefinitionNewest EFFileManagerClass;
-extern EFClassDefinitionNewest EFStringCoordinateSpaceClass;
-extern EFClassDefinitionNewest EFStringCoordinateStringClass;
 
 static pthread_mutex_t efClassLock = PTHREAD_MUTEX_INITIALIZER;
 static EFClass *efClassTable = NULL;
-static EFTypeID efClassNext = kEFTypeIDStringCoordinateString;
+static EFTypeID efClassNext = kEFTypeIDFileManager;
 static EFSize efClassCapacity = 0;
 
 static Boolean __EFClassTableExtendIfNeeded(void)
@@ -89,8 +87,6 @@ static Boolean __EFClassTableExtendIfNeeded(void)
         efClassTable[kEFTypeIDArray]                    = &EFArrayClass;
         efClassTable[kEFTypeIDDictionary]               = &EFDictionaryClass;
         efClassTable[kEFTypeIDFileManager]              = &EFFileManagerClass;
-        efClassTable[kEFTypeIDStringCoordinateSpace]    = &EFStringCoordinateSpaceClass;
-        efClassTable[kEFTypeIDStringCoordinateString]   = &EFStringCoordinateStringClass;
         efClassCapacity = 1024;
     }
     else if(efClassCapacity < efClassNext)

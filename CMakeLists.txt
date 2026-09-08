@@ -37,8 +37,6 @@ add_library(EmexFoundation ${LIB_TYPE}
     src/EFMallocBlock.c
     src/EFFileManager.c
     src/EFDictionary.c
-    src/EFStringCoordinateSpace.c
-    src/EFStringCoordinateString.c
 )
 
 target_include_directories(EmexFoundation

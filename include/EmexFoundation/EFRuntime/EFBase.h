@@ -151,8 +151,6 @@ typedef enum: unsigned long {
     kEFTypeIDArray =                    12,
     kEFTypeIDDictionary =               13, /* unimplemented */
     kEFTypeIDFileManager =              14,
-    kEFTypeIDStringCoordinateSpace =    15,
-    kEFTypeIDStringCoordinateString =   16,
 } EFTypeID;
 
 typedef void *EFObjectRef;      /* so the compiler shuts up */
@@ -176,8 +174,6 @@ typedef struct __EFURL *EFURLRef;
 typedef struct __EFUUID *EFUUIDRef;
 typedef struct __EFMallocBlock *EFMallocBlockRef;
 typedef struct __EFFileManager *EFFileManagerRef;
-typedef struct __EFStringCoordinateSpace *EFStringCoordinateSpaceRef;
-typedef struct __EFStringCoordinateString *EFStringCoordinateStringRef;
 
 typedef void (*EFObjectInitCallback)(EFObjectRef ref);
 typedef void (*EFObjectDeinitCallback)(EFObjectRef ref);
