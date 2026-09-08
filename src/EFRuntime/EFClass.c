@@ -31,6 +31,7 @@
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
  * -------------------------------------------------------------------- */
+#include <EmexFoundation/EFRuntime/EFBase.h>
 #include <EmexFoundation/EFRuntime/EFClass.h>
 #include <EmexFoundation/EFRuntime/EFAllocator.h>
 #include <EmexFoundation/EFString.h>
@@ -47,10 +48,11 @@ extern EFClassDefinitionNewest EFMappingClass;
 extern EFClassDefinitionNewest EFProcessClass;
 extern EFClassDefinitionNewest EFMallocBlockClass;
 extern EFClassDefinitionNewest EFArrayClass;
+extern EFClassDefinitionNewest EFFileManagerClass;
 
 static pthread_mutex_t efClassLock = PTHREAD_MUTEX_INITIALIZER;
 static EFClass *efClassTable = NULL;
-static EFTypeID efClassNext = kEFTypeIDDictionary;
+static EFTypeID efClassNext = kEFTypeIDFileManager;
 static EFSize efClassCapacity = 0;
 
 static Boolean __EFClassTableExtendIfNeeded(void)
@@ -68,21 +70,22 @@ static Boolean __EFClassTableExtendIfNeeded(void)
         {
             return false;
         }
-
-        efClassTable[0] = NULL;
-        efClassTable[1] = &EFStringClass;
-        efClassTable[2] = &EFNumberClass;
-        efClassTable[3] = &EFURLClass;
-        efClassTable[4] = &EFUUIDClass;
-        efClassTable[5] = &EFDataClass;
-        efClassTable[6] = &EFFileHandleClass;
-        efClassTable[7] = &EFFileClass;
-        efClassTable[8] = &EFBitWalkerClass;
-        efClassTable[9] = &EFMappingClass;
-        efClassTable[10] = &EFProcessClass;
-        efClassTable[11] = &EFMallocBlockClass;
-        efClassTable[12] = &EFArrayClass;
-        efClassTable[13] = NULL;
+        
+        efClassTable[kEFTypeIDNone]         = NULL;
+        efClassTable[kEFTypeIDString]       = &EFStringClass;
+        efClassTable[kEFTypeIDNumber]       = &EFNumberClass;
+        efClassTable[kEFTypeIDURL]          = &EFURLClass;
+        efClassTable[kEFTypeIDUUID]         = &EFUUIDClass;
+        efClassTable[kEFTypeIDData]         = &EFDataClass;
+        efClassTable[kEFTypeIDFileHandle]   = &EFFileHandleClass;
+        efClassTable[kEFTypeIDFile]         = &EFFileClass;
+        efClassTable[kEFTypeIDBitWalker]    = &EFBitWalkerClass;
+        efClassTable[kEFTypeIDMapping]      = &EFMappingClass;
+        efClassTable[kEFTypeIDProcess]      = &EFProcessClass;
+        efClassTable[kEFTypeIDMallocBlock]  = &EFMallocBlockClass;
+        efClassTable[kEFTypeIDArray]        = &EFArrayClass;
+        efClassTable[kEFTypeIDDictionary]   = NULL;
+        efClassTable[kEFTypeIDFileManager]  = &EFFileManagerClass;
         efClassCapacity = 1024;
     }
     else if(efClassCapacity < efClassNext)

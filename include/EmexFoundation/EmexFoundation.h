@@ -39,5 +39,6 @@
 #include <EmexFoundation/EFUUID.h>
 #include <EmexFoundation/EFMapping.h>
 #include <EmexFoundation/EFMallocBlock.h>
+#include <EmexFoundation/EFFileManager.h>
 
 #endif /* EMEXFOUNDATION_H */
