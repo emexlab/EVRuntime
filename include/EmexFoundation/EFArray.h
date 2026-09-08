@@ -27,14 +27,14 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 
-typedef Boolean (*EFArrayAppendCallback)(void *ptr);
-typedef void (*EFArrayRemoveCallback)(void *ptr);
+typedef Boolean (*EFArrayRetainCallback)(void *ptr);
+typedef void (*EFArrayReleaseCallback)(void *ptr);
 typedef Boolean (*EFArrayEqualCallback)(void *ptr1, void *ptr2);
 typedef EFStringRef (*EFArrayCopyDescriptionCallback)(EFAllocatorRef allocator, void *ptr);
 
 typedef struct EFArrayCallbacks {
-    EFArrayAppendCallback append;
-    EFArrayRemoveCallback remove;
+    EFArrayRetainCallback retain;
+    EFArrayReleaseCallback release;
     EFArrayEqualCallback equal;
     EFArrayCopyDescriptionCallback copyDescription;
 } *EFArrayCallbacks;

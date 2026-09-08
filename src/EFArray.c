@@ -44,19 +44,19 @@ typedef struct __EFArray {
 } *__EFArray;
 
 EFArrayCallbacks kEFArrayCallbacksDefaultCallbacks = &(struct EFArrayCallbacks){
-    .append = NULL,
-    .remove = NULL,
+    .retain = NULL,
+    .release = NULL,
     .equal = NULL,
     .copyDescription = NULL,
 };
 
-static Boolean __EFArrayAppendObjectCallback(void *ptr)
+static Boolean __EFArrayRetainObjectCallback(void *ptr)
 {
     EFObjectRef ref = EFRetain((EFObjectRef)ptr);
     return (ref != NULL);
 }
 
-static void __EFArrayRemoveObjectCallback(void *ptr)
+static void __EFArrayReleaseObjectCallback(void *ptr)
 {
     EFRelease((EFObjectRef)ptr);
 }
@@ -74,8 +74,8 @@ static EFStringRef __EFArrayCopyDescriptionObjectCallback(EFAllocatorRef allocat
 }
 
 EFArrayCallbacks kEFArrayCallbacksObjectCallbacks = &(struct EFArrayCallbacks){
-    .append = __EFArrayAppendObjectCallback,
-    .remove = __EFArrayRemoveObjectCallback,
+    .retain = __EFArrayRetainObjectCallback,
+    .release = __EFArrayReleaseObjectCallback,
     .equal = __EFArrayEqualObjectCallback,
     .copyDescription = __EFArrayCopyDescriptionObjectCallback,
 };
@@ -83,11 +83,11 @@ EFArrayCallbacks kEFArrayCallbacksObjectCallbacks = &(struct EFArrayCallbacks){
 static void __EFArrayClassDeinit(EFObjectRef arrayRef)
 {
     __EFArray array = (__EFArray)arrayRef;
-    if(array->callbacks->remove)
+    if(array->callbacks->release)
     {
         for(EFIndex index = 0; index < array->itemsCount; index++)
         {
-            array->callbacks->remove(array->items[index]);
+            array->callbacks->release(array->items[index]);
         }
     }
     EFAllocatorDeallocate(EFGetAllocator(arrayRef), array->items);
@@ -353,7 +353,7 @@ Boolean EFArrayAppendValue(EFMutableArrayRef mutableArray,
         return false;
     }
 
-    if(mutableArray->callbacks->append != NULL && !mutableArray->callbacks->append(ptr))
+    if(mutableArray->callbacks->retain != NULL && !mutableArray->callbacks->retain(ptr))
     {
         return false;
     }
@@ -374,7 +374,7 @@ Boolean EFArrayInsertValueAtIndex(EFMutableArrayRef mutableArray,
         return false;
     }
 
-    if(mutableArray->callbacks->append != NULL && !mutableArray->callbacks->append(ptr))
+    if(mutableArray->callbacks->retain != NULL && !mutableArray->callbacks->retain(ptr))
     {
         return false;
     }
@@ -395,9 +395,9 @@ void EFArrayRemoveValueAtIndex(EFMutableArrayRef mutableArray,
         return;
     }
 
-    if(mutableArray->callbacks->remove != NULL)
+    if(mutableArray->callbacks->release != NULL)
     {
-        mutableArray->callbacks->remove(mutableArray->items[index]);
+        mutableArray->callbacks->release(mutableArray->items[index]);
     }
 
     memmove(&mutableArray->items[index], &mutableArray->items[index + 1], (EFSize)((mutableArray->itemsCount - index - 1) * sizeof(void*)));
@@ -427,7 +427,7 @@ Boolean EFArrayAppendValuesOfArray(EFMutableArrayRef mutableArray,
 
     for(EFIndex index = 0; index < otherArray->itemsCount; index++)
     {
-        if(mutableArray->callbacks->append != NULL && !mutableArray->callbacks->append(otherArray->items[index]))
+        if(mutableArray->callbacks->retain != NULL && !mutableArray->callbacks->retain(otherArray->items[index]))
         {
             /* TODO: have to revert back, but currently not implemented */
             return false;
