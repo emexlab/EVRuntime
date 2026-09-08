@@ -24,6 +24,22 @@
  * -------------------------------------------------------------------- */
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFStringCoordinateString.h>
+#include <EmexFoundation/EFStringCoordinateSpace.h>
+
+typedef struct __EFStringCoordinateString {
+    EFObject header;
+    
+    EFStringCoordinateSpaceRef coordinateSpace;
+    EFStringRef virtualString;
+    EFRange physicalRange;  /* range of source string */
+} *__EFStringCoordinateString;
+
+static void __EFStringCoordinateStringDeinit(EFObjectRef coordinateStringRef)
+{
+    EFStringCoordinateStringRef coordinateString = (EFStringCoordinateStringRef)coordinateStringRef;
+    EFRelease(coordinateString->coordinateSpace);
+    EFRelease(coordinateString->virtualString);
+}
 
 EF_HIDDEN EFClassDefinitionNewest EFStringCoordinateStringClass = {
     .header = {
@@ -41,4 +57,39 @@ EF_HIDDEN EFClassDefinitionNewest EFStringCoordinateStringClass = {
 EFTypeID EFStringCoordinateStringGetTypeID(void)
 {
     return kEFTypeIDStringCoordinateString;
+}
+
+EF_HIDDEN EF_RETURNS_RETAINED EFStringCoordinateStringRef EFStringCoordinateStringCreate(EFAllocatorRef allocator,
+                                                                                         EFStringCoordinateSpaceRef coordinateSpace,
+                                                                                         EFStringRef virtualString,
+                                                                                         EFRange physicalRange)
+{
+    if(coordinateSpace == NULL || virtualString == NULL)
+    {
+        return NULL;
+    }
+
+    EFStringCoordinateStringRef coordinateString = (EFStringCoordinateStringRef)EFObjectCreate(allocator, EFStringCoordinateStringGetTypeID(), (EFIndex)sizeof(struct __EFStringCoordinateString));
+    if(coordinateString == NULL)
+    {
+        return NULL;
+    }
+
+    coordinateString->coordinateSpace = EFRetain(coordinateSpace);
+    if(coordinateString->coordinateSpace == NULL)
+    {
+        EFRelease(coordinateString);
+        return NULL;
+    }
+
+    coordinateString->virtualString = EFRetain(virtualString);
+    if(coordinateString->virtualString == NULL)
+    {
+        EFRelease(coordinateString->coordinateSpace);
+        EFRelease(coordinateString);
+        return NULL;
+    }
+
+    coordinateString->physicalRange = physicalRange;
+    return coordinateString;
 }

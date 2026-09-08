@@ -33,6 +33,6 @@ EF_EXTERN EFTypeID EFStringCoordinateSpaceGetTypeID(void);
 
 EF_EXTERN EF_RETURNS_RETAINED EFStringCoordinateSpaceRef EFStringCoordinateSpaceCreateWithString(EFAllocatorRef allocator, EFStringRef string);
 
-EF_EXTERN EF_RETURNS_RETAINED EFStringCoordinateStringRef EFStringCoordinateSpaceCreateCoordinateString(EFAllocatorRef allocator, EFRange range);
+EF_EXTERN EF_RETURNS_RETAINED EFStringCoordinateStringRef EFStringCoordinateSpaceCreateCoordinateString(EFAllocatorRef allocator, EFStringCoordinateSpaceRef coordinateSpace, EFRange range);
 
 #endif /* EFSTRINGCOORDINATESPACE_H */

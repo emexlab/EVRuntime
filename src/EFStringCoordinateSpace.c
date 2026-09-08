@@ -25,6 +25,8 @@
 #include <EmexFoundation/EFRuntime/EFRuntime.h>
 #include <EmexFoundation/EFStringCoordinateSpace.h>
 
+EF_HIDDEN EF_RETURNS_RETAINED EFStringCoordinateStringRef EFStringCoordinateStringCreate(EFAllocatorRef allocator, EFStringCoordinateSpaceRef coordinateSpace, EFStringRef virtualString, EFRange physicalRange);
+
 typedef struct __EFStringCoordinateSpace {
     EFObject header;
 
@@ -80,7 +82,13 @@ EFStringCoordinateSpaceRef EFStringCoordinateSpaceCreateWithString(EFAllocatorRe
 }
 
 EFStringCoordinateStringRef EFStringCoordinateSpaceCreateCoordinateString(EFAllocatorRef allocator,
+                                                                          EFStringCoordinateSpaceRef coordinateSpace,
                                                                           EFRange range)
 {
+    if(coordinateSpace == NULL)
+    {
+        return NULL;
+    }
+    
     return NULL;
 }
