@@ -40,6 +40,9 @@
 #include <EmexFoundation/EFData.h>
 #include <EmexFoundation/EFArray.h>
 
+#define __EFStringHashEverythingLimit   96
+#define __EFStringHashSampleLength      32
+
 static Boolean __EFStringValidateEncoding(EFStringEncoding encoding,
                                           const char *buffer,
                                           EFSize length)
@@ -203,6 +206,28 @@ static EFStringRef __EFStringCopyDescription(EFObjectRef stringRef)
     return EFRetain(stringRef); /* just return our selves */
 }
 
+static EFHashCode __EFStringHash(EFObjectRef stringRef)
+{
+    __EFString string = (__EFString)stringRef;
+    if(string == NULL)
+    {
+        return 0;
+    }
+
+    const UInt8 *bytes = (const UInt8 *)string->buffer;
+    EFIndex length = string->length;
+
+    UInt64 hash = 0xcbf29ce484222325ULL;
+    for(EFIndex index = 0; index < length; index++)
+    {
+        hash ^= bytes[index];
+        hash *= 0x100000001b3ULL;
+    }
+    hash ^= (UInt64)length;
+
+    return (EFHashCode)hash;
+}
+
 EFClassDefinitionNewest EFStringClass = {
     .header = {
         .version = EFCLASS_NEWEST_VERSION,
@@ -213,7 +238,7 @@ EFClassDefinitionNewest EFStringClass = {
     .deinit = __EFStringDeinit,
     .equal = __EFStringEqual,
     .copyDescription = __EFStringCopyDescription,
-    .hash = NULL,
+    .hash = __EFStringHash,
 };
 
 EFTypeID EFStringGetTypeID(void)
