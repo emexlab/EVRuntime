@@ -37,7 +37,7 @@ typedef struct __EFMapping {
     EFSize size;
 } *__EFMapping;
 
-static EFStringRef __EFMappingCopyDescription(EFObjectRef objectRef)
+static EFStringRef __EFMappingCopyDebugDescription(EFObjectRef objectRef)
 {
     EFMappingRef mapping = (EFMappingRef)objectRef;
     return EFStringCreateWithFormat(EFGetAllocator(objectRef), EFSTR("<EFMapping %p>{addr = %p, length = %llu}"), objectRef, mapping->addr, mapping->size);
@@ -61,8 +61,9 @@ EF_HIDDEN EFClassDefinitionNewest EFMappingClass = {
     .init = NULL,
     .deinit = __EFMappingDeinit,
     .equal = NULL,
-    .copyDescription = __EFMappingCopyDescription,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFMappingCopyDebugDescription,
 };
 
 EFTypeID EFMappingGetTypeID(void)

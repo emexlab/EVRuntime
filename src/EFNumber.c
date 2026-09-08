@@ -56,7 +56,7 @@ static Boolean __EFNumberEqual(EFObjectRef ref1,
     return number1->s128 == number2->s128;
 }
 
-static EFStringRef __EFNumberCopyDescription(EFObjectRef numberRef)
+static EFStringRef __EFNumberCopyDebugDescription(EFObjectRef numberRef)
 {
     /* since it is not a string we need to still somehow display it lol */
     __EFNumber number = (__EFNumber)numberRef;
@@ -94,7 +94,9 @@ EF_HIDDEN EFClassDefinitionNewest EFNumberClass = {
     .init = NULL,
     .deinit = NULL,
     .equal = __EFNumberEqual,
-    .copyDescription = __EFNumberCopyDescription,
+    .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFNumberCopyDebugDescription,
 };
 
 EFTypeID EFNumberGetTypeID(void)

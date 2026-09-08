@@ -67,6 +67,7 @@ EF_EXTERN EFAllocatorRef EFGetAllocator(EFObjectRef ref);
 EF_EXTERN Boolean EFEqual(EFObjectRef ref1, EFObjectRef ref2);
 
 EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFCopyDescription(EFObjectRef ref);
+EF_EXTERN EF_RETURNS_RETAINED EFStringRef EFCopyDebugDescription(EFObjectRef ref);
 
 EF_EXTERN EF_RETURNS_RETAINED EFObjectRef EFRetain(EFObjectRef ref);
 EF_EXTERN void EFRelease(EF_CONSUMED EFObjectRef ref);

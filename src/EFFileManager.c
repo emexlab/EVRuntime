@@ -51,6 +51,7 @@ EF_HIDDEN EFClassDefinitionNewest EFFileManagerClass = {
     .equal = NULL,
     .hash = NULL,
     .copyDescription = NULL,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFFileManagerGetTypeID(void)

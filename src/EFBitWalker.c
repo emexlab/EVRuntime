@@ -52,6 +52,7 @@ EF_HIDDEN EFClassDefinitionNewest EFBitWalkerClass = {
     .equal = NULL,
     .hash = NULL,
     .copyDescription = NULL,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFBitWalkerGetTypeID(void)

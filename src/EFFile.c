@@ -100,6 +100,7 @@ EF_HIDDEN EFClassDefinitionNewest EFFileClass = {
     .equal = NULL,
     .hash = NULL,
     .copyDescription = NULL,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFFileGetTypeID(void)

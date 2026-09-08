@@ -49,7 +49,7 @@ static void __EFDataDeinit(EFObjectRef dataRef)
     }
 }
 
-static EFStringRef __EFDataCopyDescription(EFObjectRef dataRef)
+static EFStringRef __EFDataCopyDebugDescription(EFObjectRef dataRef)
 {
     __EFData data = (__EFData)dataRef;
     return EFStringCreateWithFormat(EFGetAllocator(dataRef), EFSTR("<%@ %p>{buffer = %p, length = %ld}"), data->isMutable ? EFSTR("EFMutableData") : EFSTR("EFData"), dataRef, data->buffer, data->length);
@@ -64,8 +64,9 @@ EF_HIDDEN EFClassDefinitionNewest EFDataClass = {
     .init = NULL,
     .deinit = __EFDataDeinit,
     .equal = NULL,
-    .copyDescription = __EFDataCopyDescription,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFDataCopyDebugDescription,
 };
 
 EFTypeID EFDataGetTypeID(void)

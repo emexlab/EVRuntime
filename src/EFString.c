@@ -237,8 +237,9 @@ EF_HIDDEN EFClassDefinitionNewest EFStringClass = {
     .init = NULL,
     .deinit = __EFStringDeinit,
     .equal = __EFStringEqual,
-    .copyDescription = __EFStringCopyDescription,
     .hash = __EFStringHash,
+    .copyDescription = __EFStringCopyDescription,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFStringGetTypeID(void)

@@ -214,6 +214,68 @@ EFStringRef EFCopyDescription(EFObjectRef ref)
                 return descriptionRef;
             }
         }
+        else if(class->copyDebugDescription)
+        {
+            EFStringRef descriptionRef = class->copyDebugDescription(ref);
+            if(descriptionRef != NULL)
+            {
+                return descriptionRef;
+            }
+        }
+
+        EFStringRef descriptionFallbackRef = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%@ %p>"), class->header.name, ref);
+        if(descriptionFallbackRef == NULL)
+        {
+            return EFSTR("<nil>");
+        }
+        return descriptionFallbackRef;
+    }
+
+    return EFSTR("<unknown>");
+}
+
+EFStringRef EFCopyDebugDescription(EFObjectRef ref)
+{
+    EFObject *object = (EFObject*)ref;
+    if(object == NULL)
+    {
+        return EFSTR("<nil>");
+    }
+
+    if(object->_rt == kEFRootTypeAllocator)
+    {
+        EFAllocator *allocator = (EFAllocator*)ref;
+        EFStringRef string = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%s %p>"), allocator->name, ref);
+        if(string == NULL)
+        {
+            return EFSTR("<unknown>");
+        }
+        return string;
+    }
+    else if(object->_rt == kEFRootTypeObject || object->_rt == kEFRootTypeStaticObject)
+    {
+        EFClass class = __EFClassGetByID(object->typeID);
+        if(class == NULL)
+        {
+            return EFSTR("<nil>");
+        }
+
+        if(class->copyDebugDescription)
+        {
+            EFStringRef descriptionRef = class->copyDebugDescription(ref);
+            if(descriptionRef != NULL)
+            {
+                return descriptionRef;
+            }
+        }
+        else if(class->copyDescription)
+        {
+            EFStringRef descriptionRef = class->copyDescription(ref);
+            if(descriptionRef != NULL)
+            {
+                return descriptionRef;
+            }
+        }
 
         EFStringRef descriptionFallbackRef = EFStringCreateWithFormat(object->allocatorRef, EFSTR("<%@ %p>"), class->header.name, ref);
         if(descriptionFallbackRef == NULL)

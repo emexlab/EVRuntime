@@ -54,8 +54,9 @@ EF_HIDDEN EFClassDefinitionNewest EFMallocBlockClass = {
     .init = NULL,
     .deinit = __EFMallocBlockDeinit,
     .equal = NULL,
-    .copyDescription = NULL,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFMallocBlockGetTypeID(void)

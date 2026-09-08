@@ -59,8 +59,9 @@ EF_HIDDEN EFClassDefinitionNewest EFDictionaryClass = {
     .init = NULL,
     .deinit = NULL,
     .equal = NULL,
-    .copyDescription = NULL,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFDictionaryGetTypeID(void)

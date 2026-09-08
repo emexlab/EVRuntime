@@ -59,7 +59,7 @@ typedef struct __EFUUID {
     EFUUIDBytes bytes;
 } *__EFUUID;
 
-static EFStringRef __EFStringCopyDescription(EFObjectRef objectRef)
+static EFStringRef __EFStringCopyDebugDescription(EFObjectRef objectRef)
 {
     return EFUUIDCreateString(EFGetAllocator(objectRef), (EFUUIDRef)objectRef);
 }
@@ -73,8 +73,9 @@ EF_HIDDEN EFClassDefinitionNewest EFUUIDClass = {
     .init = NULL,
     .deinit = NULL,
     .equal = NULL,
-    .copyDescription = __EFStringCopyDescription,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFStringCopyDebugDescription,
 };
 
 EFTypeID EFUUIDGetTypeID(void)

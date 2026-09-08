@@ -81,7 +81,7 @@ static void __EFProcessDeinit(EFObjectRef processRef)
     EFReleaseTry(process->arguments);
 }
 
-static EFStringRef __EFProcessCopyDescription(EFObjectRef processRef)
+static EFStringRef __EFProcessDebugCopyDescription(EFObjectRef processRef)
 {
     __EFProcess process = (__EFProcess)processRef;
     EFAllocatorRef allocator = EFGetAllocator(processRef);
@@ -97,8 +97,9 @@ EF_HIDDEN EFClassDefinitionNewest EFProcessClass = {
     .init = NULL,
     .deinit = __EFProcessDeinit,
     .equal = NULL,
-    .copyDescription = __EFProcessCopyDescription,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFProcessDebugCopyDescription,
 };
 
 EFTypeID EFProcessGetTypeID(void)

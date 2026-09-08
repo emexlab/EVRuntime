@@ -122,7 +122,7 @@ static Boolean __EFArrayClassEqual(EFObjectRef arrayRef1,
     return true;
 }
 
-static EFStringRef __EFArrayCopyDescription(EFObjectRef arrayRef)
+static EFStringRef __EFArrayDebugCopyDescription(EFObjectRef arrayRef)
 {
     EFArrayRef array = (EFArrayRef)arrayRef;
     EFAllocatorRef allocatorRef = EFGetAllocator(arrayRef);
@@ -176,8 +176,9 @@ EF_HIDDEN EFClassDefinitionNewest EFArrayClass = {
     .init = NULL,
     .deinit = __EFArrayClassDeinit,
     .equal = __EFArrayClassEqual,
-    .copyDescription = __EFArrayCopyDescription,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFArrayDebugCopyDescription,
 };
 
 EFTypeID EFArrayGetTypeID(void)

@@ -48,7 +48,7 @@ static void __EFURLDeinit(EFObjectRef urlRef)
     EFReleaseTry(url->pathString);
 }
 
-static EFStringRef __EFURLCopyDescription(EFObjectRef urlRef)
+static EFStringRef __EFURLCopyDebugDescription(EFObjectRef urlRef)
 {
     return EFRetainTry(EFURLGetPath(urlRef));
 }
@@ -62,8 +62,9 @@ EF_HIDDEN EFClassDefinitionNewest EFURLClass = {
     .init = NULL,
     .deinit = __EFURLDeinit,
     .equal = NULL,
-    .copyDescription = __EFURLCopyDescription,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = __EFURLCopyDebugDescription,
 };
 
 EFTypeID EFURLGetTypeID(void)

@@ -70,8 +70,9 @@ EF_HIDDEN EFClassDefinitionNewest EFFileHandleClass = {
     .init = NULL,
     .deinit = __EVFileHandleDeinit,
     .equal = NULL,
-    .copyDescription = NULL,
     .hash = NULL,
+    .copyDescription = NULL,
+    .copyDebugDescription = NULL,
 };
 
 EFTypeID EFFileHandleGetTypeID(void)

@@ -136,7 +136,8 @@ static EFClassDefinitionNewest *EFClassCopySafely(void *classDefinition)
             newestClassDefinition->deinit = classDefinitionV2->deinit;
             newestClassDefinition->equal = classDefinitionV2->equal;
             newestClassDefinition->hash = classDefinitionV2->hash;
-            newestClassDefinition->copyDescription = classDefinitionV2->copyDescription;
+            newestClassDefinition->copyDescription = NULL;
+            newestClassDefinition->copyDebugDescription = classDefinitionV2->copyDescription;
 
             return newestClassDefinition;
         }
@@ -155,7 +156,28 @@ static EFClassDefinitionNewest *EFClassCopySafely(void *classDefinition)
             newestClassDefinition->deinit = classDefinitionV3->deinit;
             newestClassDefinition->equal = classDefinitionV3->equal;
             newestClassDefinition->hash = classDefinitionV3->hash;
-            newestClassDefinition->copyDescription = classDefinitionV3->copyDescription;
+            newestClassDefinition->copyDescription = NULL;
+            newestClassDefinition->copyDebugDescription = classDefinitionV3->copyDescription;
+
+            return newestClassDefinition;
+        }
+        case 4:
+        {
+            EFClassDefinitionV4 *classDefinitionV4 = (EFClassDefinitionV4*)classDefinition;
+            EFClassDefinitionNewest *newestClassDefinition = EFAllocatorAllocate(kEFAllocatorDefault, (EFSize)sizeof(EFClassDefinitionNewest), 0);
+            if(newestClassDefinition == NULL)
+            {
+                return NULL;
+            }
+
+            newestClassDefinition->header.name = EFStringCreateCopy(kEFAllocatorDefault, classDefinitionV4->header.name);
+            newestClassDefinition->header.version = EFCLASS_NEWEST_VERSION;
+            newestClassDefinition->init = classDefinitionV4->init;
+            newestClassDefinition->deinit = classDefinitionV4->deinit;
+            newestClassDefinition->equal = classDefinitionV4->equal;
+            newestClassDefinition->hash = classDefinitionV4->hash;
+            newestClassDefinition->copyDescription = classDefinitionV4->copyDescription;
+            newestClassDefinition->copyDebugDescription = classDefinitionV4->copyDebugDescription;
 
             return newestClassDefinition;
         }
