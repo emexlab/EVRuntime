@@ -25,9 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#if defined(__APPLE__)
-#include <sys/random.h>
-#endif /* __APPLE__ */
 
 /* ----------------------------------------------------------------------
  *  EmexFoundation Headers
@@ -88,10 +85,13 @@ EFTypeID EFUUIDGetTypeID(void)
 EFUUIDRef EFUUIDCreate(EFAllocatorRef allocator)
 {
     EFAUTOREL EFUUIDRef uuid = (EFUUIDRef)EFObjectCreate(allocator, EFUUIDGetTypeID(), (EFIndex)sizeof(struct __EFUUID));
-    if(uuid == NULL || getentropy(&(uuid->bytes), sizeof(uuid->bytes)) != 0)
+    if(uuid == NULL)
     {
         return NULL;
     }
+
+    arc4random_buf(&(uuid->bytes), sizeof(uuid->bytes));
+
     return EFAUTOTRANSFER(uuid);
 }
 
